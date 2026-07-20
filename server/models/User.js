@@ -15,19 +15,22 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      includes:'@',
       trim: true,
     },
 
-    mobileNumber: {
+    phoneNumber: {
       type: String,
       default: "",
       unique: true,
       sparse: true,
+      minlength: 10,
     },
 
     password: {
       type: String,
       default: null,
+      minlength: 6,
     },
 
     avatar: {
@@ -73,9 +76,13 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    refreshToken: {
-      type: String,
-      default: "",
+    createdAt : {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt : {
+      type: Date,
+      default: Date.now,  
     },
 
     role: {
@@ -83,10 +90,13 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
   },
 );
-userSchema.index({ isOnline: 1 });
 export default mongoose.model('User', userSchema);

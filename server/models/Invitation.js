@@ -76,18 +76,6 @@ invitationSchema.index(
 );
 
 // Lookup invitation by token
-invitationSchema.index({
-  token: 1
-});
 
-// TTL index
-invitationSchema.index(
-  {
-    expiresAt: 1
-  },
-  {
-    expireAfterSeconds: 0
-  }
-);
 
 export default mongoose.model("Invitation", invitationSchema);
