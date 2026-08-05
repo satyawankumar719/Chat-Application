@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { randomUUID } from "crypto";
 import { ENV } from "../config/envConfig.js";
 
 
@@ -6,7 +7,10 @@ export const generateToken = (user) => {
     const payload = {
         name: user.name,
         email: user.email,
-        id: user._id,
+        id: user.id || user._id,
+        isVerified: user.isVerified ?? true,
+        jti: randomUUID(),
+        iat: Math.floor(Date.now() / 1000),
     }
 
     return jwt.sign(payload, ENV.JWT_SECRET, { expiresIn: ENV.JWT_EXPIRE });

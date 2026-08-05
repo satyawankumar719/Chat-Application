@@ -19,7 +19,10 @@ const notificationSchema = new mongoose.Schema({
             "message",
             "group",
             "call",
-            "friend_request"
+            "friend_request",
+            "invitation",
+            "invitation_accepted",
+            "invitation_rejected"
         ],
         required: true
     },
@@ -36,6 +39,10 @@ const notificationSchema = new mongoose.Schema({
         message: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Message"
+        },
+        invitation: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Invitation"
         }
     },
 
@@ -43,7 +50,6 @@ const notificationSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-     se
     readAt: Date
 
 }, {

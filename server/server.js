@@ -7,15 +7,19 @@ import { connectDB } from './config/dbConfig.js';
 import routes from './routes/index.routes.js';
 import cookieParser from 'cookie-parser';
 import { connectRedis } from './config/redis.js';
-
+import http from 'http';
+import { Server } from 'socket.io';
+import socketHandler from './socket/socketHandler.js';
 const app = express();
-
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: ["http://localhost:5173"]
-}))
+    origin: ["http://localhost:5173"],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cookieParser());
@@ -31,17 +35,39 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api', routes);
-    connectDB();
-    connectRedis();
-app.use((err, req, res, next) => {
-    return res.status(500).json({
+connectDB();
+connectRedis();
+
+app.use((req, res) => {
+    return res.status(404).json({
         success: false,
-        message: err.message
-    })
-})
+        message: 'Route not found'
+    });
+});
 
+app.use((err, req, res, next) => {
+    const statusCode = err.status || 500;
+    const message = err.message || 'Internal server error';
+    return res.status(statusCode).json({
+        success: false,
+        message,
+        errors: err.errors || null
+    });
+});
 
-app.listen(ENV.PORT, () => {
+const server = http.createServer(app);
 
-    console.log("Server is running");
-})
+const io = new Server(server, {
+    cors: {
+        origin: ["http://localhost:5173"],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+    }
+});
+
+socketHandler(io);
+
+server.listen(ENV.PORT, () => {
+    console.log('Server is running');
+});

@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
-      includes:'@',
       trim: true,
     },
 
@@ -76,27 +75,16 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    createdAt : {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt : {
-      type: Date,
-      default: Date.now,  
-    },
-
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true,
-  },
-);
+  }
+)
+userSchema.index({ name: 1, email: 1, phoneNumber: 1 });
+
 export default mongoose.model('User', userSchema);

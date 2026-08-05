@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Card,
   CardAction,
@@ -12,14 +12,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import { useAuthStore } from "@/store/authStore";
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
 
   const { login, loading } = useAuthStore();
 
@@ -32,31 +34,35 @@ export function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setFeedback({ type: "", message: "" });
 
     const result = await login(formData);
 
     if (result.success) {
-      console.log("Login Successful");
-    
+      setFeedback({ type: "success", message: "Login successful!" });
+      const to = location?.state?.from?.pathname || "/chats";
+      setTimeout(() => {
+        navigate(to, { replace: true });
+      }, 500);
     } else {
-      console.log(result.message);
-      
+      setFeedback({ type: "error", message: result.message || "Failed to log in. Please check your credentials." });
     }
   };
 
   return (
-    <div className="h-screen flex justify-center items-center">
-      <Card className="w-full max-w-sm">
+    <div className="h-screen flex justify-center items-center px-4 bg-background text-foreground">
+      <Card className="w-full max-w-sm border shadow-lg">
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle className="text-xl font-bold">Login to your account</CardTitle>
 
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
 
           <CardAction>
-            <Link to='/signup'>
-            <Button variant="link">Sign Up</Button></Link>
+            <Link to="/signup">
+              <Button variant="link" className="p-0">Sign Up</Button>
+            </Link>
           </CardAction>
         </CardHeader>
 
@@ -97,6 +103,12 @@ export function LoginPage() {
                 />
               </div>
             </div>
+
+            {feedback.message ? (
+              <div className={`mt-4 p-2 text-sm rounded border ${feedback.type === "error" ? "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300" : "bg-green-50 border-green-200 text-green-700 dark:bg-green-950 dark:border-green-800 dark:text-green-300"}`}>
+                {feedback.message}
+              </div>
+            ) : null}
 
             <Button
               type="submit"

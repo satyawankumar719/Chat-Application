@@ -8,17 +8,16 @@ const invitationSchema = new mongoose.Schema(
       required: true
     },
 
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      trim: true
+    receiver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
 
     type: {
       type: String,
       enum: ["direct", "group"],
-      required: true
+      default: "direct"
     },
 
     group: {
@@ -29,19 +28,8 @@ const invitationSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "pending",
-        "accepted",
-        "declined",
-        "expired"
-      ],
+      enum: ["pending", "accepted", "rejected", "expired"],
       default: "pending"
-    },
-
-    token: {
-      type: String,
-      required: true,
-      unique: true
     },
 
     message: {
@@ -50,9 +38,9 @@ const invitationSchema = new mongoose.Schema(
       default: ""
     },
 
-    expiresAt: {
+    rejectedAt: {
       type: Date,
-      required: true
+      default: null
     }
   },
   {
@@ -60,22 +48,7 @@ const invitationSchema = new mongoose.Schema(
   }
 );
 
-// Prevent duplicate pending invitations
-invitationSchema.index(
-  {
-    email: 1,
-    type: 1,
-    status: 1
-  },
-  {
-    unique: true,
-    partialFilterExpression: {
-      status: "pending"
-    }
-  }
-);
+invitationSchema.index({ invitedBy: 1, receiver: 1 });
+invitationSchema.index({ receiver: 1, status: 1 });
 
-// Lookup invitation by token
-
-
-export default mongoose.model("Invitation", invitationSchema);
+export default mongoose.model("Invitation", invitationSchema);
