@@ -1,99 +1,105 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+export const useSocketStore = create(function (set, get) {
+  return {
+    socket: null,    
+    connected: false, 
+    token: null,     
 
-export const useSocketStore = create((set, get) => ({
-  socket: null,
-  connected: false,
-  token: null,
-
-  connectSocket: (token) => {
-    const existingSocket = get().socket;
-
-    if (existingSocket?.connected && get().token === token) {
-      return existingSocket;
-    }
-
-    if (existingSocket) {
-      existingSocket.disconnect();
-    }
-
-    const socket = io(SOCKET_URL, {
-      withCredentials: true,
-      ...(token ? { auth: { token } } : {}),
-    });
-
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-      set({ connected: true, token });
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-      set({ connected: false });
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("Socket connection error:", err.message);
-    });
-
-    set({ socket, connected: false, token });
-    return socket;
-  },
-
-  disconnectSocket: () => {
-    const socket = get().socket;
-
-    if (socket) {
-      socket.disconnect();
-      set({
-        socket: null,
-        connected: false,
-        token: null,
+    connectSocket: function (userToken) {
+      const oldSocket = get().socket;
+      const oldToken = get().token;
+      if (oldSocket?.connected && oldToken === userToken) {
+        return oldSocket;
+      }
+      if (oldSocket) {
+        oldSocket.disconnect();
+      }
+      const newSocket = io(SOCKET_SERVER_URL, {
+        withCredentials: true,
+        ...(userToken ? { auth: { token: userToken } } : {}),
       });
-    }
-  },
+      newSocket.on("connect", function () {
+        console.log("Socket connected, ID =", newSocket.id);
+        set({ connected: true, token: userToken });
+      });
+      newSocket.on("disconnect", function () {
+        console.log("Socket disconnected");
+        set({ connected: false });
+      });
+      newSocket.on("connect_error", function (error) {
+        console.error("⚠️ Socket connection error:", error.message);
+      });
+      set({ socket: newSocket, connected: false, token: userToken });
 
-  joinChat: (chatId) => {
-    const socket = get().socket;
-    if (socket?.connected && chatId) {
-      socket.emit("join_chat", chatId);
-    }
-  },
+      return newSocket;
+    },
+    disconnectSocket: function () {
+      const activeSocket = get().socket;
 
-  leaveChat: (chatId) => {
-    const socket = get().socket;
-    if (socket?.connected && chatId) {
-      socket.emit("leave_chat", chatId);
-    }
-  },
+      if (activeSocket) {
+        activeSocket.disconnect();
 
- 
+        set({
+          socket: null,
+          connected: false,
+          token: null,
+        });
+      }
+    },
+    joinChat: function (chatId) {
+      const activeSocket = get().socket;
 
-  sendMessageSocket: (chatId, content, tempId, ackCallback) => {
-    const socket = get().socket;
-    if (socket?.connected) {
-      socket.emit("send_message", { chatId, content, tempId }, ackCallback);
-      return true;
-    }
-    return false;
-  },
+      if (activeSocket?.connected && chatId) {
+        activeSocket.emit("join_chat", chatId);
+      }
+    },
+    leaveChat: function (chatId) {
+      const activeSocket = get().socket;
 
-  inviteUser: (receiverId) => {
-    const socket = get().socket;
+      if (activeSocket?.connected && chatId) {
+        activeSocket.emit("leave_chat", chatId);
+      }
+    },
+    sendMessageSocket: function (chatId, content, tempId, ackCallback, attachment = null) {
+      const activeSocket = get().socket;
 
-    if (socket?.connected) {
-      socket.emit("inviteUser", { receiverId });
-    } else {
-      console.log("Socket is not connected");
-    }
-  },
+      if (activeSocket?.connected) {
+         activeSocket.emit(
+          "send_message",
+          {
+            chatId: chatId,
+            content: content,
+            tempId: tempId,
+            type: attachment?.type || "text",
+            fileUrl: attachment?.fileUrl || null,
+            fileName: attachment?.fileName || null,
+            fileSize: attachment?.fileSize || null,
+          },
+          ackCallback
+        );
+        return true;  
+      }
 
-  markMessagesRead: (chatId) => {
-    const socket = get().socket;
-    if (socket?.connected && chatId) {
-      socket.emit("mark_messages_read", { chatId });
-    }
-  },
-}));
+      return false; 
+    },
+    inviteUser: function (receiverId) {
+      const activeSocket = get().socket;
+
+      if (activeSocket?.connected) {
+        activeSocket.emit("inviteUser", { receiverId: receiverId });
+      } else {
+        console.log("Socket abhi connected nahi, invite nahi bhej sakte.");
+      }
+    },
+    markMessagesRead: function (chatId) {
+      const activeSocket = get().socket;
+
+      if (activeSocket?.connected && chatId) {
+        activeSocket.emit("mark_messages_read", { chatId: chatId });
+      }
+    },
+  };
+});

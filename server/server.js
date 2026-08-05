@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import { connectRedis } from './config/redis.js';
 import http from 'http';
 import { Server } from 'socket.io';
-import socketHandler from './socket/socketHandler.js';
+import {socketHandler} from './socket/socketHandler.js';
 const app = express();
 // middlewares
 app.use(express.json());
@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
 
 })
 
+app.use('/uploads', express.static('uploads'));
 app.use('/api', routes);
 connectDB();
 connectRedis();

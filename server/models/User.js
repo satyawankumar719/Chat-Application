@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { boolean } from "zod";
 
 const userSchema = new mongoose.Schema(
   {
@@ -25,7 +26,10 @@ const userSchema = new mongoose.Schema(
       sparse: true,
       minlength: 10,
     },
-
+    istyping :{
+      type:Boolean,
+      default:false
+    },
     password: {
       type: String,
       default: null,

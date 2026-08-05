@@ -3,6 +3,7 @@ import {
   getChatMessagesService,
   
 } from "../services/message.service.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 export const handleGetUserChats = async (req, res, next) => {
   try {
@@ -32,6 +33,32 @@ export const handleGetChatMessages = async (req, res, next) => {
       success: true,
       data: result.messages,
       hasMore: result.hasMore,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const handleUploadFile = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded.",
+      });
+    }
+
+    const fileType = req.file.mimetype.startsWith("image/") ? "image" : "file";
+    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        fileUrl,
+        fileName: req.file.originalname,
+        fileSize: req.file.size,
+        type: fileType,
+      },
     });
   } catch (error) {
     next(error);

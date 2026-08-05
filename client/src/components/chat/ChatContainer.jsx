@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Send, ArrowLeft, Check, CheckCheck } from "lucide-react";
+import { Send, ArrowLeft, Check, CheckCheck, Paperclip } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
 import { Button } from "@/components/ui/button";
+import { messageApi } from "@/api/messageApi";
 
 function ChatContainer({ chat, onBack }) {
   const [draft, setDraft] = useState("");
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const currentChatId = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -86,6 +89,34 @@ useEffect(() => {
 
     await sendMessage(chat._id, content);
     setDraft("");
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !chat?._id) return;
+
+    try {
+      setUploadingFile(true);
+      const response = await messageApi.uploadFile(file);
+      const uploadedFile = response.data?.data || response.data;
+
+      if (!uploadedFile?.fileUrl) {
+        throw new Error("File upload did not return a valid URL.");
+      }
+
+      await sendMessage(chat._id, uploadedFile.fileName || "Attachment", {
+        type: uploadedFile.type || "image",
+        fileUrl: uploadedFile.fileUrl,
+        fileName: uploadedFile.fileName,
+        fileSize: uploadedFile.fileSize,
+      });
+    } catch (error) {
+      console.error("File upload error:", error);
+      setDraft("Unable to upload file.");
+    } finally {
+      setUploadingFile(false);
+      event.target.value = "";
+    }
   };
 
   
@@ -171,9 +202,30 @@ useEffect(() => {
                         : "bg-muted"
                     }`}
                   >
-                    <p className="break-words text-sm">
-                      {message.content}
-                    </p>
+                    {message.type === "image" && message.fileUrl ? (
+                      <div className="mb-2 overflow-hidden rounded-xl">
+                        <img
+                          src={message.fileUrl}
+                          alt={message.fileName || "Shared image"}
+                          className="max-h-64 w-full object-cover"
+                        />
+                      </div>
+                    ) : message.type === "file" && message.fileUrl ? (
+                      <a
+                        href={message.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mb-2 block rounded-lg border border-white/20 bg-black/10 px-2 py-2 text-sm underline"
+                      >
+                        {message.fileName || "Download attachment"}
+                      </a>
+                    ) : null}
+
+                    {message.content && message.content !== "Attachment" ? (
+                      <p className="break-words text-sm">
+                        {message.content}
+                      </p>
+                    ) : null}
 
                     <div className="mt-1 flex justify-end gap-1 text-[11px] opacity-80">
                       <span>
@@ -204,6 +256,23 @@ useEffect(() => {
       <form onSubmit={handleSend} className="border-t p-4">
         <div className="flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-2">
           <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileUpload}
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingFile || sendingMessage}
+            className="rounded-full p-2 text-muted-foreground hover:bg-muted disabled:opacity-50"
+          >
+            <Paperclip className="h-4 w-4" />
+          </button>
+
+          <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Type a message"
@@ -212,7 +281,7 @@ useEffect(() => {
 
           <button
             type="submit"
-            disabled={sendingMessage}
+            disabled={sendingMessage || uploadingFile}
             className="rounded-full bg-primary p-2 text-primary-foreground disabled:opacity-50"
           >
             <Send className="h-4 w-4" />

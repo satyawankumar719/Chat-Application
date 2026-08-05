@@ -3,136 +3,150 @@ import { authApi } from "@/api/authApi";
 import { useChatStore } from "./chatStore";
 import { useSocketStore } from "./socketStore";
 
-const handleError = (err) => {
-  let message = err.response?.data?.message || err.message || "Something went wrong";
-  if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
-    const fieldErrs = err.response.data.errors.map((e) => e.message).join(", ");
-    if (fieldErrs) {
-      message = fieldErrs;
-    }
+function handleError(error) {
+
+  let message = "Something went wrong";
+  if (error.response?.data?.message) {
+    message = error.response.data.message;
+  } else if (error.message) {
+    message = error.message;
   }
-  return {
-    message,
-    errors: err.response?.data?.errors || null,
+
+  if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+    const fieldMessages = error.response.data.errors.map((e) => e.message);
+    const joined = fieldMessages.join(", ");
+    if (joined.length > 0) {
+      message = joined;
+    }
+  }return {
     success: false,
+    message: message,
+    errors: error.response?.data?.errors || null,
   };
-};
+}
 
-const resetClientSession = () => {
-  useChatStore.getState().reset();
-  useSocketStore.getState().disconnectSocket();
-};
+function clearEverythingOnClient() {
+ useChatStore.getState().reset();
+useSocketStore.getState().disconnectSocket();
+}
+export const useAuthStore = create(function (set) {
+  return {
+     user: null,            
+    loading: false,       
+    checkingAuth: true,  
 
-export const useAuthStore = create((set) => ({
-  user: null,
-  loading: false,
-  checkingAuth: true,
+    setUser: function (userObject) {
+      set({ user: userObject });
+    },
+    checkAuth: async function () {
+      try {
+        set({ checkingAuth: true });
 
-  setUser: (user) => set({ user }),
+        const response = await authApi.me();
+          const userData = response.data?.user || response.data?.data || null;
+           set({ user: userData, checkingAuth: false });
+        return { success: true, user: userData };
+      } catch (err) {
+        clearEverythingOnClient();
+        set({ user: null, checkingAuth: false });
+        return handleError(err);
+      }
+    },
+    login: async function (loginData) {
+      try {
+        set({ loading: true });
 
-  checkAuth: async () => {
-    try {
-      set({ checkingAuth: true });
-      const res = await authApi.me();
-      const user = res.data?.user || res.data?.data || null;
-      set({ user, checkingAuth: false });
-      return { success: true, user };
-    } catch (err) {
-      resetClientSession();
-      set({ user: null, checkingAuth: false });
-      return handleError(err);
-    }
-  },
+        const response = await authApi.login(loginData);
+        clearEverythingOnClient();
 
-  login: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.login(data);
-      resetClientSession();
-      const user = res.data.user || res.data.data || null;
-      set({ user: user ? { ...user, token: res.data.token || null } : null });
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        const rawUser = response.data.user || response.data.data || null;
+        const savedUser = rawUser ? { ...rawUser, token: response.data.token || null } : null;
+        set({ user: savedUser });
 
-  logout: async () => {
-    try {
-      await authApi.logout();
-    } catch {
-      // Ignore logout API errors and still clear the client session
-    } finally {
-      resetClientSession();
-      set({ user: null });
-    }
-  },
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    logout: async function () {
+      try {
+        await authApi.logout();
+      } catch (ignoreThisError) {
+      } finally {
+        clearEverythingOnClient();
+        set({ user: null });
+      }
+    },
+    sendOtp: async function (data) {
+      try {
+        set({ loading: true });
+        const response = await authApi.sendOtp(data);
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    verifyOtp: async function (data) {
+      try {
+        set({ loading: true });
+        const response = await authApi.verifyOtp(data);
 
-  sendOtp: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.sendOtp(data);
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        clearEverythingOnClient();
+      const rawUser = response.data.user || response.data.data || null;
+        const savedUser = rawUser ? { ...rawUser, token: response.data.token || null } : null;
+        set({ user: savedUser });
 
-  verifyOtp: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.verifyOtp(data);
-      resetClientSession();
-      const user = res.data.user || res.data.data || null;
-      set({ user: user ? { ...user, token: res.data.token || null } : null });
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    signup: async function (data) {
+      try {
+        set({ loading: true });
+        const response = await authApi.signup(data);
 
-  signup: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.signup(data);
-      resetClientSession();
-      const user = res.data.user || res.data.data || null;
-      set({ user: user ? { ...user, token: res.data.token || null } : null });
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        clearEverythingOnClient();
 
-  forgotPassword: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.forgotPassword(data);
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+        const rawUser = response.data.user || response.data.data || null;
+        const savedUser = rawUser ? { ...rawUser, token: response.data.token || null } : null;
+        set({ user: savedUser });
 
-  resetPassword: async (data) => {
-    try {
-      set({ loading: true });
-      const res = await authApi.resetPassword(data);
-      return { message: res.data.message, success: true };
-    } catch (err) {
-      return handleError(err);
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+
+    forgotPassword: async function (data) {
+      try {
+        set({ loading: true });
+        const response = await authApi.forgotPassword(data);
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    resetPassword: async function (data) {
+      try {
+        set({ loading: true });
+        const response = await authApi.resetPassword(data);
+        return { success: true, message: response.data.message };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
+  };
+});
