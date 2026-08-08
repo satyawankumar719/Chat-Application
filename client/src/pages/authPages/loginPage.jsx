@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
+import { loginSchema, formatZodErrors, validateFieldWithZod } from "@/validations/auth.validation";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -21,31 +23,64 @@ export function LoginPage() {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({});
   const [feedback, setFeedback] = useState({ type: "", message: "" });
 
   const { login, loading } = useAuthStore();
 
+  const validateForm = () => {
+    const result = loginSchema.safeParse(formData);
+    if (!result.success) {
+      const formattedErrors = formatZodErrors(result.error);
+      setErrors(formattedErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
+
   const handleChange = (e) => {
+    const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
+      [id]: value,
     }));
+    if (errors[id]) {
+      const errorMsg = validateFieldWithZod(loginSchema, id, value);
+      setErrors((prev) => ({ ...prev, [id]: errorMsg }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { id, value } = e.target;
+    const errorMsg = validateFieldWithZod(loginSchema, id, value);
+    setErrors((prev) => ({ ...prev, [id]: errorMsg }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setFeedback({ type: "", message: "" });
 
-    const result = await login(formData);
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly");
+      return;
+    }
+
+    const result = await login({
+      email: formData.email.trim(),
+      password: formData.password
+    });
 
     if (result.success) {
       setFeedback({ type: "success", message: "Login successful!" });
+      toast.success("Login successful!");
       const to = location?.state?.from?.pathname || "/chats";
       setTimeout(() => {
         navigate(to, { replace: true });
       }, 500);
     } else {
       setFeedback({ type: "error", message: result.message || "Failed to log in. Please check your credentials." });
+      toast.error(result.message || "Failed to log in. Please check your credentials.");
     }
   };
 
@@ -67,9 +102,9 @@ export function LoginPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+          <form onSubmit={handleLogin} noValidate>
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-1.5">
                 <Label htmlFor="email">Email</Label>
 
                 <Input
@@ -78,11 +113,16 @@ export function LoginPage() {
                   placeholder="m@example.com"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
                   required
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-500 font-medium">{errors.email}</p>
+                )}
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
 
@@ -99,8 +139,13 @@ export function LoginPage() {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}
                   required
                 />
+                {errors.password && (
+                  <p className="text-xs text-red-500 font-medium">{errors.password}</p>
+                )}
               </div>
             </div>
 
@@ -118,7 +163,7 @@ export function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </Button>
 
-            <Button variant="outline" className="w-full mt-2">
+            <Button type="button" variant="outline" className="w-full mt-2">
               Login with Google
             </Button>
           </form>

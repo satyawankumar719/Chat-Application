@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Send, UserPlus, Search, ArrowRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { UserPlus, Search, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SearchResultCard from "@/components/chat/chatListContainer/SearchResultCard";
 import { queryApi } from "@/api/userApi";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 function CreateChatPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+
   const currentUserId = user?._id?.toString() || user?.id?.toString();
 
   const [query, setQuery] = useState("");
@@ -21,27 +22,35 @@ function CreateChatPage() {
   const [feedbackType, setFeedbackType] = useState("info");
 
   const handleSearch = async (value) => {
-    if (!value.trim()) {
+    const searchValue = value.trim();
+
+    if (!searchValue) {
       setSearchResults([]);
+      setFeedback("");
       return;
     }
+
     setSearching(true);
     setFeedback("");
+
     try {
-      const res = await queryApi.searchUsers(value);
+      const res = await queryApi.searchUsers(searchValue);
+
       const users = res.data?.data || res.data || [];
-      if (!users.length) {
+
+      const filteredUsers = users.filter(
+        (u) =>
+          u._id?.toString() !== currentUserId &&
+          u.id?.toString() !== currentUserId
+      );
+
+      if (!filteredUsers.length) {
         setFeedback("No users found.");
         setFeedbackType("info");
       }
-      setSearchResults(
-        users.filter(
-          (u) =>
-            u._id?.toString() !== currentUserId &&
-            u.id?.toString() !== currentUserId
-        )
-      );
-    } catch {
+
+      setSearchResults(filteredUsers);
+    } catch (error) {
       setSearchResults([]);
       setFeedback("Something went wrong searching users.");
       setFeedbackType("error");
@@ -50,15 +59,32 @@ function CreateChatPage() {
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleSearch(query);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const handleInvite = async (id) => {
     try {
       const res = await invitationApi.sendInvitation(id, message);
-      setFeedback(res.data?.message || "Invitation sent successfully.");
+
+      setFeedback(
+        res.data?.message || "Invitation sent successfully."
+      );
+
       setFeedbackType("success");
       setMessage("");
-      setTimeout(() => navigate("/invitations"), 800);
+
+      setTimeout(() => {
+        navigate("/invitations");
+      }, 800);
     } catch (err) {
-      setFeedback(err.response?.data?.message || "Unable to send invitation");
+      setFeedback(
+        err.response?.data?.message || "Unable to send invitation"
+      );
       setFeedbackType("error");
     }
   };
@@ -74,7 +100,11 @@ function CreateChatPage() {
         >
           &larr; Back
         </Button>
-        <h1 className="text-2xl font-semibold tracking-tight">Start a new chat</h1>
+
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Start a new chat
+        </h1>
+
         <p className="text-sm text-muted-foreground">
           Search people by name or email and send an invite
         </p>
@@ -83,11 +113,15 @@ function CreateChatPage() {
       <div className="rounded-xl border border-border bg-card p-4">
         <div className="mb-3 flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
           <Search className="h-4 w-4 text-muted-foreground" />
+
           <Input
             value={query}
             onChange={(e) => {
-              setQuery(e.target.value);
-              handleSearch(e.target.value);
+              const value = e.target.value
+                .replace(/\s+/g, " ")
+                .trimStart();
+
+              setQuery(value);
             }}
             placeholder="Search users to invite..."
             className="border-0 p-0 shadow-none focus-visible:ring-0"
@@ -99,13 +133,12 @@ function CreateChatPage() {
             <label className="mb-1 block text-xs font-medium text-muted-foreground">
               Personal message (optional)
             </label>
-            <div className="flex gap-2">
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Hi, let's chat!"
-              />
-            </div>
+
+            <Input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Hi, let's chat!"
+            />
           </div>
         )}
 
@@ -129,11 +162,14 @@ function CreateChatPage() {
           </p>
         )}
 
-        {!searching && query && searchResults.length === 0 && !feedback && (
-          <div className="px-1 py-8 text-center text-xs text-muted-foreground">
-            No users match &ldquo;{query}&rdquo;.
-          </div>
-        )}
+        {!searching &&
+          searchResults.length === 0 &&
+          query &&
+          !feedback && (
+            <div className="px-1 py-8 text-center text-xs text-muted-foreground">
+              No users match "{query}".
+            </div>
+          )}
 
         {!searching && searchResults.length > 0 && (
           <div className="mt-3 space-y-2">
@@ -152,13 +188,20 @@ function CreateChatPage() {
         {!query && (
           <div className="flex flex-col items-center justify-center gap-2 px-1 py-10 text-center text-sm text-muted-foreground">
             <UserPlus className="h-8 w-8 text-muted-foreground/50" />
-            <p>Type above to find someone to chat with.</p>
+
+            <p>
+              Type above to find someone to chat with.
+            </p>
           </div>
         )}
       </div>
 
       <div className="mt-4 flex justify-end">
-        <Button variant="outline" size="sm" onClick={() => navigate("/chats")}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/chats")}
+        >
           Go to chats
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>

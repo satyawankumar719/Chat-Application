@@ -7,13 +7,14 @@ export const validateBody = (schema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationErrors = error.errors.map((err) => ({
+           console.log(error)
+        const validationErrors = error.issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
         return res.status(400).json({
           success: false,
-          message: 'Validation failed',
+          message: error.message,
           errors: validationErrors,
         });
       }
@@ -29,7 +30,7 @@ export const validateQuery = (schema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationErrors = error.errors.map((err) => ({
+        const validationErrors = error.issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
@@ -51,7 +52,8 @@ export const validateParams = (schema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationErrors = error.errors.map((err) => ({
+     
+        const validationErrors = error.issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));

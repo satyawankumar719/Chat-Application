@@ -1,5 +1,6 @@
 import Chat from "../models/Conversation.js";
 import Message from "../models/Message.js";
+import { isUserOnline } from "../socket/userManager.js";
 
 export const getUserChatsService = async (userId) => {
   const chats = await Chat.find({
@@ -16,7 +17,25 @@ export const getUserChatsService = async (userId) => {
     })
     .sort({ updatedAt: -1 });
 
-  return chats;
+  return chats.map((chat) => {
+    const chatObj = chat.toObject();
+    if (chatObj.members) {
+      chatObj.members = chatObj.members.map((member) => {
+        if (member.user && member.user._id) {
+          const onlineNow = isUserOnline(member.user._id);
+          return {
+            ...member,
+            user: {
+              ...member.user,
+              isOnline: onlineNow || Boolean(member.user.isOnline),
+            },
+          };
+        }
+        return member;
+      });
+    }
+    return chatObj;
+  });
 };export const getChatMessagesService = async (chatId, userId, page = 1, limit = 50) => {
   const query = { chat: chatId };
   const safePage = Math.max(1, Number(page) || 1);

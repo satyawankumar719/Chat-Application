@@ -10,6 +10,7 @@ import { connectRedis } from './config/redis.js';
 import http from 'http';
 import { Server } from 'socket.io';
 import {socketHandler} from './socket/socketHandler.js';
+import { logger } from './logger.js';
 const app = express();
 // middlewares
 app.use(express.json());
@@ -21,7 +22,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan('dev'));
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy : {policy :"cross-origin"}
+}));
+
 app.use(cookieParser());
 
 
@@ -70,5 +74,5 @@ const io = new Server(server, {
 socketHandler(io);
 
 server.listen(ENV.PORT, () => {
-    console.log('Server is running');
+    logger.info('Server is running');
 });

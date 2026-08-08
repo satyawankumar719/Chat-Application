@@ -1,92 +1,152 @@
 import { create } from "zustand";
 import { messageApi } from "@/api/messageApi";
-import { invitationApi } from "@/api/invitationApi";
 import { useAuthStore } from "./authStore";
 import { useSocketStore } from "./socketStore";
 import { createTempMessage } from "@/lib/messageHelpers";
 
 const PAGE_SIZE = 50;
+
 function getCurrentUserId() {
   const user = useAuthStore.getState().user;
   const idFromdb = user?._id?.toString();
   const idFromField = user?.id?.toString();
   return idFromdb || idFromField || null;
 }
+
 function sortChatsByRecent(chatsArray) {
   const copy = [...chatsArray];
 
-  copy.sort(function (chatA, chatB) {
-    const timeA = new Date(chatA.updatedAt || chatA.lastMessage?.createdAt || 0).getTime();
-    const timeB = new Date(chatB.updatedAt || chatB.lastMessage?.createdAt || 0).getTime();
-    return timeB - timeA; 
-  });
+  for (let i = 0; i < copy.length; i++) {
+    for (let j = i + 1; j < copy.length; j++) {
+      const timeI = new Date(copy[i].updatedAt || copy[i].lastMessage?.createdAt || 0).getTime();
+      const timeJ = new Date(copy[j].updatedAt || copy[j].lastMessage?.createdAt || 0).getTime();
+
+      if (timeJ > timeI) {
+        const temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+      }
+    }
+  }
 
   return copy;
 }
+
 function makeUniqueAndSortMessages(messagesArray) {
-  const map = new Map();
+  const map = {};
+  const result = [];
+
   for (let i = 0; i < messagesArray.length; i++) {
     const msg = messagesArray[i];
-    if (msg?._id) {
-      map.set(msg._id, msg);
+    if (msg?._id && !map[msg._id]) {
+      map[msg._id] = true;
+      result.push(msg);
     }
   }
-  const uniqueArray = [...map.values()];
 
-  uniqueArray.sort(function (a, b) {
-    return new Date(a.createdAt) - new Date(b.createdAt);
-  });
+  for (let i = 0; i < result.length; i++) {
+    for (let j = i + 1; j < result.length; j++) {
+      if (new Date(result[i].createdAt) > new Date(result[j].createdAt)) {
+        const temp = result[i];
+        result[i] = result[j];
+        result[j] = temp;
+      }
+    }
+  }
 
-  return uniqueArray;
+  return result;
 }
 
 function updateLastMessageInChats(chatsArray, chatId, newMessage) {
-  const updatedChats = chatsArray.map(function (chat) {
+  const result = [];
+
+  for (let i = 0; i < chatsArray.length; i++) {
+    const chat = chatsArray[i];
     if (chat._id === chatId) {
-      return {
+      result.push({
         ...chat,
         lastMessage: newMessage,
         updatedAt: newMessage.createdAt,
-      };
+      });
     } else {
-      return chat;
+      result.push(chat);
     }
-  });
+  }
 
-  return sortChatsByRecent(updatedChats);
+  return sortChatsByRecent(result);
+}
+
+function updateUserStatusInChats(chatsArray, userId, isOnline, lastSeen) {
+  if (!userId || !Array.isArray(chatsArray)) return chatsArray || [];
+  const result = [];
+  const userIdStr = userId.toString();
+
+  for (let i = 0; i < chatsArray.length; i++) {
+    const chat = chatsArray[i];
+    if (!chat) continue;
+    const newMembers = [];
+
+    for (let j = 0; j < (chat.members || []).length; j++) {
+      const member = chat.members[j];
+      if (!member) continue;
+
+      const userObj = typeof member.user === "object" && member.user !== null ? member.user : null;
+      const memberId = (userObj?._id || userObj?.id || member.user || "").toString();
+
+      if (memberId === userIdStr) {
+        if (userObj) {
+          newMembers.push({
+            ...member,
+            user: {
+              ...userObj,
+              isOnline: isOnline,
+              lastSeen: lastSeen || userObj.lastSeen,
+            },
+          });
+        } else {
+          newMembers.push(member);
+        }
+      } else {
+        newMembers.push(member);
+      }
+    }
+
+    result.push({ ...chat, members: newMembers });
+  }
+
+  return result;
 }
 
 export const useChatStore = create(function (set, get) {
   return {
-    chats: [],                
-    messages: [],              
-    selectedChatId: null,      
+    chats: [],
+    messages: [],
+    selectedChatId: null,
     previousSelectedChatId: null,
 
-    loadingChats: false,       
-    loadingMessages: false,    
-    loadingMore: false,       
-    loadingInvitations: false, 
+    loadingChats: false,
+    loadingMessages: false,
+    loadingMore: false,
     sendingMessage: false,
 
-    page: 1,                  
-    hasMore: true,            
+    page: 1,
+    hasMore: true,
+    isTyping: false,
 
-    pendingInvitations: [],   
-    socketListenersAttached: false, 
+    socketListenersAttached: false,
 
-    error: null,            
-    invitationMessage: null,
+    error: null,
+
+    onlineUserIds: [],
 
     reset: function () {
       try {
         const current = get();
         if (current.selectedChatId) {
-  
           useSocketStore.getState().leaveChat(current.selectedChatId);
         }
-      } catch (ignoreThisError) {
-  
+      } catch {
+
       }
 
       set({
@@ -97,16 +157,27 @@ export const useChatStore = create(function (set, get) {
         loadingChats: false,
         loadingMessages: false,
         loadingMore: false,
-        loadingInvitations: false,
         sendingMessage: false,
         page: 1,
         hasMore: true,
-        pendingInvitations: [],
+        isTyping: false,
         socketListenersAttached: false,
         error: null,
-        invitationMessage: null,
+        onlineUserIds: [],
       });
     },
+
+    addChat: function (newChat) {
+      set(function (state) {
+        for (let i = 0; i < state.chats.length; i++) {
+          if (state.chats[i]._id === newChat._id) {
+            return state;
+          }
+        }
+        return { chats: sortChatsByRecent([newChat, ...state.chats]) };
+      });
+    },
+
     setSelectedChatId: function (chatId) {
       const stateBefore = get();
       const oldChatId = stateBefore.selectedChatId;
@@ -118,7 +189,7 @@ export const useChatStore = create(function (set, get) {
       if (oldChatId) {
         socketStore.leaveChat(oldChatId);
       }
-    set({
+      set({
         selectedChatId: chatId,
         previousSelectedChatId: oldChatId,
         messages: [],
@@ -127,26 +198,36 @@ export const useChatStore = create(function (set, get) {
       });
 
       if (!chatId) return;
-    socketStore.joinChat(chatId);
+      socketStore.joinChat(chatId);
       get().fetchMessages(chatId);
       socketStore.markMessagesRead(chatId);
     },
 
-      initSocketListeners: function () {
+    initSocketListeners: function () {
       const socket = useSocketStore.getState().socket;
       if (!socket) return;
 
       socket.off("receive_message");
-      socket.off("invitation_received");
-      socket.off("invitation_accepted");
-      socket.off("invitation_rejected");
       socket.off("message_status_update");
+      socket.off("user_status_changed");
+      socket.off("get_online_users");
 
       socket.on("receive_message", get().handleIncomingMessage);
-      socket.on("invitation_received", get().handleInvitationReceived);
-      socket.on("invitation_accepted", get().handleInvitationAccepted);
 
-      socket.on("invitation_rejected", get().handleInvitationRejected);
+      socket.on("get_online_users", function (onlineUserIds) {
+        if (!Array.isArray(onlineUserIds)) return;
+        const stringIds = onlineUserIds.map((id) => id.toString());
+        set(function (state) {
+          let updatedChats = state.chats;
+          for (let i = 0; i < stringIds.length; i++) {
+            updatedChats = updateUserStatusInChats(updatedChats, stringIds[i], true);
+          }
+          return {
+            onlineUserIds: stringIds,
+            chats: updatedChats,
+          };
+        });
+      });
 
       socket.on("message_status_update", function (data) {
         if (!data) data = {};
@@ -163,16 +244,54 @@ export const useChatStore = create(function (set, get) {
         }
       });
 
+      socket.on("user_status_changed", function (data) {
+        console.log("STATUS EVENT:", data);
+
+        if (!data?.userId) return;
+        get().handleUserStatusChanged(data.userId, data.isOnline, data.lastSeen);
+      });
+
       set({ socketListenersAttached: true });
     },
+
+    handleUserStatusChanged: function (userId, isOnline, lastSeen) {
+      if (!userId) return;
+      const targetId = userId.toString();
+      const currentUserId = getCurrentUserId();
+
+      if (targetId === currentUserId?.toString()) return;
+
+      set(function (state) {
+        let newOnlineIds = state.onlineUserIds || [];
+        if (isOnline) {
+          if (!newOnlineIds.includes(targetId)) {
+            newOnlineIds = [...newOnlineIds, targetId];
+          }
+        } else {
+          newOnlineIds = newOnlineIds.filter((id) => id !== targetId);
+        }
+
+        return {
+          onlineUserIds: newOnlineIds,
+          chats: updateUserStatusInChats(state.chats, targetId, isOnline, lastSeen),
+        };
+      });
+    },
+
     fetchChats: async function () {
       set({ loadingChats: true, error: null });
 
       try {
         const response = await messageApi.getUserChats();
         const chats = response.data?.data || response.data || [];
-        set({ chats: sortChatsByRecent(chats) });
-        get().fetchPendingInvitations();
+
+        const onlineIds = get().onlineUserIds || [];
+        let updatedChats = chats;
+        for (let i = 0; i < onlineIds.length; i++) {
+          updatedChats = updateUserStatusInChats(updatedChats, onlineIds[i], true);
+        }
+
+        set({ chats: sortChatsByRecent(updatedChats) });
 
         const savedSelectedChatId = get().selectedChatId;
 
@@ -190,9 +309,14 @@ export const useChatStore = create(function (set, get) {
           get().fetchMessages(firstChatId);
           return;
         }
-        const chatStillExists = chats.some(function (c) {
-          return c._id === savedSelectedChatId;
-        });
+
+        let chatStillExists = false;
+        for (let i = 0; i < chats.length; i++) {
+          if (chats[i]._id === savedSelectedChatId) {
+            chatStillExists = true;
+            break;
+          }
+        }
 
         if (savedSelectedChatId && !chatStillExists) {
           if (chats.length > 0) {
@@ -224,127 +348,6 @@ export const useChatStore = create(function (set, get) {
       }
     },
 
-    fetchPendingInvitations: async function () {
-      set({ loadingInvitations: true, invitationMessage: null });
-
-      try {
-        const response = await invitationApi.getPendingInvitations();
-        const invitations = response.data?.data || response.data || [];
-        set({ pendingInvitations: invitations });
-      } catch (err) {
-        set({
-          invitationMessage: err.response?.data?.message || "Unable to load invitations.",
-        });
-      } finally {
-        set({ loadingInvitations: false });
-      }
-    },
-    handleInvitationReceived: function (data) {
-      const invitation = data?.invitation;
-      if (!invitation) return;
-
-      set(function (state) {
-        const alreadyPresent = state.pendingInvitations.some(function (item) {
-          return item._id === invitation._id;
-        });
-
-        let newList;
-        if (alreadyPresent) {
-          newList = state.pendingInvitations.map(function (item) {
-            if (item._id === invitation._id) {
-              return invitation;
-            } else {
-              return item;
-            }
-          });
-        } else {
-          newList = [invitation, ...state.pendingInvitations];
-        }
-
-        return {
-          pendingInvitations: newList,
-          invitationMessage: "New invitation from " + (invitation.invitedBy?.name || "someone"),
-        };
-      });
-    },
-
-    handleInvitationAccepted: function (data) {
-      const invitation = data?.invitation;
-      const newChat = data?.chat;
-
-      set(function (state) {
-        let updatedChats = state.chats;
-        if (newChat) {
-          const alreadyHasChat = state.chats.some(function (c) {
-            return c._id === newChat._id;
-          });
-          if (!alreadyHasChat) {
-            updatedChats = [newChat, ...state.chats];
-          }
-        }
-
-        return {
-          pendingInvitations: state.pendingInvitations.filter(function (item) {
-            return item._id !== invitation?._id;
-          }),
-          chats: sortChatsByRecent(updatedChats),
-          invitationMessage: "Invitation accepted.",
-        };
-      });
-    },
-    handleInvitationRejected: function (data) {
-      const invitation = data?.invitation;
-
-      set(function (state) {
-        return {
-          pendingInvitations: state.pendingInvitations.filter(function (item) {
-            return item._id !== invitation?._id;
-          }),
-          invitationMessage: "Invitation declined.",
-        };
-      });
-    },
-    acceptInvitation: async function (invitationId) {
-      try {
-        const res = await invitationApi.acceptInvitation(invitationId);
-
-        set(function (state) {
-          return {
-            pendingInvitations: state.pendingInvitations.filter(function (item) {
-              return item._id !== invitationId;
-            }),
-            invitationMessage: res.data?.message || "Invitation accepted.",
-          };
-        });
-        await get().fetchChats();
-        return res;
-      } catch (err) {
-        const message = err.response?.data?.message || "Unable to accept invitation.";
-        set({ invitationMessage: message });
-        throw err;
-      }
-    },
-
-    rejectInvitation: async function (invitationId) {
-      try {
-        const res = await invitationApi.rejectInvitation(invitationId);
-
-        set(function (state) {
-          return {
-            pendingInvitations: state.pendingInvitations.filter(function (item) {
-              return item._id !== invitationId;
-            }),
-            invitationMessage: res.data?.message || "Invitation declined.",
-          };
-        });
-
-        return res;
-      } catch (err) {
-        const message = err.response?.data?.message || "Unable to reject invitation.";
-        set({ invitationMessage: message });
-        throw err;
-      }
-    },
     fetchMessages: async function (chatId, page) {
       if (!page) page = 1;
 
@@ -393,6 +396,7 @@ export const useChatStore = create(function (set, get) {
         set({ loadingMessages: false, loadingMore: false });
       }
     },
+
     loadMoreMessages: async function () {
       const current = get();
       if (!current.selectedChatId) return;
@@ -401,6 +405,7 @@ export const useChatStore = create(function (set, get) {
 
       await get().fetchMessages(current.selectedChatId, current.page + 1);
     },
+
     handleIncomingMessage: function (data) {
       const incomingMessage = data?.message;
       if (!incomingMessage) return;
@@ -422,8 +427,10 @@ export const useChatStore = create(function (set, get) {
         let updatedMessages = current.messages;
 
         if (isForCurrentlySelectedChat) {
-        
-          const existingIndex = current.messages.findIndex(function (m) {
+          let existingIndex = -1;
+          for (let i = 0; i < current.messages.length; i++) {
+            const m = current.messages[i];
+
             const idMatch = m._id === incomingMessage._id;
 
             const sendingTempMatch =
@@ -431,17 +438,22 @@ export const useChatStore = create(function (set, get) {
               && m.content === incomingMessage.content
               && m.sender?._id === incomingMessage.sender?._id;
 
-            return idMatch || sendingTempMatch;
-          });
+            if (idMatch || sendingTempMatch) {
+              existingIndex = i;
+              break;
+            }
+          }
 
           if (existingIndex !== -1) {
-            updatedMessages = current.messages.map(function (m, idx) {
-              if (idx === existingIndex) {
-                return incomingMessage;
+            const replaced = [];
+            for (let k = 0; k < current.messages.length; k++) {
+              if (k === existingIndex) {
+                replaced.push(incomingMessage);
               } else {
-                return m;
+                replaced.push(current.messages[k]);
               }
-            });
+            }
+            updatedMessages = replaced;
           } else {
             updatedMessages = [...current.messages, incomingMessage];
           }
@@ -453,94 +465,247 @@ export const useChatStore = create(function (set, get) {
         };
       });
     },
-  sendMessage: async (chatId, content, attachment = null) => {
-  if (!chatId) return null;
 
-  const text = content?.trim();
-  const hasAttachment = Boolean(attachment?.fileUrl);
-  if (!text && !hasAttachment) return null;
+    cancelUpload: function (messageId) {
+      set(function (state) {
+        const msg = state.messages.find((m) => m._id === messageId);
+        if (msg?.abortController) {
+          try {
+            msg.abortController.abort();
+          } catch (e) {
+            console.log("Upload aborted:", e);
+          }
+        }
+        const filtered = state.messages.filter((m) => m._id !== messageId);
+        return { messages: filtered };
+      });
+    },
 
-  const { user } = useAuthStore.getState();
-  const socketStore = useSocketStore.getState();
+    updateMessageProgress: function (tempId, progress) {
+      set(function (state) {
+        const updated = state.messages.map((m) => {
+          if (m._id === tempId) {
+            return { ...m, uploadProgress: progress };
+          }
+          return m;
+        });
+        return { messages: updated };
+      });
+    },
 
-  if (!socketStore.connected) {
-    set({
-      error: "Socket is not connected. Please wait or refresh.",
-    });
-    return null;
-  }
+    sendMessage: async function (chatId, content, attachments) {
+      if (!attachments) attachments = [];
 
-const tempId = `temp-${Date.now()}`;
+      if (!chatId) return null;
 
-const tempMessage = createTempMessage({
-  tempId,
-  chatId,
-  user,
-  content: text || attachment?.fileName || "Attachment",
-  attachment,
-});
+      const text = content?.trim();
+      const hasAttachments = attachments.length > 0;
+      if (!text && !hasAttachments) return null;
 
-  set((state) => ({
-    sendingMessage: true,
-    error: null,
-    messages: [...state.messages, tempMessage],
-    chats: updateLastMessageInChats(state.chats, chatId, tempMessage),
-  }));
+      const { user } = useAuthStore.getState();
+      const socketStore = useSocketStore.getState();
 
-  try {
-    const response = await Promise.race([
-      new Promise((resolve) =>
-        socketStore.sendMessageSocket(chatId, text || attachment?.fileName || "Attachment", tempId, resolve, attachment)
-      ),
-      new Promise((resolve) =>
-        setTimeout(
-          () => resolve({ success: false, error: "Socket timeout" }),
-          10000
-        )
-      ),
-    ]);
+      if (!socketStore.connected) {
+        set({
+          error: "Socket is not connected. Please wait or refresh.",
+        });
+        return null;
+      }
 
-    if (!response.success) {
-      throw new Error(response.error || "Unable to send message.");
-    }
+      const rawFileItems = attachments.filter((item) => item.file && item.preview);
+      const isFileUpload = rawFileItems.length > 0;
 
-    const serverMessage = response.message;
+      let finalAttachments = [];
+      let abortController = null;
+      const tempId = `temp-${Date.now()}`;
 
-    set((state) => ({
-      messages: state.messages.map((msg) =>
-        msg._id === tempId ? serverMessage : msg
-      ),
-      chats: updateLastMessageInChats(
-        state.chats,
+      if (isFileUpload) {
+        abortController = new AbortController();
+        finalAttachments = rawFileItems.map((item) => ({
+          type: item.file.type.startsWith("image") ? "image" : "file",
+          fileUrl: item.preview,
+          fileName: item.file.name,
+          fileSize: item.file.size,
+        }));
+      } else {
+        finalAttachments = attachments;
+      }
+
+      const firstAttachment = finalAttachments[0] || null;
+      const displayContent = text || firstAttachment?.fileName || "Attachment";
+
+      const tempMessage = createTempMessage({
+        tempId,
         chatId,
-        serverMessage
-      ),
-    }));
+        user,
+        content: displayContent,
+        attachment: firstAttachment,
+        attachments: finalAttachments,
+        isUploading: isFileUpload,
+        uploadProgress: 0,
+        abortController: abortController,
+      });
 
-    return serverMessage;
-  } catch (err) {
-    set((state) => ({
-      messages: state.messages.filter((m) => m._id !== tempId),
-      error: err.message,
-    }));
+      set(function (state) {
+        return {
+          sendingMessage: true,
+          error: null,
+          messages: [...state.messages, tempMessage],
+          chats: updateLastMessageInChats(state.chats, chatId, tempMessage),
+        };
+      });
 
-    return null;
-  } finally {
-    set({ sendingMessage: false });
-  }
-},
+      let serverUploadedFiles = [];
+
+      if (isFileUpload) {
+        try {
+          for (const item of rawFileItems) {
+            const response = await messageApi.uploadFile(
+              item.file,
+              (progressEvent) => {
+                if (progressEvent.total) {
+                  const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                  get().updateMessageProgress(tempId, percent);
+                }
+              },
+              abortController.signal
+            );
+
+            const uploadedFile = response.data?.data || response.data;
+            if (uploadedFile?.fileUrl) {
+              serverUploadedFiles.push({
+                type: uploadedFile.type || "image",
+                fileUrl: uploadedFile.fileUrl,
+                fileName: uploadedFile.fileName,
+                fileSize: uploadedFile.fileSize,
+              });
+            }
+          }
+        } catch (uploadErr) {
+          if (uploadErr.name === "CanceledError" || uploadErr.code === "ERR_CANCELED") {
+            console.log("Upload cancelled by user");
+            return null;
+          }
+          set(function (state) {
+            return {
+              messages: state.messages.filter((m) => m._id !== tempId),
+              error: uploadErr.response?.data?.message || "File upload failed.",
+            };
+          });
+          return null;
+        }
+
+        finalAttachments = serverUploadedFiles;
+      }
+
+      set(function (state) {
+        const updated = state.messages.map((m) => {
+          if (m._id === tempId) {
+            return {
+              ...m,
+              attachments: finalAttachments,
+              fileUrl: finalAttachments[0]?.fileUrl || m.fileUrl,
+              isUploading: false,
+              uploadProgress: 100,
+              status: "sending",
+            };
+          }
+          return m;
+        });
+        return { messages: updated };
+      });
+
+      const updatedFirstAttachment = finalAttachments[0] || firstAttachment;
+
+      let gotResponse = false;
+
+      try {
+        const response = await new Promise(function (resolve) {
+          let timeoutId = setTimeout(function () {
+            if (!gotResponse) {
+              gotResponse = true;
+              resolve({ success: false, error: "Socket timeout" });
+            }
+          }, 10000);
+
+          socketStore.sendMessageSocket(
+            chatId,
+            displayContent,
+            tempId,
+            function (result) {
+              if (!gotResponse) {
+                gotResponse = true;
+                clearTimeout(timeoutId);
+                resolve(result);
+              }
+            },
+            updatedFirstAttachment,
+            finalAttachments
+          );
+        });
+
+        if (!response.success) {
+          throw new Error(response.error || "Unable to send message.");
+        }
+
+        const serverMessage = response.message;
+
+        set(function (state) {
+          const replaced = [];
+          for (let k = 0; k < state.messages.length; k++) {
+            if (state.messages[k]._id === tempId) {
+              replaced.push(serverMessage);
+            } else {
+              replaced.push(state.messages[k]);
+            }
+          }
+
+          return {
+            messages: replaced,
+            chats: updateLastMessageInChats(
+              state.chats,
+              chatId,
+              serverMessage
+            ),
+          };
+        });
+
+        return serverMessage;
+      } catch (err) {
+        set(function (state) {
+          const filtered = [];
+          for (let k = 0; k < state.messages.length; k++) {
+            if (state.messages[k]._id !== tempId) {
+              filtered.push(state.messages[k]);
+            }
+          }
+
+          return {
+            messages: filtered,
+            error: err.message,
+          };
+        });
+
+        return null;
+      } finally {
+        set({ sendingMessage: false });
+      }
+    },
+
     messageStatusUpdate: function (messageId, newStatus) {
       if (!messageId || !newStatus) return;
 
       set(function (state) {
-        const updated = state.messages.map(function (message) {
+        const updated = [];
+        for (let i = 0; i < state.messages.length; i++) {
+          const message = state.messages[i];
           const idMatch = message._id === messageId || message.id === messageId;
           if (idMatch) {
-            return { ...message, status: newStatus };
+            updated.push({ ...message, status: newStatus });
           } else {
-            return message;
+            updated.push(message);
           }
-        });
+        }
 
         return { messages: updated };
       });

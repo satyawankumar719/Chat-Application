@@ -1,6 +1,5 @@
 import React from "react";
 import InvitationCard from "./InvitationCard";
-import {useChatStore} from "../../../store/chatStore";
 import { MailOpen } from "lucide-react";
 function InvitationList({
   invitations,

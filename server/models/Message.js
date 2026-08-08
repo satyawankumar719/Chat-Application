@@ -33,6 +33,27 @@ const messageSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  attachments: [
+    {
+      type: {
+        type: String,
+        enum: ["image", "file", "audio", "video"],
+        required: true,
+      },
+      fileUrl: {
+        type: String,
+        required: true,
+      },
+      fileName: {
+        type: String,
+        default: null,
+      },
+      fileSize: {
+        type: Number,
+        default: null,
+      },
+    },
+  ],
   replyTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Message',

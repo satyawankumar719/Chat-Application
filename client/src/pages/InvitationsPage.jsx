@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import InvitationCard from "@/components/chat/chatListContainer/InvitationCard";
-import { useChatStore } from "@/store/chatStore";
 import { UserPlus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import InvitationList from "@/components/chat/chatListContainer/InvitationList";
+import { useInvitationStore } from "@/store/invitationStore";
 
 function InvitationsPage() {
   const navigate = useNavigate();
@@ -14,7 +13,7 @@ function InvitationsPage() {
     acceptInvitation,
     rejectInvitation,
     fetchPendingInvitations,
-  } = useChatStore();
+  } = useInvitationStore();
 
   useEffect(() => {
     fetchPendingInvitations();

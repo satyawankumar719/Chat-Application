@@ -4,6 +4,8 @@ import redisClient from "../config/redis.js";
 import { otpEmailTemplate } from "../templates/otpEmail.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOtp } from "../utils/index.js";
+import { logger } from "../logger.js";
+import { success } from "zod";
 
 export const login = async (data) => {
     const { email, password } = data;
@@ -51,13 +53,14 @@ export const sendOtpToEmail = async (email) => {
     await redisClient.set(`otp:${email}`, OTP, "EX", 300);
 
     const html = otpEmailTemplate(OTP);
-    console.log("Sending OTP email to:", email);
+    
     try {
         await sendEmail(email, "Your OTP Code", html);
+        return { success: true, message: "OTP sent successfully" };
     } catch (emailErr) {
-        console.error("Failed to send OTP email, but OTP is stored:", OTP);
+        logger.error("Failed to send OTP email, but OTP is stored:", OTP);
+        return { success: false, message: "Failed to send OTP email", emailErr };
     }
-    return { message: "OTP sent successfully" };
 };
 
 export const verifyEmailOtp = async (email, otp) => {
@@ -69,16 +72,30 @@ export const verifyEmailOtp = async (email, otp) => {
         throw { status: 400, message: "Invalid OTP" };
     }
 
-    return { message: "OTP verified successfully" };
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw { status: 404, message: "User not found. Please sign up again." };
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    await redisClient.del(`otp:${email}`);
+
+    return {
+        _id: user._id,
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        phoneNumber: user.phoneNumber,
+        avatar: user.avatar,
+        bio: user.bio,
+    };
 };
 
 export const signup = async (data) => {
-    const { name, email, password, phoneNumber, otp } = data;
-
-    if (otp) {
-        await verifyEmailOtp(email, otp);
-        await redisClient.del(`otp:${email}`);
-    }
+    const { name, email, password, phoneNumber } = data;
 
     let user = await User.findOne({ email });
     if (user && user.isVerified) {
@@ -90,7 +107,7 @@ export const signup = async (data) => {
         user.name = name;
         user.password = hashedPassword;
         user.phoneNumber = phoneNumber || user.phoneNumber;
-        user.isVerified = true;
+        user.isVerified = false;
         await user.save();
     } else {
         user = await User.create({
@@ -98,19 +115,17 @@ export const signup = async (data) => {
             email,
             password: hashedPassword,
             phoneNumber,
-            isVerified: true,
+            isVerified: false,
         });
     }
 
+    const otpResult = await sendOtpToEmail(email);
+
     return {
-        _id: user._id,
-        id: user._id,
-        name: user.name,
+        success: true,
+        message: "Signup successful. OTP sent to your email.",
         email: user.email,
-        isVerified: user.isVerified,
-        phoneNumber: user.phoneNumber,
-        avatar: user.avatar,
-        bio: user.bio,
+        otpSent: otpResult.success,
     };
 };
 
@@ -147,11 +162,11 @@ export const sendForgotPasswordOtp = async (email) => {
     await redisClient.set(`reset-otp:${email}`, OTP, "EX", 600);
 
     const html = otpEmailTemplate(OTP);
-    console.log("Sending reset password OTP to:", email);
+    
     try {
         await sendEmail(email, "Reset Your Password - OTP", html);
     } catch (emailErr) {
-        console.error("Failed to send reset OTP email, but OTP is stored:", OTP);
+        logger.error("Failed to send reset OTP email, but OTP is stored:", OTP);
     }
     return { message: "Password reset OTP sent to your email" };
 };

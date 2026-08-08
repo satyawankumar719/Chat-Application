@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { authApi } from "@/api/authApi";
 import { useChatStore } from "./chatStore";
 import { useSocketStore } from "./socketStore";
+import { useInvitationStore } from "./invitationStore";
+import { useEffect } from "react";
 
 function handleError(error) {
 
@@ -26,8 +28,9 @@ function handleError(error) {
 }
 
 function clearEverythingOnClient() {
- useChatStore.getState().reset();
-useSocketStore.getState().disconnectSocket();
+  useChatStore.getState().reset();
+  useInvitationStore.getState().reset();
+  useSocketStore.getState().disconnectSocket();
 }
 export const useAuthStore = create(function (set) {
   return {
@@ -38,6 +41,7 @@ export const useAuthStore = create(function (set) {
     setUser: function (userObject) {
       set({ user: userObject });
     },
+    
     checkAuth: async function () {
       try {
         set({ checkingAuth: true });
@@ -73,7 +77,7 @@ export const useAuthStore = create(function (set) {
     logout: async function () {
       try {
         await authApi.logout();
-      } catch (ignoreThisError) {
+      } catch {
       } finally {
         clearEverythingOnClient();
         set({ user: null });
@@ -111,14 +115,11 @@ export const useAuthStore = create(function (set) {
       try {
         set({ loading: true });
         const response = await authApi.signup(data);
-
-        clearEverythingOnClient();
-
-        const rawUser = response.data.user || response.data.data || null;
-        const savedUser = rawUser ? { ...rawUser, token: response.data.token || null } : null;
-        set({ user: savedUser });
-
-        return { success: true, message: response.data.message };
+        return {
+          success: true,
+          message: response.data.message,
+          email: response.data.email || data.email,
+        };
       } catch (err) {
         return handleError(err);
       } finally {

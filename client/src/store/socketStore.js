@@ -63,7 +63,7 @@ export const useSocketStore = create(function (set, get) {
         activeSocket.emit("leave_chat", chatId);
       }
     },
-    sendMessageSocket: function (chatId, content, tempId, ackCallback, attachment = null) {
+    sendMessageSocket: function (chatId, content, tempId, ackCallback, attachment = null, attachments = []) {
       const activeSocket = get().socket;
 
       if (activeSocket?.connected) {
@@ -77,6 +77,7 @@ export const useSocketStore = create(function (set, get) {
             fileUrl: attachment?.fileUrl || null,
             fileName: attachment?.fileName || null,
             fileSize: attachment?.fileSize || null,
+            attachments: attachments,
           },
           ackCallback
         );
@@ -91,7 +92,7 @@ export const useSocketStore = create(function (set, get) {
       if (activeSocket?.connected) {
         activeSocket.emit("inviteUser", { receiverId: receiverId });
       } else {
-        console.log("Socket abhi connected nahi, invite nahi bhej sakte.");
+        console.log("Socket not connected, cannot send invite.");
       }
     },
     markMessagesRead: function (chatId) {
@@ -101,5 +102,7 @@ export const useSocketStore = create(function (set, get) {
         activeSocket.emit("mark_messages_read", { chatId: chatId });
       }
     },
+    
+    
   };
 });

@@ -23,6 +23,7 @@ export const API_CONFIG = {
     MESSAGES: {
       CHATS: "/messages/chats",
       UPLOAD: "/messages/upload",
+      UPLOAD_MULTIPLE :"/messages/upload/multiple",
       BY_CHAT_ID: (chatId, page = 1, limit = 20) =>
         `/messages/${chatId}?page=${page}&limit=${limit}`,
     }

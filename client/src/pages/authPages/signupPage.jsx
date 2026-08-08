@@ -1,208 +1,207 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
+import { signupSchema, formatZodErrors, validateFieldWithZod } from "@/validations/auth.validation";
 
-function SignupPage() {
+function SignupForm() {
   const navigate = useNavigate();
-  const { sendOtp, signup, loading } = useAuthStore();
-  const [step, setStep] = useState("signup");
+  const { signup, loading } = useAuthStore();
+
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    phoneNumber: "",
     name: "",
-    otp: "",
+    email: "",
+    phoneNumber: "",
+    password: ""
   });
+
+  const [errors, setErrors] = useState({});
   const [feedback, setFeedback] = useState({ type: "", message: "" });
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes (300s)
 
-  const isOtpStep = step === "otp";
-
-  useEffect(() => {
-    let timer;
-    if (isOtpStep && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
+  const validateForm = () => {
+    const result = signupSchema.safeParse(formData);
+    if (!result.success) {
+      const formattedErrors = formatZodErrors(result.error);
+      setErrors(formattedErrors);
+      return false;
     }
-    return () => clearInterval(timer);
-  }, [isOtpStep, timeLeft]);
+    setErrors({});
+    return true;
+  };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
-
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
-    setFeedback({ type: "", message: "" });
-
-    const result = await sendOtp({ email: formData.email });
-    if (result.success) {
-      setFeedback({ type: "success", message: result.message || "OTP sent to your email." });
-      setStep("otp");
-      setTimeLeft(300);
-    } else {
-      setFeedback({ type: "error", message: result.message || "Unable to send OTP." });
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    if (errors[id]) {
+      const errorMsg = validateFieldWithZod(signupSchema, id, value);
+      setErrors(prev => ({ ...prev, [id]: errorMsg }));
     }
   };
 
-  const handleResendOtp = async () => {
-    setFeedback({ type: "", message: "" });
-    const result = await sendOtp({ email: formData.email });
-    if (result.success) {
-      setFeedback({ type: "success", message: "A new OTP has been sent to your email." });
-      setTimeLeft(300);
-    } else {
-      setFeedback({ type: "error", message: result.message || "Failed to resend OTP." });
-    }
+  const handleBlur = (e) => {
+    const { id, value } = e.target;
+    const errorMsg = validateFieldWithZod(signupSchema, id, value);
+    setErrors(prev => ({ ...prev, [id]: errorMsg }));
   };
 
-  const handleVerifyAndSignup = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setFeedback({ type: "", message: "" });
 
-    if (timeLeft === 0) {
-      setFeedback({ type: "error", message: "OTP has expired. Please request a new one." });
+    if (!validateForm()) {
+      toast.error("Please fix the validation errors before submitting");
       return;
     }
 
     const result = await signup({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      phoneNumber: formData.phoneNumber,
-      otp: formData.otp,
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phoneNumber: formData.phoneNumber.trim()
     });
 
     if (result.success) {
-      setFeedback({ type: "success", message: "Account created and logged in successfully!" });
-      setTimeout(() => {
-        navigate("/chats");
-      }, 1000);
+      localStorage.setItem("pendingEmail", formData.email.trim());
+      toast.success(result.message || "OTP sent to your email!");
+      navigate("/verify-otp", { state: { email: formData.email.trim() } });
     } else {
-      setFeedback({ type: "error", message: result.message || "OTP verification or signup failed." });
+      setFeedback({ type: "error", message: result.message || "Unable to send OTP" });
+      toast.error(result.message || "Signup failed");
     }
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  const buttonLabel = useMemo(() => {
-    if (loading) return isOtpStep ? "Verifying & Registering..." : "Sending OTP...";
-    return isOtpStep ? "Verify OTP & Register" : "Register & Send OTP";
-  }, [loading, isOtpStep]);
-
   return (
-    <div className="min-h-screen flex justify-center items-center px-4 bg-background text-foreground">
-      <Card className="w-full max-w-sm border shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">{isOtpStep ? "Verify your Email" : "Create Account"}</CardTitle>
-        
-          <CardAction>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/20 px-4">
+      <Card className="w-full max-w-md shadow-xl border-primary/10">
+
+        <CardHeader className="space-y-2 text-center">
+          <CardTitle className="text-xl font-bold">
+            Create your Chat Account
+          </CardTitle>
+
+          <p className="text-sm text-muted-foreground">
+            Connect with friends and start conversations instantly
+          </p>
+
+          <CardAction className="mx-auto">
+            <span className="text-sm text-muted-foreground">
+              Already have an account?
+            </span>
             <Link to="/login">
-              <Button variant="link" className="p-0 bold"> Login</Button>
+              <Button variant="link" className="px-1">
+                Login
+              </Button>
             </Link>
           </CardAction>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={isOtpStep ? handleVerifyAndSignup : handleSendOtp}>
-            <div className="flex flex-col gap-4">
-              {!isOtpStep ? (
-                <>
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" type="text" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} required />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="phoneNumber">Phone Number (Optional)</Label>
-                    <Input id="phoneNumber" type="text" placeholder="1234567890" value={formData.phoneNumber} onChange={handleChange} />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" placeholder="••••••••" value={formData.password} onChange={handleChange} required />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="grid gap-2">
-                    <Label htmlFor="otp">6-Digit OTP</Label>
-                    <Input
-                      id="otp"
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      placeholder="123456"
-                      value={formData.otp}
-                      onChange={handleChange}
-                      required
-                      className="text-center tracking-widest text-lg font-mono"
-                    />
-                  </div>
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="flex flex-col gap-3">
 
-                  <div className="flex items-center justify-between text-sm mt-2">
-                    <span className={`font-mono ${timeLeft < 60 ? "text-red-500 font-semibold" : "text-muted-foreground"}`}>
-                      {timeLeft > 0 ? `Time remaining: ${formatTime(timeLeft)}` : "OTP Expired"}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleResendOtp}
-                      disabled={loading}
-                      className="text-xs hover:underline p-1 h-auto"
-                    >
-                      Resend OTP
-                    </Button>
-                  </div>
-                </>
-              )}
+              <div className="grid gap-1">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`h-10 ${errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  required
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 font-medium mt-0.5">{errors.name}</p>
+                )}
+              </div>
+
+              <div className="grid gap-1">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`h-10 ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  required
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500 font-medium mt-0.5">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="grid gap-1">
+                <Label htmlFor="phoneNumber">
+                  Phone Number <span className="text-muted-foreground text-xs">(optional)</span>
+                </Label>
+                <Input
+                  id="phoneNumber"
+                  placeholder="+91 9876543210"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`h-10 ${errors.phoneNumber ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                />
+                {errors.phoneNumber && (
+                  <p className="text-xs text-red-500 font-medium mt-0.5">{errors.phoneNumber}</p>
+                )}
+              </div>
+
+              <div className="grid gap-1">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a strong password (min 6 chars)"
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`h-10 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  required
+                />
+                {errors.password && (
+                  <p className="text-xs text-red-500 font-medium mt-0.5">{errors.password}</p>
+                )}
+              </div>
+
             </div>
 
-            {feedback.message ? (
-              <div className={`mt-4 p-2 text-sm rounded border ${feedback.type === "error" ? "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300" : "bg-green-50 border-green-200 text-green-700 dark:bg-green-950 dark:border-green-800 dark:text-green-300"}`}>
+            {feedback.message && (
+              <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-2 text-sm text-red-600">
                 {feedback.message}
               </div>
-            ) : null}
+            )}
 
-            <Button type="submit" className="w-full mt-6" disabled={loading || (isOtpStep && timeLeft === 0)}>
-              {buttonLabel}
+            <Button
+              type="submit"
+              className="w-full mt-5 h-10"
+              disabled={loading}
+            >
+              {loading ? "Sending OTP..." : "Create Account & Continue"}
             </Button>
 
-            {isOtpStep && (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full mt-2"
-                onClick={() => {
-                  setStep("signup");
-                  setFeedback({ type: "", message: "" });
-                }}
-              >
-                Back to Registration
-              </Button>
-            )}
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              By creating an account, you agree to our terms and privacy policy.
+            </p>
           </form>
         </CardContent>
 
-        <CardFooter className="flex-col gap-2"></CardFooter>
+        <CardFooter className="justify-center py-3">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+            Secure OTP verification enabled
+          </div>
+        </CardFooter>
+
       </Card>
     </div>
   );
 }
 
-export default SignupPage;
+export default SignupForm;

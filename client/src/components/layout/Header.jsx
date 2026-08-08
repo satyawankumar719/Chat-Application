@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MessageCircle, UserPlus, LogOut, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
-
+import {toast} from 'sonner'
 function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
@@ -48,6 +48,7 @@ function Header() {
             size="sm"
             onClick={() => {
               logout();
+              toast.success("logout successfully")
               navigate("/login", { replace: true });
             }}
             title="Logout"

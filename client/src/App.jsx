@@ -6,14 +6,20 @@ import InvitationsPage from "./pages/InvitationsPage";
 import CreateChatPage from "./pages/CreateChatPage";
 import ProtectedRoute from "./components/protectedRoutes";
 import AppLayout from "./components/layout/AppLayout";
-
+import PublicRoutes from "./components/publicRoutes";
+import VerifyOtp from "./pages/authPages/verifyOtp";
+import { Toaster } from "sonner";
 function App() {
+
+  
   return (
     <BrowserRouter>
       <Routes>
+        <Route element = {<PublicRoutes/>}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-
+        <Route path="/verify-otp" element = {<VerifyOtp/>}/>
+</Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route index element={<Navigate to="/chats" replace />} />
@@ -25,6 +31,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/chats" replace />} />
       </Routes>
+     <Toaster position="top-center" richColors />
     </BrowserRouter>
   );
 }

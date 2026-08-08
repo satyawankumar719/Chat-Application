@@ -1,28 +1,56 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
-import { useChatStore } from "../../../store/chatStore";
 
-function SearchRecentUsers({ setFilteredChats }) {
-  const [search, setSearch] = useState("");
-
-  const { chats } = useChatStore();
+function SearchRecentUsers({ setSearchResults, chats = [], setSearching, currentUserId }) {
+  const [searchText, setSearchText] = useState("");
 
   const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearch(value);
+    const text = e.target.value;
+    setSearchText(text);
 
-    if (!value.trim()) {
-      setFilteredChats(chats);
+    const query = text.toLowerCase().trim();
+
+    if (query === "") {
+      setSearchResults(chats);
+      setSearching(false);
       return;
     }
 
-    const filtered = chats.filter((chat) =>
-      (chat.name || "")
-        .toLowerCase()
-        .includes(value.toLowerCase())
-    );
+    const currentId = currentUserId ? currentUserId.toString() : "";
 
-    setFilteredChats(filtered);
+    const filtered = chats.filter(function (chat) {
+      // Check if chat has a group/chat name
+      if (chat.name && chat.name.toLowerCase().includes(query)) {
+        return true;
+      }
+
+      // Check member names
+      if (chat.members && Array.isArray(chat.members)) {
+        for (let i = 0; i < chat.members.length; i++) {
+          const member = chat.members[i];
+          const user = member.user;
+
+          if (user) {
+            const memberId = (user._id || user.id || "").toString();
+
+            // Skip checking myself
+            if (memberId !== currentId) {
+              const name = (user.name || "").toLowerCase();
+              const email = (user.email || "").toLowerCase();
+
+              if (name.includes(query) || email.includes(query)) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+
+      return false;
+    });
+
+    setSearching(true);
+    setSearchResults(filtered);
   };
 
   return (
@@ -31,7 +59,7 @@ function SearchRecentUsers({ setFilteredChats }) {
 
       <input
         type="text"
-        value={search}
+        value={searchText}
         onChange={handleSearch}
         placeholder="Search users..."
         className="h-10 w-full rounded-lg border bg-background pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary"

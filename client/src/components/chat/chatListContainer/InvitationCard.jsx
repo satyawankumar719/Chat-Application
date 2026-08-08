@@ -1,6 +1,6 @@
 import React from "react";
 import { Check, X } from "lucide-react";
-
+import { Loader } from "lucide-react";
 function InvitationCard({
   invitation,
   loading,

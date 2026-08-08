@@ -4,11 +4,23 @@ import { API_CONFIG } from "./apiConfig";
 export const messageApi = {
   getUserChats: async () => apiClient.get(API_CONFIG.ENDPOINTS.MESSAGES.CHATS),
 
-  uploadFile: async (file) => {
+  uploadFile: async (file, onUploadProgress, signal) => {
     const formData = new FormData();
     formData.append("file", file);
 
     return apiClient.post(API_CONFIG.ENDPOINTS.MESSAGES.UPLOAD, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress,
+      signal,
+    });
+  },
+    uploadMultipleFile: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return apiClient.post(API_CONFIG.ENDPOINTS.MESSAGES.UPLOAD_MULTIPLE, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

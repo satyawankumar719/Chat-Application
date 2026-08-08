@@ -37,15 +37,12 @@ export const handleLogin = async (req, res, next) => {
 
 export const handleSignup = async (req, res, next) => {
     try {
-        const { name, email, password, phoneNumber, otp } = req.body;
-        const user = await signup({ name, email, password, phoneNumber, otp });
-        const token = generateToken(user);
-        res.cookie("Chat_token", token, COOKIE_OPTIONS);
+        const { name, email, password, phoneNumber } = req.body;
+        const result = await signup({ name, email, password, phoneNumber });
         return res.status(201).json({
             success: true,
-            message: "Signup successful",
-            user,
-            token,
+            message: result.message,
+            email: result.email,
         });
     } catch (error) {
         next(error);
@@ -56,6 +53,14 @@ export const sendOtp = async (req, res, next) => {
     try {
         const { email } = req.body;
         const result = await sendOtpToEmail(email);
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                message: result.message || "Failed to send OTP",
+            });
+        }
+
         return res.status(200).json({
             success: true,
             message: result.message,
@@ -68,10 +73,14 @@ export const sendOtp = async (req, res, next) => {
 export const verifyOtp = async (req, res, next) => {
     try {
         const { email, otp } = req.body;
-        const result = await verifyEmailOtp(email, otp);
+        const user = await verifyEmailOtp(email, otp);
+        const token = generateToken(user);
+        res.cookie("Chat_token", token, COOKIE_OPTIONS);
         return res.status(200).json({
             success: true,
-            message: result.message,
+            message: "Email verified successfully",
+            user,
+            token,
         });
     } catch (error) {
         next(error);

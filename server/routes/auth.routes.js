@@ -21,7 +21,7 @@ import {
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = Router();
-router.get('/me', authMiddleware, getCurrentUser);
+
 router.post("/login", validateBody(loginSchema), handleLogin);
 router.post("/signup", validateBody(registerSchema), handleSignup);
 router.post("/send-otp", validateBody(sendOtpSchema), sendOtp);
@@ -29,7 +29,6 @@ router.post("/verify-otp", validateBody(verifyOtpSchema), verifyOtp);
 router.post("/forgot-password", validateBody(forgotPasswordSchema), handleForgotPassword);
 router.post("/reset-password", validateBody(resetPasswordSchema), handleResetPassword);
 router.post("/logout", handleLogout);
-
 router.get("/me", authMiddleware, getCurrentUser);
 
 export default router;

@@ -4,6 +4,7 @@ import ChatList from "@/components/chat/chatListContainer/ChatList";
 import ChatContainer from "@/components/chat/ChatContainer";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { useInvitationStore } from "@/store/invitationStore";
 
 function ChatsPage() {
   const navigate = useNavigate();
@@ -15,14 +16,22 @@ function ChatsPage() {
     selectedChatId,
     loadingChats,
     setSelectedChatId,
+    fetchChats,
   } = useChatStore();
+
+  const { fetchPendingInvitations } = useInvitationStore();
 
   useEffect(() => {
     if (!checkingAuth && !user) {
       navigate("/login", { replace: true });
       return;
     }
-  }, [user, checkingAuth, navigate]);
+
+    if (user) {
+      fetchChats();
+      fetchPendingInvitations();
+    }
+  }, [user, checkingAuth, navigate, fetchChats, fetchPendingInvitations]);
 
   const selectedChat = chats.find((chat) => chat._id === selectedChatId) || null;
 
