@@ -1,5 +1,8 @@
 import { logger } from "../logger.js";
 import Message from "../models/Message.js";
+import User from "../models/User.js";
+import { verifyToken } from "../utils/index.js";
+import { getTokenFromCookie } from "./socketAuth.js";
 import {
   findChatForUser,
   setUserUnreadCount,
@@ -8,10 +11,36 @@ import {
 } from "./socketHelpers.js";
 import { isUserOnline } from "./userManager.js";
 
+async function validateSocketUser(socket, messageData, currentUserId) {
+  let token = messageData?.token || socket.authToken;
+  if (!token) {
+    const cookieHeader = socket.request?.headers?.cookie || socket.handshake?.headers?.cookie;
+    token = getTokenFromCookie(cookieHeader) || socket.handshake.auth?.token;
+  }
+
+  if (!token) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded || !decoded.id || decoded.id.toString() !== currentUserId.toString()) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const dbUser = await User.findById(currentUserId);
+  if (!dbUser) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  return dbUser;
+}
+
 function handleMarkMessagesRead(socket, currentUserId) {
   socket.on("mark_messages_read", async ({ chatId }) => {
     try {
       if (!chatId) return;
+
+      await validateSocketUser(socket, null, currentUserId);
 
       const chat = await findChatForUser(chatId, currentUserId);
 
@@ -61,6 +90,9 @@ function handleMarkMessagesRead(socket, currentUserId) {
         status: "read",
       });
     } catch (error) {
+      if (error.message === "UNAUTHORIZED") {
+        socket.emit("auth_error", { message: "Session expired or invalid token" });
+      }
       logger.error("Mark Read Error:", error);
     }
   });
@@ -69,6 +101,19 @@ function handleMarkMessagesRead(socket, currentUserId) {
 function handleSendMessage(io, socket, currentUserId) {
   socket.on("send_message", async (messageData, acknowledge) => {
     try {
+      // Security Check: Validate token and user existence before accepting message
+      try {
+        await validateSocketUser(socket, messageData, currentUserId);
+      } catch (authErr) {
+        socket.emit("auth_error", { message: "Session expired or invalid token" });
+        return acknowledge?.({
+          success: false,
+          error: "Unauthorized: Invalid or expired token",
+          code: "UNAUTHORIZED",
+        });
+      }
+
+
       const {
         chatId,
         content,
@@ -97,7 +142,8 @@ function handleSendMessage(io, socket, currentUserId) {
       if (!chat) {
         return acknowledge?.({
           success: false,
-          error: "Chat not found.",
+          error: "Forbidden: You are not a member of this chat.",
+          code: "FORBIDDEN",
         });
       }
 
@@ -188,3 +234,4 @@ function handleSendMessage(io, socket, currentUserId) {
 }
 
 export { handleMarkMessagesRead, handleSendMessage };
+

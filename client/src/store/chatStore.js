@@ -13,6 +13,107 @@ function getCurrentUserId() {
   return idFromdb || idFromField || null;
 }
 
+async function uploadFileResumable(file, chatId, onProgress, uploadId, signal) {
+  const CHUNK_SIZE = 1 * 1024 * 1024;
+  const fileType = file.type.startsWith("image") ? "image" : "file";
+
+  let startByte = 0;
+  let currentUploadId = uploadId;
+
+  try {
+    const initRes = await messageApi.initUpload({
+      uploadId,
+      chatId,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType,
+    });
+    const session = initRes.data?.data;
+    startByte = session?.uploadedBytes || 0;
+    currentUploadId = session?.uploadId || uploadId;
+
+    if (session?.status === "upload_completed" && session?.finalUrl) {
+      return {
+        fileUrl: session.finalUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        type: fileType,
+      };
+    }
+  } catch (e) {
+    // Fall back if init fails
+  }
+
+  const handleUnload = () => {
+    try {
+      const payload = JSON.stringify({ uploadId: currentUploadId });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon("/api/messages/upload/interrupt", payload);
+      }
+    } catch {}
+  };
+  window.addEventListener("beforeunload", handleUnload);
+
+  try {
+    while (startByte < file.size) {
+      if (signal?.aborted) {
+        throw new Error("ERR_CANCELED");
+      }
+
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        onProgress({ loaded: startByte, total: file.size, isReconnecting: true });
+        await new Promise((resolve) => {
+          const handleOnline = () => {
+            window.removeEventListener("online", handleOnline);
+            resolve();
+          };
+          window.addEventListener("online", handleOnline);
+        });
+        try {
+          const statusRes = await messageApi.getUploadStatus(currentUploadId);
+          startByte = statusRes.data?.data?.uploadedBytes || startByte;
+        } catch {}
+      }
+
+      const endByte = Math.min(file.size, startByte + CHUNK_SIZE);
+      const chunkBlob = file.slice(startByte, endByte);
+
+      const formData = new FormData();
+      formData.append("uploadId", currentUploadId);
+      formData.append("startByte", startByte.toString());
+      formData.append("chunk", chunkBlob, file.name);
+
+      const chunkRes = await messageApi.uploadChunk(
+        formData,
+        (pEvent) => {
+          const currentLoaded = pEvent.loaded || 0;
+          const totalLoaded = Math.min(file.size, startByte + currentLoaded);
+          onProgress({ loaded: totalLoaded, total: file.size, isReconnecting: false });
+        },
+        signal
+      );
+
+      const chunkData = chunkRes.data?.data;
+
+      if (chunkData?.completed && chunkData?.fileUrl) {
+        return {
+          fileUrl: chunkData.fileUrl,
+          fileName: file.name,
+          fileSize: file.size,
+          type: fileType,
+        };
+      }
+
+      startByte = chunkData?.uploadedBytes || endByte;
+    }
+  } finally {
+    window.removeEventListener("beforeunload", handleUnload);
+  }
+
+  throw new Error("Upload ended without URL.");
+}
+
+
 function sortChatsByRecent(chatsArray) {
   const copy = [...chatsArray];
 
@@ -57,14 +158,22 @@ function makeUniqueAndSortMessages(messagesArray) {
   return result;
 }
 
+function getSenderId(sender) {
+  if (!sender) return "";
+  if (typeof sender === "object") {
+    return (sender._id || sender.id || "").toString();
+  }
+  return sender.toString();
+}
+
 function updateLastMessageInChats(chatsArray, chatId, newMessage, isCurrentlySelected, currentUserId) {
   const result = [];
 
   for (let i = 0; i < chatsArray.length; i++) {
     const chat = chatsArray[i];
     if (chat._id === chatId) {
-      const senderId = newMessage?.sender?._id?.toString() || newMessage?.sender?.id?.toString();
-      const isFromOther = senderId && currentUserId && senderId !== currentUserId;
+      const senderId = getSenderId(newMessage?.sender);
+      const isFromOther = senderId && currentUserId && senderId !== currentUserId.toString();
       let newUnreadCount = { ...(chat.unreadCount || {}) };
 
       if (isCurrentlySelected) {
@@ -87,6 +196,7 @@ function updateLastMessageInChats(chatsArray, chatId, newMessage, isCurrentlySel
 
   return sortChatsByRecent(result);
 }
+
 
 function updateUserStatusInChats(chatsArray, userId, isOnline, lastSeen) {
   if (!userId || !Array.isArray(chatsArray)) return chatsArray || [];
@@ -437,10 +547,9 @@ export const useChatStore = create(function (set, get) {
       const current = get();
       const currentUserId = getCurrentUserId();
 
-      const senderId = incomingMessage.sender?._id?.toString()
-        || incomingMessage.sender?.id?.toString();
+      const senderId = getSenderId(incomingMessage.sender);
 
-      const isMyOwnMessage = senderId && currentUserId && senderId === currentUserId;
+      const isMyOwnMessage = senderId && currentUserId && senderId === currentUserId.toString();
       const isForCurrentlySelectedChat = incomingMessage.chat === current.selectedChatId;
 
       if (isForCurrentlySelectedChat && !isMyOwnMessage) {
@@ -458,15 +567,16 @@ export const useChatStore = create(function (set, get) {
             const idMatch = m._id === incomingMessage._id;
 
             const sendingTempMatch =
-              m.status === "sending"
+              (m.status === "sending" || m.isUploading)
               && m.content === incomingMessage.content
-              && m.sender?._id === incomingMessage.sender?._id;
+              && getSenderId(m.sender) === senderId;
 
             if (idMatch || sendingTempMatch) {
               existingIndex = i;
               break;
             }
           }
+
 
           if (existingIndex !== -1) {
             const replaced = [];
@@ -523,9 +633,128 @@ export const useChatStore = create(function (set, get) {
       });
     },
 
+    updateMessageUploadState: function (tempId, updates) {
+      set(function (state) {
+        const updated = state.messages.map((m) => {
+          if (m._id === tempId) {
+            return { ...m, ...updates };
+          }
+          return m;
+        });
+        return { messages: updated };
+      });
+    },
+
+    retryUpload: async function (tempId) {
+      const state = get();
+      const tempMsg = state.messages.find((m) => m._id === tempId);
+      if (!tempMsg || !tempMsg.rawFileItems || tempMsg.rawFileItems.length === 0) return;
+
+      const abortController = new AbortController();
+      get().updateMessageUploadState(tempId, {
+        uploadStatus: "uploading",
+        isUploading: true,
+        uploadError: null,
+        abortController,
+      });
+
+      const chatId = tempMsg.chat;
+      let serverUploadedFiles = [];
+
+      try {
+        for (const item of tempMsg.rawFileItems) {
+          const uploaded = await uploadFileResumable(
+            item.file,
+            chatId,
+            (p) => {
+              const percent = Math.round((p.loaded * 100) / p.total);
+              get().updateMessageUploadState(tempId, {
+                uploadProgress: percent,
+                isReconnecting: p.isReconnecting,
+              });
+            },
+            tempId,
+            abortController.signal
+          );
+          if (uploaded?.fileUrl) {
+            serverUploadedFiles.push(uploaded);
+          }
+        }
+      } catch (err) {
+        if (err.name === "CanceledError" || err.message === "ERR_CANCELED") {
+          return null;
+        }
+        get().updateMessageUploadState(tempId, {
+          uploadStatus: "upload_failed",
+          isUploading: false,
+          uploadError: err.response?.data?.message || err.message || "Upload failed",
+        });
+        return null;
+      }
+
+      get().updateMessageUploadState(tempId, {
+        attachments: serverUploadedFiles,
+        fileUrl: serverUploadedFiles[0]?.fileUrl || tempMsg.fileUrl,
+        isUploading: false,
+        uploadStatus: "upload_completed",
+        uploadProgress: 100,
+        status: "sending",
+      });
+
+      const socketStore = useSocketStore.getState();
+      const firstAttachment = serverUploadedFiles[0] || tempMsg.attachment;
+
+      let gotResponse = false;
+      try {
+        const response = await new Promise(function (resolve) {
+          let timeoutId = setTimeout(function () {
+            if (!gotResponse) {
+              gotResponse = true;
+              resolve({ success: false, error: "Socket timeout" });
+            }
+          }, 10000);
+
+          socketStore.sendMessageSocket(
+            chatId,
+            tempMsg.content,
+            tempId,
+            function (result) {
+              if (!gotResponse) {
+                gotResponse = true;
+                clearTimeout(timeoutId);
+                resolve(result);
+              }
+            },
+            firstAttachment,
+            serverUploadedFiles
+          );
+        });
+
+        if (!response.success) {
+          if (response.code === "UNAUTHORIZED") {
+            if (window.location.pathname !== "/login") window.location.href = "/login";
+          }
+          throw new Error(response.error || "Unable to send message.");
+        }
+
+        const serverMessage = response.message;
+        set(function (s) {
+          const replaced = s.messages.map((m) => (m._id === tempId ? serverMessage : m));
+          return {
+            messages: replaced,
+            chats: updateLastMessageInChats(s.chats, chatId, serverMessage),
+          };
+        });
+      } catch (sendErr) {
+        get().updateMessageUploadState(tempId, {
+          status: "failed",
+          uploadError: sendErr.message,
+        });
+      }
+    },
+
     sendMessage: async function (chatId, content, attachments) {
       if (!attachments) attachments = [];
-
       if (!chatId) return null;
 
       const text = content?.trim();
@@ -573,7 +802,9 @@ export const useChatStore = create(function (set, get) {
         attachments: finalAttachments,
         isUploading: isFileUpload,
         uploadProgress: 0,
+        uploadStatus: isFileUpload ? "uploading" : "upload_completed",
         abortController: abortController,
+        rawFileItems: rawFileItems,
       });
 
       set(function (state) {
@@ -590,37 +821,32 @@ export const useChatStore = create(function (set, get) {
       if (isFileUpload) {
         try {
           for (const item of rawFileItems) {
-            const response = await messageApi.uploadFile(
+            const uploaded = await uploadFileResumable(
               item.file,
-              (progressEvent) => {
-                if (progressEvent.total) {
-                  const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                  get().updateMessageProgress(tempId, percent);
-                }
+              chatId,
+              (p) => {
+                const percent = Math.round((p.loaded * 100) / p.total);
+                get().updateMessageUploadState(tempId, {
+                  uploadProgress: percent,
+                  isReconnecting: p.isReconnecting,
+                });
               },
+              tempId,
               abortController.signal
             );
-
-            const uploadedFile = response.data?.data || response.data;
-            if (uploadedFile?.fileUrl) {
-              serverUploadedFiles.push({
-                type: uploadedFile.type || "image",
-                fileUrl: uploadedFile.fileUrl,
-                fileName: uploadedFile.fileName,
-                fileSize: uploadedFile.fileSize,
-              });
+            if (uploaded?.fileUrl) {
+              serverUploadedFiles.push(uploaded);
             }
           }
         } catch (uploadErr) {
-          if (uploadErr.name === "CanceledError" || uploadErr.code === "ERR_CANCELED") {
+          if (uploadErr.name === "CanceledError" || uploadErr.message === "ERR_CANCELED") {
             console.log("Upload cancelled by user");
             return null;
           }
-          set(function (state) {
-            return {
-              messages: state.messages.filter((m) => m._id !== tempId),
-              error: uploadErr.response?.data?.message || "File upload failed.",
-            };
+          get().updateMessageUploadState(tempId, {
+            uploadStatus: "upload_failed",
+            isUploading: false,
+            uploadError: uploadErr.response?.data?.message || uploadErr.message || "File upload failed.",
           });
           return null;
         }
@@ -636,6 +862,7 @@ export const useChatStore = create(function (set, get) {
               attachments: finalAttachments,
               fileUrl: finalAttachments[0]?.fileUrl || m.fileUrl,
               isUploading: false,
+              uploadStatus: "upload_completed",
               uploadProgress: 100,
               status: "sending",
             };
@@ -646,7 +873,6 @@ export const useChatStore = create(function (set, get) {
       });
 
       const updatedFirstAttachment = finalAttachments[0] || firstAttachment;
-
       let gotResponse = false;
 
       try {
@@ -675,6 +901,9 @@ export const useChatStore = create(function (set, get) {
         });
 
         if (!response.success) {
+          if (response.code === "UNAUTHORIZED") {
+            if (window.location.pathname !== "/login") window.location.href = "/login";
+          }
           throw new Error(response.error || "Unable to send message.");
         }
 
@@ -703,15 +932,15 @@ export const useChatStore = create(function (set, get) {
         return serverMessage;
       } catch (err) {
         set(function (state) {
-          const filtered = [];
-          for (let k = 0; k < state.messages.length; k++) {
-            if (state.messages[k]._id !== tempId) {
-              filtered.push(state.messages[k]);
+          const updated = state.messages.map((m) => {
+            if (m._id === tempId) {
+              return { ...m, status: "failed", uploadError: err.message };
             }
-          }
+            return m;
+          });
 
           return {
-            messages: filtered,
+            messages: updated,
             error: err.message,
           };
         });
@@ -721,6 +950,7 @@ export const useChatStore = create(function (set, get) {
         set({ sendingMessage: false });
       }
     },
+
 
     messageStatusUpdate: function (messageId, newStatus) {
       if (!messageId || !newStatus) return;

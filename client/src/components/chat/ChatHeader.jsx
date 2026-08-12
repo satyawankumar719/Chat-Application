@@ -35,21 +35,28 @@ function ChatHeader({
             <ArrowLeft className="h-5 w-5" />
           </button>
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Users className="h-5 w-5" />
-          </div>
+          <div
+            onClick={handleOpen}
+            className="flex items-center gap-3 cursor-pointer group hover:opacity-90 transition-opacity"
+            title="Open Group Info"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary group-hover:bg-primary/25 transition-colors">
+              <Users className="h-5 w-5" />
+            </div>
 
-          <div>
-            <h3 className="font-semibold">
-              {chat.name || "Group"}
-            </h3>
+            <div>
+              <h3 className="font-semibold group-hover:text-primary transition-colors">
+                {chat.name || "Group"}
+              </h3>
 
-            <p className="text-sm text-muted-foreground">
-              {memberCount}{" "}
-              {memberCount === 1 ? "member" : "members"}
-            </p>
+              <p className="text-sm text-muted-foreground">
+                {memberCount}{" "}
+                {memberCount === 1 ? "member" : "members"}
+              </p>
+            </div>
           </div>
         </div>
+
 
         <button
           type="button"

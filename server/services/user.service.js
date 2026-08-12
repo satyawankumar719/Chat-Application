@@ -2,26 +2,33 @@ import User from "../models/User.js";
 import Invitation from "../models/Invitation.js";
 import Chat from "../models/Conversation.js";
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 export const searchUsers = async (currentUserId, searchQuery) => {
-  if (!searchQuery || !searchQuery.trim()) {
-    return [];
-  }
-
-  const queryRegex = new RegExp(searchQuery.trim(), "i");
-
-  const users = await User.find({
+  const filter = {
     _id: { $ne: currentUserId },
-    isVerified: true,
-    $or: [
+  };
+
+  if (searchQuery && searchQuery.trim()) {
+    const sanitizedQuery = searchQuery.trim();
+    const queryRegex = new RegExp(escapeRegex(sanitizedQuery), "i");
+    filter.$or = [
       { name: queryRegex },
       { email: queryRegex },
       { phoneNumber: queryRegex }
-    ]
-  }).select("name email phoneNumber avatar isOnline lastSeen bio").limit(20);
+    ];
+  }
+
+  const users = await User.find(filter)
+    .select("name email phoneNumber avatar isOnline lastSeen bio")
+    .limit(30);
 
   if (users.length === 0) {
     return [];
   }
+
 
   const userIds = users.map((u) => u._id);
 

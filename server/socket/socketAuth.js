@@ -1,4 +1,5 @@
 import { verifyToken } from "../utils/index.js";
+import User from "../models/User.js";
 
 function getTokenFromCookie(cookieHeader) {
   if (!cookieHeader) return null;
@@ -14,7 +15,7 @@ function getTokenFromCookie(cookieHeader) {
   return authCookie.split("=")[1];
 }
 
-function socketAuthMiddleware(socket, next) {
+async function socketAuthMiddleware(socket, next) {
   let token = socket.handshake.auth?.token;
 
   if (!token) {
@@ -23,21 +24,28 @@ function socketAuthMiddleware(socket, next) {
   }
 
   if (!token) {
-    return next(new Error("Unauthorized access. Token missing."));
+    return next(new Error("UNAUTHORIZED: Token missing"));
   }
 
   try {
     const decodedUser = verifyToken(token);
 
-    if (!decodedUser.isVerified) {
-      return next(new Error("Unauthorized. Email not verified."));
+    if (!decodedUser || !decodedUser.id) {
+      return next(new Error("UNAUTHORIZED: Invalid token payload"));
     }
 
-    socket.user = decodedUser;
+    const dbUser = await User.findById(decodedUser.id).select("-password");
+    if (!dbUser) {
+      return next(new Error("UNAUTHORIZED: User no longer exists"));
+    }
+
+    socket.user = dbUser;
+    socket.authToken = token;
     next();
   } catch (error) {
-    next(new Error("Unauthorized access. Invalid token."));
+    next(new Error("UNAUTHORIZED: Invalid token"));
   }
 }
 
 export { socketAuthMiddleware, getTokenFromCookie };
+

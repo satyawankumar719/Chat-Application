@@ -29,10 +29,24 @@ export const useSocketStore = create(function (set, get) {
         console.log("Socket disconnected");
         set({ connected: false });
       });
+      newSocket.on("auth_error", function (data) {
+        console.error("⚠️ Socket auth error:", data?.message);
+        set({ connected: false });
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+      });
       newSocket.on("connect_error", function (error) {
         console.error("⚠️ Socket connection error:", error.message);
+        if (error.message && error.message.includes("UNAUTHORIZED")) {
+          set({ connected: false });
+          if (window.location.pathname !== "/login") {
+            window.location.href = "/login";
+          }
+        }
       });
       set({ socket: newSocket, connected: false, token: userToken });
+
 
       return newSocket;
     },
@@ -65,11 +79,13 @@ export const useSocketStore = create(function (set, get) {
     },
     sendMessageSocket: function (chatId, content, tempId, ackCallback, attachment = null, attachments = []) {
       const activeSocket = get().socket;
+      const userToken = get().token;
 
       if (activeSocket?.connected) {
          activeSocket.emit(
           "send_message",
           {
+            token: userToken,
             chatId: chatId,
             content: content,
             tempId: tempId,
@@ -86,6 +102,7 @@ export const useSocketStore = create(function (set, get) {
 
       return false; 
     },
+
     inviteUser: function (receiverId) {
       const activeSocket = get().socket;
 

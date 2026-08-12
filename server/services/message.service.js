@@ -37,7 +37,13 @@ export const getUserChatsService = async (userId) => {
     return chatObj;
   });
 };export const getChatMessagesService = async (chatId, userId, page = 1, limit = 50) => {
+  const chat = await Chat.findOne({ _id: chatId, "members.user": userId, isActive: true });
+  if (!chat) {
+    throw { status: 403, message: "Forbidden: You are not authorized to view messages in this chat." };
+  }
+
   const query = { chat: chatId };
+
   const safePage = Math.max(1, Number(page) || 1);
   const safeLimit = Math.max(1, Number(limit) || 50);
   const skip = (safePage - 1) * safeLimit;

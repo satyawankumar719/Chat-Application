@@ -41,16 +41,21 @@ function ChatContainer({ chat, onBack, setShowGroupInfo }) {
     };
   }, [socket, chat?._id, currentUserId]);
 
+  const savedUnreadIdRef = useRef(null);
+
   useEffect(() => {
     if (!chat?._id) return;
 
     currentChatIdRef.current = chat._id;
+    savedUnreadIdRef.current = null;
+
     markMessagesRead(chat._id);
 
     return () => {
       currentChatIdRef.current = null;
     };
   }, [chat?._id, markMessagesRead]);
+
 
   if (!chat) {
     return (
@@ -66,26 +71,31 @@ function ChatContainer({ chat, onBack, setShowGroupInfo }) {
     );
   }
 
-  let firstUnreadId = null;
   let unreadCount = 0;
 
   if (Array.isArray(messages)) {
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
-      const senderId = (msg.sender?._id || msg.sender?.id || "").toString();
-      if (
-        senderId &&
-        currentUserId &&
-        senderId !== currentUserId.toString() &&
-        msg.status !== "read"
-      ) {
-        if (!firstUnreadId) {
-          firstUnreadId = msg._id || msg.id;
+      const senderObj = msg?.sender;
+      const senderId = (typeof senderObj === "object" ? (senderObj?._id || senderObj?.id) : senderObj)?.toString() || "";
+
+      const isFromOther = senderId && currentUserId && senderId !== currentUserId.toString();
+
+      const isUnread =
+        isFromOther &&
+        msg.status !== "read" &&
+        (!msg.readBy || !msg.readBy.some((r) => (r.user?._id || r.user || "").toString() === currentUserId.toString()));
+
+      if (isUnread) {
+        if (!savedUnreadIdRef.current) {
+          savedUnreadIdRef.current = msg._id || msg.id;
         }
         unreadCount++;
       }
     }
   }
+
+  const firstUnreadId = savedUnreadIdRef.current;
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
@@ -116,6 +126,7 @@ function ChatContainer({ chat, onBack, setShowGroupInfo }) {
         firstUnreadId={firstUnreadId}
         unreadCount={unreadCount}
       />
+
 
       <MessageInput
         chat={chat}

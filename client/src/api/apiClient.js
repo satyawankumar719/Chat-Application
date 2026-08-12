@@ -11,12 +11,23 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
+    try {
+      const authStorage = localStorage.getItem("auth-storage");
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        const token = parsed?.state?.user?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch {}
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
+
 
 apiClient.interceptors.response.use(
   (response) => response,

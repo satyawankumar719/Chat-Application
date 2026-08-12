@@ -38,15 +38,21 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
   const isAdminOrOwner = ["owner", "admin"].includes(currentMember?.role);
 
   const [searching, setSearching] = useState(false);
+  const searchSeqRef = React.useRef(0);
 
   useEffect(() => {
     if (!showAddMembers) return;
 
     setSearching(true);
+    const currentSeq = ++searchSeqRef.current;
+
     const timer = setTimeout(async () => {
       try {
         const queryToUse = searchQuery.trim();
         const res = await queryApi.searchUsers(queryToUse);
+
+        if (currentSeq !== searchSeqRef.current) return;
+
         const rawUsers = res.data?.data || res.data || [];
         const users = Array.isArray(rawUsers) ? rawUsers : [];
 
@@ -57,22 +63,33 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
           })
         );
 
-        setSearchResults(
-          users.filter((u) => {
-            const uid = (u._id || u.id)?.toString();
-            return uid && uid !== currentUserId && !memberIdSet.has(uid);
-          })
-        );
+        const seenIds = new Set();
+        const filtered = [];
+
+        for (const u of users) {
+          const uid = (u._id || u.id)?.toString();
+          if (uid && uid !== currentUserId && !memberIdSet.has(uid) && !seenIds.has(uid)) {
+            seenIds.add(uid);
+            filtered.push(u);
+          }
+        }
+
+        setSearchResults(filtered);
       } catch (err) {
-        console.error("Search users error in GroupInfoModal:", err);
-        setSearchResults([]);
+        if (currentSeq === searchSeqRef.current) {
+          console.error("Search users error in GroupInfoModal:", err);
+          setSearchResults([]);
+        }
       } finally {
-        setSearching(false);
+        if (currentSeq === searchSeqRef.current) {
+          setSearching(false);
+        }
       }
     }, 300);
 
     return () => clearTimeout(timer);
   }, [searchQuery, showAddMembers, chat?.members, currentUserId]);
+
 
   if (!isOpen || !chat) return null;
   const toggleSelectUser = (u) => {
@@ -277,10 +294,14 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search new users..."
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\s+/g, " ").trimStart();
+                    setSearchQuery(value);
+                  }}
+                  placeholder="Search users by name, email or phone..."
                   className="w-full bg-transparent text-sm focus:outline-none"
                 />
+
               </div>
 
               <div className="max-h-48 overflow-y-auto space-y-1">

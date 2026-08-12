@@ -16,10 +16,11 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
 
   const isOnline = onlineUserIds.includes(displayUserId);
 
-  const senderId = chat.lastMessage?.sender?._id?.toString() ||
-    chat.lastMessage?.sender?.id?.toString();
+  const lastSender = chat.lastMessage?.sender;
+  const senderId = (typeof lastSender === "object" ? (lastSender?._id || lastSender?.id) : lastSender)?.toString() || "";
 
-  const isMine = senderId === currentUserId;
+  const isMine = Boolean(senderId && currentUserId && senderId === currentUserId.toString());
+
 
   const message = isMine
     ? `You: ${chat.lastMessage?.content || ""}`
@@ -36,6 +37,9 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
     }
   }
 
+  const isGroup = chat.type === "group";
+  const title = isGroup ? chat.name || "Group Chat" : (displayUser?.name || "Unknown User");
+
   return (
     <button
       onClick={() => onSelectChat(chat._id)}
@@ -46,7 +50,9 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
       }`}
     >
       <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
-        {displayUser?.avatar?.url ? (
+        {isGroup ? (
+          <span className="font-bold text-sm">GRP</span>
+        ) : displayUser?.avatar?.url ? (
           <img
             src={displayUser.avatar.url}
             className="absolute inset-0 h-full w-full rounded-full object-cover"
@@ -55,7 +61,7 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
           displayUser?.name?.charAt(0)?.toUpperCase() || "U"
         )}
 
-        {isOnline && (
+        {!isGroup && isOnline && (
           <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500 ring-2 ring-emerald-500/20 animate-pulse" />
         )}
       </div>
@@ -63,8 +69,9 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
       <div className="min-w-0 flex-1">
         <div className="flex justify-between">
           <p className="truncate font-medium">
-            {displayUser?.name || "Unknown"}
+            {title}
           </p>
+
 
           <div className="flex gap-2">
             {time && (

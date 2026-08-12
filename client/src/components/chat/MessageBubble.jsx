@@ -180,6 +180,7 @@ function renderAttachmentList(message, connected) {
 
 function MessageBubble({ message, isMine }) {
   const connected = useSocketStore((state) => state.connected);
+  const isReconnecting = message.isReconnecting || !connected;
   const attachmentsBlock = renderAttachmentList(message, connected);
   let showContent = true;
 
@@ -190,7 +191,11 @@ function MessageBubble({ message, isMine }) {
     showContent = false;
   }
 
-  const isFailed = message.status === "upload_failed";
+  const isFailed =
+    message.uploadStatus === "upload_failed" ||
+    message.status === "upload_failed" ||
+    message.status === "failed";
+
   const senderName = message.sender?.name;
 
   return (
@@ -218,17 +223,24 @@ function MessageBubble({ message, isMine }) {
           </p>
         ) : null}
 
+        {isReconnecting && message.isUploading && (
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-amber-200 font-medium animate-pulse">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span>Reconnecting...</span>
+          </div>
+        )}
+
         {isFailed && (
           <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/20 pt-1.5 text-xs">
-            <span>Upload failed</span>
+            <span>{message.uploadError || "Upload failed"}</span>
             <button
               type="button"
               onClick={() =>
                 useChatStore
                   .getState()
-                  .sendMessage(message.chat, message.content, message.attachments)
+                  .retryUpload(message._id)
               }
-              className="flex items-center gap-1 rounded-md bg-black/30 px-2 py-1 text-[11px] font-medium hover:bg-black/50 transition"
+              className="flex items-center gap-1 rounded-md bg-black/30 px-2 py-1 text-[11px] font-medium hover:bg-black/50 transition cursor-pointer"
             >
               <RotateCw size={12} />
               <span>Retry</span>
@@ -258,5 +270,6 @@ function MessageBubble({ message, isMine }) {
     </div>
   );
 }
+
 
 export default MessageBubble;

@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 import MessageBubble from "./MessageBubble";
-import { ArrowDown, CheckCheck } from "lucide-react";
+import { ArrowDown } from "lucide-react";
+
 
 function formatDateLabel(dateStr) {
   if (!dateStr) return "";
@@ -36,7 +37,22 @@ function MessageList({
   const messagesContainerRef = useRef(null);
   const loadingMoreRef = useRef(false);
   const initialScrolledRef = useRef(false);
-  const [showJumpToUnread, setShowJumpToUnread] = useState(false);
+  const isScrolledUpRef = useRef(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+
+  const rawChat = messages.length > 0 ? messages[0]?.chat : null;
+  const currentChatId = (
+    rawChat && typeof rawChat === "object"
+      ? (rawChat._id || rawChat.id || "")
+      : (rawChat || "")
+  ).toString();
+
+
+  useEffect(() => {
+    initialScrolledRef.current = false;
+    isScrolledUpRef.current = false;
+    setShowScrollBottom(false);
+  }, [currentChatId]);
 
   useEffect(() => {
     if (!messages.length) return;
@@ -45,29 +61,39 @@ function MessageList({
 
     if (!initialScrolledRef.current) {
       initialScrolledRef.current = true;
-      if (firstUnreadId && unreadRef.current) {
-        unreadRef.current.scrollIntoView({ behavior: "auto", block: "center" });
-      } else {
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-      }
-      return;
+
+      const timer = setTimeout(() => {
+        if (firstUnreadId && unreadRef.current) {
+          unreadRef.current.scrollIntoView({ behavior: "auto", block: "start" });
+        } else if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+        }
+      }, 50);
+
+      return () => clearTimeout(timer);
     }
 
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, firstUnreadId]);
+    const lastMessage = messages[messages.length - 1];
+    const lastSender = lastMessage?.sender;
+    const senderId = (typeof lastSender === "object" ? (lastSender?._id || lastSender?.id) : lastSender)?.toString() || "";
 
-  useEffect(() => {
-    initialScrolledRef.current = false;
-  }, [firstUnreadId]);
+    const isMine = Boolean(senderId && currentUserId && senderId === currentUserId.toString());
+
+    if (!isScrolledUpRef.current || isMine) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, firstUnreadId, currentUserId]);
 
   const handleScroll = async () => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    const isScrolledUp =
-      container.scrollHeight - container.scrollTop - container.clientHeight > 180;
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isScrolledUp = distanceFromBottom > 120;
 
-    setShowJumpToUnread(Boolean(isScrolledUp && firstUnreadId));
+    setShowScrollBottom(isScrolledUp);
+    isScrolledUpRef.current = isScrolledUp;
 
     if (container.scrollTop <= 50 && onLoadMore && !loadingMore && !loadingMoreRef.current) {
       loadingMoreRef.current = true;
@@ -85,9 +111,9 @@ function MessageList({
     }
   };
 
-  const handleJumpToUnread = () => {
-    if (unreadRef.current) {
-      unreadRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  const handleScrollToBottom = () => {
+    if (firstUnreadId && unreadRef.current) {
+      unreadRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
@@ -133,12 +159,12 @@ function MessageList({
 
         <div className="flex flex-col gap-3">
           {messages.map((message) => {
-            const isMine =
-              message.sender?._id === currentUserId ||
-              message.sender?.id === currentUserId;
+            const mSender = message.sender;
+            const mSenderId = (typeof mSender === "object" ? (mSender?._id || mSender?.id) : mSender)?.toString() || "";
+            const isMine = mSenderId && currentUserId && mSenderId === currentUserId.toString();
 
-            const msgId = message._id || message.id;
-            const isFirstUnread = firstUnreadId && msgId === firstUnreadId;
+            const msgId = (message._id || message.id)?.toString();
+            const isFirstUnread = Boolean(firstUnreadId && msgId === firstUnreadId.toString());
 
             const messageDate = message.createdAt
               ? new Date(message.createdAt).toDateString()
@@ -163,7 +189,7 @@ function MessageList({
                 {isFirstUnread && (
                   <div
                     ref={unreadRef}
-                    className="my-3 flex items-center justify-center gap-2"
+                    className="my-3 flex items-center justify-center gap-2 scroll-mt-6"
                   >
                     <div className="h-[1px] flex-1 bg-primary/30" />
                     <span className="rounded-full bg-primary/10 border border-primary/20 px-3.5 py-1 text-xs font-semibold text-primary shadow-2xs backdrop-blur-xs flex items-center gap-1.5 animate-pulse">
@@ -181,14 +207,16 @@ function MessageList({
         </div>
       </main>
 
-      {showJumpToUnread && (
+
+      {showScrollBottom && (
         <button
           type="button"
-          onClick={handleJumpToUnread}
-          className="absolute bottom-4 right-6 flex items-center gap-2 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-lg transition-all hover:scale-105 active:scale-95 z-20"
+          onClick={handleScrollToBottom}
+          className="absolute bottom-4 right-6 flex items-center gap-2 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-lg transition-all hover:scale-105 active:scale-95 z-20 cursor-pointer"
+          title="Scroll to latest message"
         >
           <ArrowDown className="h-4 w-4" />
-          <span>Jump to unread</span>
+          <span>Latest messages</span>
           {unreadCount > 0 && (
             <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-background px-1 text-[10px] font-bold text-foreground">
               {unreadCount}
@@ -198,6 +226,7 @@ function MessageList({
       )}
     </div>
   );
+
 }
 
 export default memo(MessageList);
