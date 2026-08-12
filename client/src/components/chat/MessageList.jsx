@@ -12,7 +12,7 @@ function MessageList({
   const messagesContainerRef = useRef(null);
   const loadingMoreRef = useRef(false);
   const initialScrollRef = useRef(false);
-  const [loadMoreState,setLoadingMoreState] = useRef(false)
+ 
 
   useEffect(() => {
     if (!messages.length) return;
@@ -41,7 +41,7 @@ function MessageList({
       loadingMoreRef.current = true;
 
       const previousHeight = container.scrollHeight;
-       setLoadingMoreState(true)
+    
       await onLoadMore();
 
       requestAnimationFrame(() => {
@@ -54,10 +54,10 @@ function MessageList({
 
   if (loadingMessages) {
     return (<>
-      { loadMoreState &&
+      
       <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
         Loading messages...
-      </div>}</>
+      </div></>
     );
   }
 

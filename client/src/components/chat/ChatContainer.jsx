@@ -7,7 +7,7 @@ import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 
-function ChatContainer({ chat, onBack }) {
+function ChatContainer({ chat, onBack,isopen }) {
   const [isTyping, setIsTyping] = useState(false);
   const currentChatIdRef = React.useRef(null);
 
@@ -77,6 +77,7 @@ function ChatContainer({ chat, onBack }) {
         chat={chat}
         currentUserId={currentUserId}
         onBack={onBack}
+        isopen={isopen}
       />
 
       {isTyping ? (

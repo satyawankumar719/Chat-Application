@@ -3,6 +3,7 @@ import SignupPage from "./pages/authPages/signupPage";
 import ChatsPage from "./pages/chatDashboard/ChatsPage";
 import InvitationsPage from "./pages/InvitationsPage";
 import CreateChatPage from "./pages/CreateChatPage";
+import GroupChat from "./pages/chatDashboard/groupChat";
 
 export const PUBLIC_ROUTES = [
   {
@@ -23,6 +24,10 @@ export const PROTECTED_ROUTES = [
   {
     path: "/chats",
     element: <ChatsPage />,
+  },
+  {
+    path :"/groups",
+    element : <GroupChat/>
   },
   {
     path: "/chats/create",

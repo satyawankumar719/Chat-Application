@@ -9,6 +9,7 @@ import AppLayout from "./components/layout/AppLayout";
 import PublicRoutes from "./components/publicRoutes";
 import VerifyOtp from "./pages/authPages/verifyOtp";
 import { Toaster } from "sonner";
+import GroupChat from "./pages/chatDashboard/groupChat";
 function App() {
 
   
@@ -24,6 +25,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route index element={<Navigate to="/chats" replace />} />
             <Route path="/chats" element={<ChatsPage />} />
+            <Route path="/groups" element= {<GroupChat/>}/>
             <Route path="/chats/create" element={<CreateChatPage />} />
             <Route path="/invitations" element={<InvitationsPage />} />
           </Route>

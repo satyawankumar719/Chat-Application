@@ -3,7 +3,7 @@ import { messageApi } from "@/api/messageApi";
 import { useAuthStore } from "./authStore";
 import { useSocketStore } from "./socketStore";
 import { createTempMessage } from "@/lib/messageHelpers";
-
+import { groupApi } from "@/api/groupApi";
 const PAGE_SIZE = 50;
 
 function getCurrentUserId() {
@@ -710,5 +710,192 @@ export const useChatStore = create(function (set, get) {
         return { messages: updated };
       });
     },
+createGroup: async ({ name, description = "", memberIds = [] }) => {
+  try {
+    const res = await groupChatApi.createGroup({
+      name: name.trim(),
+      description: description.trim(),
+      memberIds,
+    });
+
+    const newGroup = res.data?.data || res.data;
+
+    set((state) => ({
+      chats: [newGroup, ...state.chats],
+      selectedChatId:
+        newGroup?._id || newGroup?.id || state.selectedChatId,
+    }));
+
+    return newGroup;
+  } catch (err) {
+    console.error("Create group error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to create group"
+    );
+  }
+},
+
+addGroupMembers: async (groupId, memberIds) => {
+  try {
+    const res = await groupApi.createGroup(groupId, {
+      memberIds,
+    });
+
+    const updatedGroup = res.data?.data || res.data;
+
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat._id === groupId ? updatedGroup : chat
+      ),
+    }));
+
+    return updatedGroup;
+  } catch (err) {
+    console.error("Add group members error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to add members"
+    );
+  }
+},
+
+removeGroupMember: async (groupId, memberId) => {
+  try {
+    const res = await groupApi.removeMember(
+      groupId,
+      memberId
+    );
+
+    const updatedGroup = res.data?.data || res.data;
+
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat._id === groupId ? updatedGroup : chat
+      ),
+    }));
+
+    return updatedGroup;
+  } catch (err) {
+    console.error("Remove group member error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to remove member"
+    );
+  }
+},
+
+updateGroupMemberRole: async (groupId, memberId, role) => {
+  try {
+    const res = await groupApi.updateMemberRole(
+      groupId,
+      memberId,
+      { role }
+    );
+
+    const updatedGroup = res.data?.data || res.data;
+
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat._id === groupId ? updatedGroup : chat
+      ),
+    }));
+
+    return updatedGroup;
+  } catch (err) {
+    console.error("Update member role error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to update member role"
+    );
+  }
+},
+
+updateGroupInfo: async (groupId, data) => {
+  try {
+    const res = await groupApi.updateGroup(
+      groupId,
+      data
+    );
+
+    const updatedGroup = res.data?.data || res.data;
+
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat._id === groupId ? updatedGroup : chat
+      ),
+    }));
+
+    return updatedGroup;
+  } catch (err) {
+    console.error("Update group info error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to update group info"
+    );
+  }
+},
+
+leaveGroup: async (groupId) => {
+  try {
+    await groupApi.leaveGroup(groupId);
+
+    set((state) => {
+      const newChats = state.chats.filter(
+        (chat) => chat._id !== groupId
+      );
+
+      const isSelected = state.selectedChatId === groupId;
+
+      return {
+        chats: newChats,
+        selectedChatId: isSelected
+          ? newChats[0]?._id || null
+          : state.selectedChatId,
+      };
+    });
+  } catch (err) {
+    console.error("Leave group error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to leave group"
+    );
+  }
+},
+
+deleteGroup: async (groupId) => {
+  try {
+    await groupApi.deleteGroup(groupId);
+
+    set((state) => {
+      const newChats = state.chats.filter(
+        (chat) => chat._id !== groupId
+      );
+
+      const isSelected = state.selectedChatId === groupId;
+
+      return {
+        chats: newChats,
+        selectedChatId: isSelected
+          ? newChats[0]?._id || null
+          : state.selectedChatId,
+      };
+    });
+  } catch (err) {
+    console.error("Delete group error:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to delete group"
+    );
+  }
+},
+
   };
 });

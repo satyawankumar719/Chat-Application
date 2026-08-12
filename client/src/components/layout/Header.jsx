@@ -7,7 +7,7 @@ import {toast} from 'sonner'
 function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-
+   
   const navClass = ({ isActive }) =>
     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
       isActive
@@ -28,6 +28,10 @@ function Header() {
             <MessageCircle className="h-4 w-4" />
             <span className="hidden sm:inline">Chats</span>
           </NavLink>
+            <NavLink to="/groups" className={navClass}>
+            <PlusCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Groups</span>
+          </NavLink>
           <NavLink to="/invitations" className={navClass}>
             <UserPlus className="h-4 w-4" />
             <span className="hidden sm:inline">Invitations</span>
@@ -36,6 +40,7 @@ function Header() {
             <PlusCircle className="h-4 w-4" />
             <span className="hidden sm:inline">New Chat</span>
           </NavLink>
+
         </nav>
 
         <div className="flex items-center gap-3">
