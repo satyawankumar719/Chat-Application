@@ -7,7 +7,6 @@ function PublicRoutes() {
   useEffect(()=>{
     checkAuth();
   },[])
-  console.log(user)
   if (user) {
     return <Navigate to="/chats" replace />;
   }

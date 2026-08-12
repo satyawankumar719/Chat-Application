@@ -67,14 +67,9 @@ export const useInvitationStore = create(function (set, get) {
       const newChat = data?.chat;
 
       set(function (state) {
-        let updatedChats = useChatStore.getState().chats;
         if (newChat) {
-          const alreadyHasChat = updatedChats.some(function (c) {
-            return c._id === newChat._id;
-          });
-          if (!alreadyHasChat) {
-            useChatStore.getState().addChat(newChat);
-          }
+          useChatStore.getState().addChat(newChat);
+          useSocketStore.getState().joinChat(newChat._id);
         }
 
         return {
@@ -102,6 +97,13 @@ export const useInvitationStore = create(function (set, get) {
     acceptInvitation: async function (invitationId) {
       try {
         const res = await invitationApi.acceptInvitation(invitationId);
+        const resultData = res.data?.data || res.data;
+        const newChat = resultData?.chat;
+
+        if (newChat) {
+          useChatStore.getState().addChat(newChat);
+          useSocketStore.getState().joinChat(newChat._id);
+        }
 
         set(function (state) {
           return {
@@ -111,7 +113,6 @@ export const useInvitationStore = create(function (set, get) {
             invitationMessage: res.data?.message || "Invitation accepted.",
           };
         });
-        await useChatStore.getState().fetchChats();
         return res;
       } catch (err) {
         const message = err.response?.data?.message || "Unable to accept invitation.";

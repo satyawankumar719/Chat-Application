@@ -244,7 +244,7 @@ const handleFileSelect = (e) => {
           type="file"
           multiple
           hidden
-          accept="image/*"
+          accept="image/jpeg,image/png,image/gif,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,video/mp4"
           onChange={handleFileSelect}
         />
        
@@ -291,10 +291,11 @@ const handleFileSelect = (e) => {
 
       </div>
 
-
-
-
-      
+      {error && (
+        <div className="mt-2 px-3 text-xs text-destructive whitespace-pre-line">
+          {error}
+        </div>
+      )}
 
     </form>
   );

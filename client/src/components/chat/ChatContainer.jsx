@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
-import { useInvitationStore } from "@/store/invitationStore";
+import { MessageSquare } from "lucide-react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 
-function ChatContainer({ chat, onBack,isopen }) {
+function ChatContainer({ chat, onBack, setShowGroupInfo }) {
   const [isTyping, setIsTyping] = useState(false);
-  const currentChatIdRef = React.useRef(null);
+  const currentChatIdRef = useRef(null);
 
   const { user } = useAuthStore();
   const { socket, markMessagesRead } = useSocketStore();
@@ -18,57 +18,73 @@ function ChatContainer({ chat, onBack,isopen }) {
     messages,
     loadingMessages,
     sendingMessage,
-    fetchMessages,
     sendMessage,
     loadMoreMessages,
-  
   } = useChatStore();
-
 
   const currentUserId = user?._id || user?.id;
 
-  // Global socket connection and listeners are handled at AppLayout level
-
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !chat?._id) return;
 
-    const handleTyping = (status) => {
-      setIsTyping(status);
+    const handleTyping = (data) => {
+      if (data?.chatId === chat._id && data?.userId !== currentUserId) {
+        setIsTyping(Boolean(data?.typing));
+      }
     };
 
     socket.on("typing", handleTyping);
 
     return () => {
       socket.off("typing", handleTyping);
+      setIsTyping(false);
     };
-  }, [socket]);
+  }, [socket, chat?._id, currentUserId]);
 
   useEffect(() => {
     if (!chat?._id) return;
 
     currentChatIdRef.current = chat._id;
-
-    const load = async () => {
-      await fetchMessages(chat._id);
-
-      if (currentChatIdRef.current === chat._id) {
-        markMessagesRead(chat._id);
-      }
-    };
-
-    load();
+    markMessagesRead(chat._id);
 
     return () => {
       currentChatIdRef.current = null;
     };
-  }, [chat?._id, fetchMessages, markMessagesRead]);
+  }, [chat?._id, markMessagesRead]);
 
   if (!chat) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        Select a conversation to start chatting
+      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-muted/10">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-xs">
+          <MessageSquare className="h-8 w-8" />
+        </div>
+        <h3 className="text-lg font-semibold tracking-tight">Your Messages</h3>
+        <p className="mt-1 text-sm text-muted-foreground max-w-xs">
+          Select a conversation from the left to start chatting in real time.
+        </p>
       </div>
     );
+  }
+
+  let firstUnreadId = null;
+  let unreadCount = 0;
+
+  if (Array.isArray(messages)) {
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      const senderId = (msg.sender?._id || msg.sender?.id || "").toString();
+      if (
+        senderId &&
+        currentUserId &&
+        senderId !== currentUserId.toString() &&
+        msg.status !== "read"
+      ) {
+        if (!firstUnreadId) {
+          firstUnreadId = msg._id || msg.id;
+        }
+        unreadCount++;
+      }
+    }
   }
 
   return (
@@ -77,14 +93,19 @@ function ChatContainer({ chat, onBack,isopen }) {
         chat={chat}
         currentUserId={currentUserId}
         onBack={onBack}
-        isopen={isopen}
+        setShowGroupInfo={setShowGroupInfo}
       />
 
-      {isTyping ? (
-        <div className="border-b bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
-          Typing...
+      {isTyping && (
+        <div className="border-b bg-primary/5 px-4 py-1.5 text-xs text-primary flex items-center gap-2">
+          <div className="flex gap-1 items-center">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
+          </div>
+          <span className="font-medium text-[11px]">Someone is typing...</span>
         </div>
-      ) : null}
+      )}
 
       <MessageList
         messages={messages}
@@ -92,6 +113,8 @@ function ChatContainer({ chat, onBack,isopen }) {
         loadingMore={useChatStore.getState().loadingMore}
         onLoadMore={() => loadMoreMessages()}
         currentUserId={currentUserId}
+        firstUnreadId={firstUnreadId}
+        unreadCount={unreadCount}
       />
 
       <MessageInput

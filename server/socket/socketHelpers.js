@@ -2,7 +2,6 @@ import { logger } from "../logger.js";
 import Chat from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import { getSocketByUserId } from "./userManager.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 async function findChatForUser(chatId, userId) {
   if (!chatId || !userId) return null;

@@ -1,5 +1,5 @@
 import { socketAuthMiddleware } from "./socketAuth.js";
-import { handleJoinChat, handleLeaveChat } from "./roomHandlers.js";
+import { handleJoinChat, handleLeaveChat, handleTyping } from "./roomHandlers.js";
 import { handleMarkMessagesRead, handleSendMessage } from "./messageHandlers.js";
 import { handleUserConnect, handleUserDisconnect } from "./statusHandlers.js";
 import { logger } from "../logger.js";
@@ -21,6 +21,7 @@ export const socketHandler = (io) => {
 
     handleJoinChat(socket, currentUserId);
     handleLeaveChat(socket);
+    handleTyping(socket, currentUserId);
     handleMarkMessagesRead(socket, currentUserId);
     handleSendMessage(io, socket, currentUserId);
 

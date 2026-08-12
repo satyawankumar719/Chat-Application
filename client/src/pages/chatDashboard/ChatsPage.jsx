@@ -24,14 +24,8 @@ function ChatsPage() {
   useEffect(() => {
     if (!checkingAuth && !user) {
       navigate("/login", { replace: true });
-      return;
     }
-
-    if (user) {
-      fetchChats();
-      fetchPendingInvitations();
-    }
-  }, [user, checkingAuth, navigate, fetchChats, fetchPendingInvitations]);
+  }, [user, checkingAuth, navigate]);
 
   const selectedChat = chats.find((chat) => chat._id === selectedChatId) || null;
 

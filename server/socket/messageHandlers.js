@@ -7,8 +7,6 @@ import {
   notifyMessageSenders,
 } from "./socketHelpers.js";
 import { isUserOnline } from "./userManager.js";
-import { getTokenFromCookie } from "./socketAuth.js";
-import { verifyToken } from "../utils/index.js";
 
 function handleMarkMessagesRead(socket, currentUserId) {
   socket.on("mark_messages_read", async ({ chatId }) => {
@@ -71,29 +69,6 @@ function handleMarkMessagesRead(socket, currentUserId) {
 function handleSendMessage(io, socket, currentUserId) {
   socket.on("send_message", async (messageData, acknowledge) => {
     try {
-      let token = socket.handshake.auth?.token;
-      if (!token) {
-        const cookieHeader = socket.request?.headers?.cookie || socket.handshake?.headers?.cookie;
-        token = getTokenFromCookie(cookieHeader);
-      }
-
-      if (!token) {
-        socket.disconnect();
-        return acknowledge?.({
-          success: false,
-          error: "Unauthorized access. Token missing.",
-        });
-      }
-
-      try {
-        verifyToken(token);
-      } catch (authErr) {
-        socket.disconnect();
-        return acknowledge?.({
-          success: false,
-          error: "Unauthorized access. Invalid token.",
-        });
-      }
       const {
         chatId,
         content,

@@ -1,5 +1,4 @@
 const connectedUserSockets = new Map();
-import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function addUserSocket(userId, socketId) {
   const userIdString = userId.toString();

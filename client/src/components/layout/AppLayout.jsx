@@ -5,12 +5,14 @@ import { useInvitationStore } from "@/store/invitationStore";
 import { useChatStore } from "@/store/chatStore";
 import { useSocketStore } from "@/store/socketStore";
 import { useAuthStore } from "@/store/authStore";
+import { useGroupStore } from "@/store/groupStore";
 
 function AppLayout() {
   const { user } = useAuthStore();
   const { connectSocket, socket } = useSocketStore();
   const { fetchPendingInvitations, initInvitationListeners } = useInvitationStore();
   const { fetchChats, initSocketListeners } = useChatStore();
+  const { initGroupListeners } = useGroupStore();
 
   useEffect(() => {
     if (user) {
@@ -24,8 +26,9 @@ function AppLayout() {
     if (socket) {
       initSocketListeners();
       initInvitationListeners();
+      initGroupListeners();
     }
-  }, [socket, initSocketListeners, initInvitationListeners]);
+  }, [socket, initSocketListeners, initInvitationListeners, initGroupListeners]);
 
   return (
     <div className="min-h-screen bg-muted/30">

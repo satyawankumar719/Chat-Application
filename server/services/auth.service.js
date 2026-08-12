@@ -5,7 +5,6 @@ import { otpEmailTemplate } from "../templates/otpEmail.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOtp } from "../utils/index.js";
 import { logger } from "../logger.js";
-import { success } from "zod";
 
 export const login = async (data) => {
     const { email, password } = data;

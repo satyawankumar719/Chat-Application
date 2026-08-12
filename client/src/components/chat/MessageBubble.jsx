@@ -1,7 +1,15 @@
 import { useChatStore } from "@/store/chatStore";
-import { Check, CheckCheck, FileImage, Paperclip, X, Loader2 } from "lucide-react";
+import { useSocketStore } from "@/store/socketStore";
+import { Check, CheckCheck, FileText, Image as ImageIcon, X, RotateCw, Loader2 } from "lucide-react";
 
-function renderAttachmentList(message) {
+function formatFileSize(bytes) {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function renderAttachmentList(message, connected) {
   let attachments = [];
 
   if (message.attachments && message.attachments.length > 0) {
@@ -38,7 +46,7 @@ function renderAttachmentList(message) {
 
     if (attach.type === "image") {
       attachmentElements.push(
-        <div className="relative mb-2 overflow-hidden rounded-xl" key={key}>
+        <div className="relative mb-2 overflow-hidden rounded-xl bg-black/20" key={key}>
           <a
             href={attach.fileUrl}
             target="_blank"
@@ -55,49 +63,56 @@ function renderAttachmentList(message) {
           </a>
 
           {isUploading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all">
-              <div className="relative flex items-center justify-center">
-                {/* SVG Progress Ring */}
-                <svg className="h-14 w-14 -rotate-90 transform" viewBox="0 0 36 36">
-                  <path
-                    className="text-white/30"
-                    strokeWidth="3"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path
-                    className="text-white transition-all duration-300"
-                    strokeDasharray={`${progress}, 100`}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-[2px] transition-all">
+              {!connected ? (
+                <div className="flex flex-col items-center gap-1 text-xs text-white font-medium">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Reconnecting...</span>
+                </div>
+              ) : (
+                <>
+                  <div className="relative flex items-center justify-center">
+                    <svg className="h-14 w-14 -rotate-90 transform" viewBox="0 0 36 36">
+                      <path
+                        className="text-white/20"
+                        strokeWidth="3"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-white transition-all duration-300 ease-out"
+                        strokeDasharray={`${progress}, 100`}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
 
-                {/* Centered X Abort Button */}
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  title="Cancel Upload"
-                  className="absolute rounded-full bg-black/60 p-2 text-white transition hover:bg-black/80 hover:scale-110 active:scale-95"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      title="Cancel Upload"
+                      className="absolute rounded-full bg-black/60 p-2 text-white transition hover:bg-black/90 hover:scale-110 active:scale-95"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
 
-              <span className="mt-1 text-[11px] font-medium text-white shadow-sm">
-                {progress}%
-              </span>
+                  <span className="mt-1.5 text-xs font-semibold text-white tracking-wider">
+                    {progress}%
+                  </span>
+                </>
+              )}
             </div>
           )}
 
-          {attach.fileName ? (
-            <div className="px-1 pb-1 pt-1 text-[11px] opacity-80 break-all">
-              <FileImage size={11} className="inline mr-1" />
-              {attach.fileName}
+          {attach.fileName && !isUploading ? (
+            <div className="px-2 py-1 text-[11px] opacity-80 break-all flex items-center gap-1">
+              <ImageIcon size={12} className="shrink-0" />
+              <span className="truncate">{attach.fileName}</span>
             </div>
           ) : null}
         </div>
@@ -106,26 +121,35 @@ function renderAttachmentList(message) {
       attachmentElements.push(
         <div
           key={key}
-          className="relative mb-2 block rounded-lg border border-white/20 bg-black/10 px-3 py-2 text-sm break-all"
+          className="relative mb-2 block rounded-xl border border-white/10 bg-black/15 p-3 text-sm transition"
         >
-          <div className="flex items-center justify-between gap-2">
-            <a
-              href={attach.fileUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 underline"
-              onClick={(e) => isUploading && e.preventDefault()}
-            >
-              <Paperclip size={14} className="opacity-80 flex-shrink-0" />
-              <span className="truncate">{attach.fileName || "Download attachment"}</span>
-            </a>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                <FileText size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <a
+                  href={attach.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium truncate block hover:underline"
+                  onClick={(e) => isUploading && e.preventDefault()}
+                >
+                  {attach.fileName || "Document"}
+                </a>
+                <span className="text-[10px] opacity-75">
+                  {formatFileSize(attach.fileSize)}
+                </span>
+              </div>
+            </div>
 
             {isUploading && (
               <button
                 type="button"
                 onClick={handleCancel}
                 title="Cancel Upload"
-                className="rounded-full bg-black/40 p-1 text-white hover:bg-black/70 flex-shrink-0"
+                className="rounded-full bg-black/40 p-1.5 text-white hover:bg-black/70 shrink-0 transition"
               >
                 <X size={14} />
               </button>
@@ -133,11 +157,17 @@ function renderAttachmentList(message) {
           </div>
 
           {isUploading && (
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-black/20">
-              <div
-                className="h-full bg-primary transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
+            <div className="mt-2.5 space-y-1">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/30">
+                <div
+                  className="h-full bg-white transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] font-medium opacity-80">
+                <span>{connected ? "Uploading..." : "Reconnecting..."}</span>
+                <span>{progress}%</span>
+              </div>
             </div>
           )}
         </div>
@@ -149,8 +179,8 @@ function renderAttachmentList(message) {
 }
 
 function MessageBubble({ message, isMine }) {
-  const attachmentsBlock = renderAttachmentList(message);
-
+  const connected = useSocketStore((state) => state.connected);
+  const attachmentsBlock = renderAttachmentList(message, connected);
   let showContent = true;
 
   if (
@@ -160,34 +190,64 @@ function MessageBubble({ message, isMine }) {
     showContent = false;
   }
 
+  const isFailed = message.status === "upload_failed";
+  const senderName = message.sender?.name;
+
   return (
     <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[75%] rounded-2xl px-3 py-2 ${
+        className={`max-w-[75%] rounded-2xl px-3.5 py-2 shadow-xs transition-all ${
           isMine
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted"
+            ? isFailed
+              ? "bg-destructive text-destructive-foreground"
+              : "bg-primary text-primary-foreground rounded-br-xs"
+            : "bg-muted rounded-bl-xs"
         }`}
       >
+        {!isMine && senderName && (
+          <p className="mb-1 text-[11px] font-semibold text-primary">
+            {senderName}
+          </p>
+        )}
+
         {attachmentsBlock}
 
         {showContent ? (
-          <p className="break-words text-sm">
+          <p className="break-words text-sm leading-relaxed">
             {message.content}
           </p>
         ) : null}
 
-        <div className="mt-1 flex justify-end gap-1 text-[11px] opacity-80">
+        {isFailed && (
+          <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/20 pt-1.5 text-xs">
+            <span>Upload failed</span>
+            <button
+              type="button"
+              onClick={() =>
+                useChatStore
+                  .getState()
+                  .sendMessage(message.chat, message.content, message.attachments)
+              }
+              className="flex items-center gap-1 rounded-md bg-black/30 px-2 py-1 text-[11px] font-medium hover:bg-black/50 transition"
+            >
+              <RotateCw size={12} />
+              <span>Retry</span>
+            </button>
+          </div>
+        )}
+
+        <div className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-75">
           <span>
-            {new Date(message.createdAt).toLocaleTimeString([], {
+            {new Date(message.createdAt || Date.now()).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
           </span>
 
           {isMine &&
+            !isFailed &&
             (message.status === "read" ? (
-              <CheckCheck size={14} className="text-blue-500" />
+              <CheckCheck size={14} className="text-sky-400" />
             ) : message.status === "delivered" ? (
               <CheckCheck size={14} />
             ) : (

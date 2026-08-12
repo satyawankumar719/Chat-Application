@@ -2,7 +2,6 @@ import User from "../models/User.js";
 import { addUserSocket, removeUserSocket, getSocketCount, getAllOnlineUserIds } from "./userManager.js";
 import { deliverPendingMessages } from "./socketHelpers.js";
 import { logger } from "../logger.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 async function handleUserConnect(io, socket, currentUserId) {
   addUserSocket(currentUserId, socket.id);

@@ -1,8 +1,5 @@
-import { locales } from "zod";
 import Chat from "../models/Conversation.js";
-import { isUserOnline } from "./userManager.js";
 import { logger } from "../logger.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function handleJoinChat(socket, currentUserId) {
   socket.on("join_chat", async (chatId) => {
@@ -17,7 +14,6 @@ function handleJoinChat(socket, currentUserId) {
       if (!isChatMember) return;
 
       socket.join(`chat:${chatId}`);
-    
     } catch (error) {
       logger.error("Join Chat Error:", error);
     }
@@ -31,4 +27,15 @@ function handleLeaveChat(socket) {
   });
 }
 
-export { handleJoinChat, handleLeaveChat };
+function handleTyping(socket, currentUserId) {
+  socket.on("typing", ({ chatId, typing }) => {
+    if (!chatId) return;
+    socket.to(`chat:${chatId}`).emit("typing", {
+      chatId,
+      userId: currentUserId,
+      typing,
+    });
+  });
+}
+
+export { handleJoinChat, handleLeaveChat, handleTyping };

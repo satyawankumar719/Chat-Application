@@ -57,16 +57,28 @@ function makeUniqueAndSortMessages(messagesArray) {
   return result;
 }
 
-function updateLastMessageInChats(chatsArray, chatId, newMessage) {
+function updateLastMessageInChats(chatsArray, chatId, newMessage, isCurrentlySelected, currentUserId) {
   const result = [];
 
   for (let i = 0; i < chatsArray.length; i++) {
     const chat = chatsArray[i];
     if (chat._id === chatId) {
+      const senderId = newMessage?.sender?._id?.toString() || newMessage?.sender?.id?.toString();
+      const isFromOther = senderId && currentUserId && senderId !== currentUserId;
+      let newUnreadCount = { ...(chat.unreadCount || {}) };
+
+      if (isCurrentlySelected) {
+        if (currentUserId) newUnreadCount[currentUserId] = 0;
+      } else if (isFromOther && currentUserId) {
+        const prev = typeof newUnreadCount[currentUserId] === "number" ? newUnreadCount[currentUserId] : 0;
+        newUnreadCount[currentUserId] = prev + 1;
+      }
+
       result.push({
         ...chat,
         lastMessage: newMessage,
         updatedAt: newMessage.createdAt,
+        unreadCount: newUnreadCount,
       });
     } else {
       result.push(chat);
@@ -185,16 +197,30 @@ export const useChatStore = create(function (set, get) {
       if (oldChatId === chatId) return;
 
       const socketStore = useSocketStore.getState();
+      const currentUserId = getCurrentUserId();
 
       if (oldChatId) {
         socketStore.leaveChat(oldChatId);
       }
-      set({
-        selectedChatId: chatId,
-        previousSelectedChatId: oldChatId,
-        messages: [],
-        page: 1,
-        hasMore: true,
+
+      set(function (state) {
+        const updatedChats = state.chats.map((c) => {
+          if (c._id === chatId) {
+            const newUnread = { ...(c.unreadCount || {}) };
+            if (currentUserId) newUnread[currentUserId] = 0;
+            return { ...c, unreadCount: newUnread };
+          }
+          return c;
+        });
+
+        return {
+          chats: updatedChats,
+          selectedChatId: chatId,
+          previousSelectedChatId: oldChatId,
+          messages: [],
+          page: 1,
+          hasMore: true,
+        };
       });
 
       if (!chatId) return;
@@ -245,8 +271,6 @@ export const useChatStore = create(function (set, get) {
       });
 
       socket.on("user_status_changed", function (data) {
-        console.log("STATUS EVENT:", data);
-
         if (!data?.userId) return;
         get().handleUserStatusChanged(data.userId, data.isOnline, data.lastSeen);
       });
@@ -461,7 +485,13 @@ export const useChatStore = create(function (set, get) {
 
         return {
           messages: makeUniqueAndSortMessages(updatedMessages),
-          chats: updateLastMessageInChats(current.chats, incomingMessage.chat, incomingMessage),
+          chats: updateLastMessageInChats(
+            current.chats,
+            incomingMessage.chat,
+            incomingMessage,
+            isForCurrentlySelectedChat,
+            currentUserId
+          ),
         };
       });
     },
@@ -712,7 +742,7 @@ export const useChatStore = create(function (set, get) {
     },
 createGroup: async ({ name, description = "", memberIds = [] }) => {
   try {
-    const res = await groupChatApi.createGroup({
+    const res = await groupApi.createGroup({
       name: name.trim(),
       description: description.trim(),
       memberIds,
@@ -728,7 +758,6 @@ createGroup: async ({ name, description = "", memberIds = [] }) => {
 
     return newGroup;
   } catch (err) {
-    console.error("Create group error:", err);
     throw new Error(
       err.response?.data?.message ||
       err.message ||
@@ -739,9 +768,7 @@ createGroup: async ({ name, description = "", memberIds = [] }) => {
 
 addGroupMembers: async (groupId, memberIds) => {
   try {
-    const res = await groupApi.createGroup(groupId, {
-      memberIds,
-    });
+    const res = await groupApi.addMembers(groupId, memberIds);
 
     const updatedGroup = res.data?.data || res.data;
 

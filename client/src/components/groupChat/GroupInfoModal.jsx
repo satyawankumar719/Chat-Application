@@ -74,7 +74,6 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     return () => clearTimeout(timer);
   }, [searchQuery, showAddMembers, chat?.members, currentUserId]);
 
-
   if (!isOpen || !chat) return null;
   const toggleSelectUser = (u) => {
     const id = (u._id || u.id).toString();
@@ -103,7 +102,6 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
   };
 
   const handleAddMembersSubmit = async () => {
-    console.log("sb")
     if (selectedUserIds.length === 0) return;
     setLoading(true);
     setError("");

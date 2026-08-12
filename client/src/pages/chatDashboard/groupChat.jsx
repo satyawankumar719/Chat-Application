@@ -5,6 +5,7 @@ import ChatContainer from "@/components/chat/ChatContainer";
 import CreateGroupModal from "@/components/groupChat/createGroup";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import GroupInfoModal from "@/components/groupChat/GroupInfoModal";
 
 export default function GroupChat() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function GroupChat() {
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("all"); 
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
 
   useEffect(() => {
     if (!checkingAuth && !user) {
@@ -110,7 +112,32 @@ export default function GroupChat() {
               />
             </div>
 
-  
+            <div className="flex gap-1 rounded-lg bg-muted/50 p-1 text-xs">
+              <button
+                onClick={() => setFilterTab("all")}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "all" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterTab("managed")}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "managed" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Managed
+              </button>
+              <button
+                onClick={() => setFilterTab("member")}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "member" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Member
+              </button>
+            </div>
           </div>
 
           {/* Group List Body */}
@@ -226,7 +253,7 @@ export default function GroupChat() {
           } md:flex h-full flex-1`}
         >
           {selectedGroup ? (
-            <ChatContainer chat={selectedGroup} onBack={handleBack} isOpen={showCreateGroup}/>
+            <ChatContainer chat={selectedGroup} onBack={handleBack} setShowGroupInfo={setShowGroupInfo} />
           ) : (
             <div className="flex flex-col items-center justify-center h-full w-full p-8 text-center bg-muted/10">
               <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary mb-4">
@@ -254,6 +281,12 @@ export default function GroupChat() {
       <CreateGroupModal
         isOpen={showCreateGroup}
         onClose={() => setShowCreateGroup(false)}
+      />
+   
+      <GroupInfoModal
+       isOpen={showGroupInfo}
+       onClose={()=>setShowGroupInfo(false)}
+       chat={selectedGroup}
       />
     </div>
   );
