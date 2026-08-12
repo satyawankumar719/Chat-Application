@@ -17,7 +17,7 @@ export default function GroupChat() {
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterTab, setFilterTab] = useState("all"); 
+  const [filterTab, setFilterTab] = useState("all");
   const [showGroupInfo, setShowGroupInfo] = useState(false);
 
   useEffect(() => {
@@ -70,13 +70,12 @@ export default function GroupChat() {
   return (
     <div className="h-[calc(100vh-8rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
       <div className="flex h-full w-full">
-    
+
         <aside
-          className={`${
-            mobileViewChat ? "hidden" : "flex"
-          } md:flex h-full w-full flex-col md:w-[380px] md:flex-shrink-0 md:border-r md:border-border`}
+          className={`${mobileViewChat ? "hidden" : "flex"
+            } md:flex h-full w-full flex-col md:w-[380px] md:flex-shrink-0 md:border-r md:border-border`}
         >
-         
+
           <div className="border-b border-border p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -115,25 +114,22 @@ export default function GroupChat() {
             <div className="flex gap-1 rounded-lg bg-muted/50 p-1 text-xs">
               <button
                 onClick={() => setFilterTab("all")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${
-                  filterTab === "all" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "all" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 All
               </button>
               <button
                 onClick={() => setFilterTab("managed")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${
-                  filterTab === "managed" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "managed" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Managed
               </button>
               <button
                 onClick={() => setFilterTab("member")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${
-                  filterTab === "member" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "member" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Member
               </button>
@@ -188,11 +184,10 @@ export default function GroupChat() {
                   <button
                     key={group._id}
                     onClick={() => handleSelectGroup(group._id)}
-                    className={`flex items-center gap-3 w-full rounded-xl border p-3 text-left transition ${
-                      isSelected
-                        ? "border-primary bg-primary/10 shadow-xs"
-                        : "border-transparent bg-card hover:border-border"
-                    }`}
+                    className={`flex items-center gap-3 w-full rounded-xl border p-3 text-left transition ${isSelected
+                      ? "border-primary bg-primary/10 shadow-xs"
+                      : "border-transparent bg-card hover:border-border"
+                      }`}
                   >
                     {/* Avatar */}
                     <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 font-bold text-primary text-sm">
@@ -248,9 +243,8 @@ export default function GroupChat() {
         </aside>
 
         <section
-          className={`${
-            mobileViewChat ? "flex" : "hidden"
-          } md:flex h-full flex-1`}
+          className={`${mobileViewChat ? "flex" : "hidden"
+            } md:flex h-full flex-1`}
         >
           {selectedGroup ? (
             <ChatContainer chat={selectedGroup} onBack={handleBack} setShowGroupInfo={setShowGroupInfo} />
@@ -282,12 +276,8 @@ export default function GroupChat() {
         isOpen={showCreateGroup}
         onClose={() => setShowCreateGroup(false)}
       />
-   
-      <GroupInfoModal
-       isOpen={showGroupInfo}
-       onClose={()=>setShowGroupInfo(false)}
-       chat={selectedGroup}
-      />
+
+
     </div>
   );
 }

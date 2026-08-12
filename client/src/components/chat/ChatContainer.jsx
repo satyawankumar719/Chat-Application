@@ -6,10 +6,20 @@ import { MessageSquare } from "lucide-react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
+import GroupInfoModal from "@/components/groupChat/GroupInfoModal";
 
-function ChatContainer({ chat, onBack, setShowGroupInfo }) {
+function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }) {
   const [isTyping, setIsTyping] = useState(false);
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
   const currentChatIdRef = useRef(null);
+
+  const handleOpenGroupInfo = (val = true) => {
+    if (setShowGroupInfoProp) {
+      setShowGroupInfoProp(val);
+    }
+    setShowGroupInfo(val);
+  };
+
 
   const { user } = useAuthStore();
   const { socket, markMessagesRead } = useSocketStore();
@@ -103,19 +113,11 @@ function ChatContainer({ chat, onBack, setShowGroupInfo }) {
         chat={chat}
         currentUserId={currentUserId}
         onBack={onBack}
-        setShowGroupInfo={setShowGroupInfo}
+        setShowGroupInfo={handleOpenGroupInfo}
+        isTyping={isTyping}
       />
 
-      {isTyping && (
-        <div className="border-b bg-primary/5 px-4 py-1.5 text-xs text-primary flex items-center gap-2">
-          <div className="flex gap-1 items-center">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
-          </div>
-          <span className="font-medium text-[11px]">Someone is typing...</span>
-        </div>
-      )}
+
 
       <MessageList
         messages={messages}
@@ -127,14 +129,20 @@ function ChatContainer({ chat, onBack, setShowGroupInfo }) {
         unreadCount={unreadCount}
       />
 
-
       <MessageInput
         chat={chat}
         onSendMessage={sendMessage}
         sendingMessage={sendingMessage}
       />
+
+      <GroupInfoModal
+        isOpen={showGroupInfo}
+        onClose={() => setShowGroupInfo(false)}
+        chat={chat}
+      />
     </div>
   );
+
 }
 
 export default ChatContainer;

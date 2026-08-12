@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Users, X, UserPlus, Shield, UserMinus, Search, Check, Edit2, LogOut, Save, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { queryApi } from "@/api/userApi";
+import { invitationApi } from "@/api/invitationApi";
 
 export default function GroupInfoModal({ isOpen, onClose, chat }) {
   const { user } = useAuthStore();
-  const { addGroupMembers, removeGroupMember, updateGroupMemberRole, updateGroupInfo, leaveGroup,deleteGroup } =
+  const { addGroupMembers, removeGroupMember, updateGroupMemberRole, updateGroupInfo, leaveGroup, deleteGroup } =
     useChatStore();
   const currentUserId = (user?._id || user?.id)?.toString();
 
@@ -20,8 +21,11 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [confirmDelete , setConfirmDelete] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
+  const [inviteMsg, setInviteMsg] = useState({});
+  const [invitingUserId, setInvitingUserId] = useState(null);
 
   useEffect(() => {
     if (chat) {
@@ -30,26 +34,35 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     }
   }, [chat]);
 
-
-
   const currentMember = chat?.members?.find(
     (m) => (m.user?._id || m.user?.id || m.user)?.toString() === currentUserId
   );
   const isAdminOrOwner = ["owner", "admin"].includes(currentMember?.role);
 
   const [searching, setSearching] = useState(false);
-  const searchSeqRef = React.useRef(0);
+  const searchSeqRef = useRef(0);
 
   useEffect(() => {
-    if (!showAddMembers) return;
+    if (!showAddMembers) {
+      setSearchResults([]);
+      return;
+    }
+
+    const queryToUse = searchQuery.trim();
+
+    if (!queryToUse) {
+      setSearchResults([]);
+      setSearching(false);
+      return;
+    }
 
     setSearching(true);
     const currentSeq = ++searchSeqRef.current;
 
     const timer = setTimeout(async () => {
       try {
-        const queryToUse = searchQuery.trim();
         const res = await queryApi.searchUsers(queryToUse);
+
 
         if (currentSeq !== searchSeqRef.current) return;
 
@@ -89,6 +102,33 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
 
     return () => clearTimeout(timer);
   }, [searchQuery, showAddMembers, chat?.members, currentUserId]);
+
+  const handleSendInvitation = async (receiverId) => {
+    try {
+      setInvitingUserId(receiverId);
+      setError("");
+      setInviteSuccess("");
+      const msg = inviteMsg[receiverId] || "";
+      const res = await invitationApi.sendInvitation(receiverId, msg);
+
+      setInviteSuccess(res.data?.message || "Invitation sent successfully.");
+
+      setSearchResults((prev) =>
+        prev.map((u) => {
+          const uid = (u._id || u.id)?.toString();
+          if (uid === receiverId) {
+            return { ...u, connectionStatus: "pending_sent" };
+          }
+          return u;
+        })
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Failed to send invitation.");
+    } finally {
+      setInvitingUserId(null);
+    }
+  };
+
 
 
   if (!isOpen || !chat) return null;
@@ -145,7 +185,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     }
   };
 
- 
+
 
   const handleToggleAdmin = async (memberId, currentRole) => {
     const newRole = currentRole === "admin" ? "member" : "admin";
@@ -159,8 +199,8 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
       setLoading(false);
     }
   };
-  const handleDeleteGroup = async ()=>{
-     setLoading(true);
+  const handleDeleteGroup = async () => {
+    setLoading(true);
     setError("");
     try {
       await deleteGroup(chat._id);
@@ -204,7 +244,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
         )}
 
         <div className="mt-4 space-y-4">
-       
+
           <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-2">
             {isEditing ? (
               <div className="space-y-3">
@@ -304,49 +344,122 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
 
               </div>
 
-              <div className="max-h-48 overflow-y-auto space-y-1">
-                {searching ? (
+              {inviteSuccess && (
+                <p className="rounded-lg bg-green-500/10 p-2 text-xs text-green-700 dark:text-green-400 font-medium">
+                  {inviteSuccess}
+                </p>
+              )}
+
+              <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                {!searchQuery.trim() ? (
+                  <div className="p-6 text-center text-xs text-muted-foreground">
+                    Type a name, email, or phone number above to search users.
+                  </div>
+                ) : searching ? (
                   <div className="p-3 text-center text-xs text-muted-foreground">
                     Searching users...
                   </div>
                 ) : searchResults.length === 0 ? (
                   <div className="p-3 text-center text-xs text-muted-foreground">
-                    {searchQuery.trim() ? `No users match "${searchQuery}"` : "No new users available to add."}
+                    No users match "{searchQuery}".
                   </div>
                 ) : (
                   searchResults.map((u) => {
                     const uid = (u._id || u.id).toString();
                     const isSelected = selectedUserIds.includes(uid);
-                    const isFriend = u.connectionStatus === "connected";
+                    const status = u.connectionStatus;
+                    const isFriend = status === "connected";
+                    const isPendingSent = status === "pending_sent";
+                    const isPendingReceived = status === "pending_received";
+
                     return (
                       <div
                         key={uid}
-                        onClick={() => toggleSelectUser(u)}
-                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-muted text-sm ${
-                          isSelected ? "bg-primary/10" : ""
-                        }`}
+                        className={`p-2.5 rounded-lg border transition ${isSelected
+                            ? "bg-primary/10 border-primary"
+                            : "bg-card border-border hover:border-primary/40"
+                          }`}
                       >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{u.name}</p>
-                            <span
-                              className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                                isFriend
-                                  ? "bg-green-500/15 text-green-700 dark:text-green-400"
-                                  : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                        <div className="flex items-center justify-between gap-2">
+                          <div
+                            onClick={() => {
+                              if (isFriend) toggleSelectUser(u);
+                            }}
+                            className={`flex items-center gap-2.5 flex-1 min-w-0 ${isFriend ? "cursor-pointer" : ""
                               }`}
-                            >
-                              {isFriend ? "Friend (Direct Add)" : "Invite Needed"}
-                            </span>
+                          >
+                            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary text-xs">
+                              {u.name?.[0]?.toUpperCase() || "U"}
+                              {u.isOnline && (
+                                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-medium text-sm truncate">{u.name}</p>
+                                <span
+                                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${isFriend
+                                      ? "bg-green-500/15 text-green-700 dark:text-green-400"
+                                      : isPendingSent
+                                        ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
+                                        : isPendingReceived
+                                          ? "bg-purple-500/15 text-purple-700 dark:text-purple-400"
+                                          : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                    }`}
+                                >
+                                  {isFriend
+                                    ? "Friend (Direct Add)"
+                                    : isPendingSent
+                                      ? "Invite Sent"
+                                      : isPendingReceived
+                                        ? "Invite Received"
+                                        : "Not Connected"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{u.email}</p>
+
+                          {isFriend ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSelectUser(u)}
+                              className="shrink-0 p-1.5 rounded-md hover:bg-muted text-primary"
+                            >
+                              {isSelected ? (
+                                <Check className="h-5 w-5 text-primary" />
+                              ) : (
+                                <span className="text-xs font-medium text-primary hover:underline">+ Select</span>
+                              )}
+                            </button>
+                          ) : !isPendingSent && !isPendingReceived ? (
+                            <button
+                              type="button"
+                              disabled={invitingUserId === uid}
+                              onClick={() => handleSendInvitation(uid)}
+                              className="shrink-0 flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50 cursor-pointer shadow-2xs"
+                            >
+                              <UserPlus className="h-3.5 w-3.5" />
+                              <span>{invitingUserId === uid ? "Sending..." : "Send Invite"}</span>
+                            </button>
+                          ) : null}
                         </div>
-                        {isSelected && <Check className="h-4 w-4 text-primary" />}
+
+                        {!isFriend && !isPendingSent && !isPendingReceived && (
+                          <input
+                            type="text"
+                            value={inviteMsg[uid] || ""}
+                            onChange={(e) => setInviteMsg({ ...inviteMsg, [uid]: e.target.value })}
+                            placeholder="Personal message (optional)..."
+                            className="mt-2 w-full rounded-md border border-border bg-background px-2.5 py-1 text-xs focus:outline-none focus:border-primary"
+                          />
+                        )}
                       </div>
                     );
                   })
                 )}
               </div>
+
 
               <button
                 onClick={handleAddMembersSubmit}
@@ -364,6 +477,14 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
                 const uid = (u._id || u.id)?.toString();
                 const isMe = uid === currentUserId;
                 const isOnline = u.isOnline;
+
+                const myRole = currentMember?.role;
+                const targetRole = m.role;
+
+                const canManageRole = myRole === "owner" && !isMe && targetRole !== "owner";
+                const canRemoveMember = !isMe && targetRole !== "owner" && (
+                  myRole === "owner" || (myRole === "admin" && targetRole === "member")
+                );
 
                 return (
                   <div
@@ -391,33 +512,38 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
                       </div>
                     </div>
 
-                    {isAdminOrOwner && !isMe && m.role !== "owner" && (
+                    {(canManageRole || canRemoveMember) && (
                       <div className="flex items-center gap-1">
-                        <button
-                          title={m.role === "admin" ? "Demote to member" : "Make Admin"}
-                          onClick={() => handleToggleAdmin(uid, m.role)}
-                          className={`p-1.5 rounded-md hover:bg-muted ${
-                            m.role === "admin"
-                              ? "text-primary font-semibold"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          <Shield className="h-4 w-4" />
-                        </button>
+                        {canManageRole && (
+                          <button
+                            title={m.role === "admin" ? "Demote to member" : "Make Admin"}
+                            onClick={() => handleToggleAdmin(uid, m.role)}
+                            className={`p-1.5 rounded-md hover:bg-muted ${
+                              m.role === "admin"
+                                ? "text-primary font-semibold"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            <Shield className="h-4 w-4" />
+                          </button>
+                        )}
 
-                        <button
-                          title="Remove from group"
-                          onClick={() => handleRemoveMember(uid)}
-                          className="p-1.5 rounded-md text-destructive hover:bg-destructive/10"
-                        >
-                          <UserMinus className="h-4 w-4" />
-                        </button>
+                        {canRemoveMember && (
+                          <button
+                            title="Remove from group"
+                            onClick={() => handleRemoveMember(uid)}
+                            className="p-1.5 rounded-md text-destructive hover:bg-destructive/10"
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
                 );
               })}
             </div>
+
           )}
 
           {/* Leave Group Section */}
@@ -454,7 +580,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
             )}
           </div>
 
-           {isAdminOrOwner && (
+          {isAdminOrOwner && (
             <div className="pt-3 border-t">
               {confirmDelete ? (
                 <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 space-y-2">

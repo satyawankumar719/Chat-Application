@@ -27,15 +27,13 @@ function ChatList({
     );
   }
   const list = searching ? searchResults : chats;
- 
+  console.log(searchResults)
 
   return (
     <div className="flex h-full flex-col gap-2 overflow-hidden p-2">
       <SearchRecentUsers
-        setSearchResults={setSearchResults}
-        chats={chats}
         setSearching={setSearching}
-        currentUserId={currentUserId}
+        setFilteredChats={setSearchResults}
       />
 
       {!list.length ? (

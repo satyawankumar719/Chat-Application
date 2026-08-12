@@ -23,9 +23,18 @@ export const API_CONFIG = {
     MESSAGES: {
       CHATS: "/messages/chats",
       UPLOAD: "/messages/upload",
-      UPLOAD_MULTIPLE :"/messages/upload/multiple",
+      UPLOAD_MULTIPLE: "/messages/upload/multiple",
       BY_CHAT_ID: (chatId, page = 1, limit = 20) =>
         `/messages/${chatId}?page=${page}&limit=${limit}`,
+    },
+    GROUPS: {
+      BASE: "/groups",
+      BY_ID: (groupId) => `/groups/${groupId}`,
+      MEMBERS: (groupId) => `/groups/${groupId}/members`,
+      MEMBER_BY_ID: (groupId, memberId) => `/groups/${groupId}/members/${memberId}`,
+      MEMBER_ROLE: (groupId, memberId) => `/groups/${groupId}/members/${memberId}/role`,
+      LEAVE: (groupId) => `/groups/${groupId}/leave`,
     }
   }
 };
+

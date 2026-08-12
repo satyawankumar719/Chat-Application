@@ -7,6 +7,7 @@ function ChatHeader({
   currentUserId,
   onBack,
   setShowGroupInfo,
+  isTyping
 }) {
   const onlineUserIds = useChatStore((state) => state.onlineUserIds);
 
@@ -48,6 +49,8 @@ function ChatHeader({
               <h3 className="font-semibold group-hover:text-primary transition-colors">
                 {chat.name || "Group"}
               </h3>
+
+
 
               <p className="text-sm text-muted-foreground">
                 {memberCount}{" "}
@@ -138,8 +141,19 @@ function ChatHeader({
             {displayUser?.name || "Conversation"}
           </h3>
 
-          <p className="text-xs text-muted-foreground transition-all">
-            {statusText}
+          <p className="text-xs text-muted-foreground">
+            {isTyping ? (
+              <span className="flex items-center gap-1.5 text-primary font-medium">
+                typing
+                <span className="flex gap-0.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
+                </span>
+              </span>
+            ) : (
+              statusText
+            )}
           </p>
         </div>
       </div>
