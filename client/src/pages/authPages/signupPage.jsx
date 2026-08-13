@@ -56,7 +56,7 @@ function SignupForm() {
       toast.error("Please fix the validation errors before submitting");
       return;
     }
-
+  
     const result = await signup({
       ...formData,
       name: formData.name.trim(),
@@ -65,9 +65,10 @@ function SignupForm() {
     });
 
     if (result.success) {
+       navigate("/verify-otp", { state: { email: formData.email.trim() } });
       localStorage.setItem("pendingEmail", formData.email.trim());
       toast.success(result.message || "OTP sent to your email!");
-      navigate("/verify-otp", { state: { email: formData.email.trim() } });
+     
     } else {
       setFeedback({ type: "error", message: result.message || "Unable to send OTP" });
       toast.error(result.message || "Signup failed");

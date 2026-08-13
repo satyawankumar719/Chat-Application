@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
+import { getCookie } from "@/lib/utils";
 
 const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 export const useSocketStore = create(function (set, get) {
@@ -10,8 +11,9 @@ export const useSocketStore = create(function (set, get) {
 
     connectSocket: function (userToken) {
       const oldSocket = get().socket;
+      const cookieToken = getCookie("Chat_token") || userToken;
       const oldToken = get().token;
-      if (oldSocket?.connected && oldToken === userToken) {
+      if (oldSocket?.connected && oldToken === cookieToken) {
         return oldSocket;
       }
       if (oldSocket) {
@@ -19,33 +21,37 @@ export const useSocketStore = create(function (set, get) {
       }
       const newSocket = io(SOCKET_SERVER_URL, {
         withCredentials: true,
-        ...(userToken ? { auth: { token: userToken } } : {}),
+        ...(cookieToken ? { auth: { token: cookieToken } } : {}),
       });
       newSocket.on("connect", function () {
         console.log("Socket connected, ID =", newSocket.id);
-        set({ connected: true, token: userToken });
+        set({ connected: true, token: cookieToken });
       });
       newSocket.on("disconnect", function () {
         console.log("Socket disconnected");
         set({ connected: false });
       });
       newSocket.on("auth_error", function (data) {
-        console.error("⚠️ Socket auth error:", data?.message);
-        set({ connected: false });
-        if (window.location.pathname !== "/login") {
+        console.error("Socket auth error:", data?.message);
+        const activeSocket = get().socket;
+        if (activeSocket) activeSocket.disconnect();
+        set({ connected: false, socket: null, token: null });
+        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
       });
       newSocket.on("connect_error", function (error) {
-        console.error("⚠️ Socket connection error:", error.message);
+        console.error("Socket connection error:", error.message);
         if (error.message && error.message.includes("UNAUTHORIZED")) {
-          set({ connected: false });
-          if (window.location.pathname !== "/login") {
+          const activeSocket = get().socket;
+          if (activeSocket) activeSocket.disconnect();
+          set({ connected: false, socket: null, token: null });
+          if (typeof window !== "undefined" && window.location.pathname !== "/login") {
             window.location.href = "/login";
           }
         }
       });
-      set({ socket: newSocket, connected: false, token: userToken });
+      set({ socket: newSocket, connected: false, token: cookieToken });
 
 
       return newSocket;
@@ -79,13 +85,27 @@ export const useSocketStore = create(function (set, get) {
     },
     sendMessageSocket: function (chatId, content, tempId, ackCallback, attachment = null, attachments = []) {
       const activeSocket = get().socket;
-      const userToken = get().token;
+      const cookieToken = getCookie("Chat_token");
+
+      if (!cookieToken) {
+        if (activeSocket) activeSocket.disconnect();
+        set({ connected: false, socket: null, token: null });
+        ackCallback?.({
+          success: false,
+          error: "Unauthorized: Token missing or renamed",
+          code: "UNAUTHORIZED",
+        });
+        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+        return false;
+      }
 
       if (activeSocket?.connected) {
          activeSocket.emit(
           "send_message",
           {
-            token: userToken,
+            token: cookieToken,
             chatId: chatId,
             content: content,
             tempId: tempId,

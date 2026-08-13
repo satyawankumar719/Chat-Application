@@ -260,7 +260,6 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
     throw new Error("User or target member not found in group");
   }
 
-  // Permission checks: owner can remove anyone; admin can remove members; user can remove self (leave)
   const isSelf = userId.toString() === targetMemberId.toString();
   if (!isSelf) {
     if (requester.role === "member") {
@@ -271,13 +270,15 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
     }
   }
 
-  if (target.role === "owner" && group.members.length > 1) {
+  if (target.role === "owner" && group.members.length > 1 && !isSelf) {
     throw new Error("Owner cannot be removed. Transfer ownership or leave group.");
   }
 
+  const previousMemberIds = group.members.map((m) => m.user.toString());
   group.members = group.members.filter((m) => m.user.toString() !== targetMemberId.toString());
 
-  if (group.members.length === 0) {
+  const isGroupDeactivated = group.members.length <= 1;
+  if (isGroupDeactivated) {
     group.isActive = false;
   }
 
@@ -292,20 +293,26 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
 
   const systemMsg = await createSystemMessage(group._id, userId, actionText);
 
-  const remainingMemberIds = group.members.map((m) => m.user.toString());
   const populatedGroup = await Chat.findById(group._id)
     .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
     .populate("createdBy", "name email avatar");
 
-  notifyGroupMembers(remainingMemberIds, "group_updated", {
-    group: populatedGroup,
-    systemMessage: systemMsg,
-  });
+  if (isGroupDeactivated) {
+    notifyGroupMembers(previousMemberIds, "group_removed", {
+      groupId: group._id,
+      message: "Group has been closed because fewer than 2 members remain.",
+    });
+  } else {
+    const remainingMemberIds = group.members.map((m) => m.user.toString());
+    notifyGroupMembers(remainingMemberIds, "group_updated", {
+      group: populatedGroup,
+      systemMessage: systemMsg,
+    });
 
-  // Notify removed member
-  notifyGroupMembers([targetMemberId], "group_removed", {
-    groupId: group._id,
-  });
+    notifyGroupMembers([targetMemberId], "group_removed", {
+      groupId: group._id,
+    });
+  }
 
   return populatedGroup;
 };
@@ -377,9 +384,9 @@ export const leaveGroup = async (userId, groupId) => {
   }
 
   const isOwner = memberObj.role === "owner";
+  const previousMemberIds = group.members.map((m) => m.user.toString());
   group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
 
-  // Auto-reassign owner if owner leaves and members remain
   if (isOwner && group.members.length > 0) {
     const oldestAdmin = group.members.find((m) => m.role === "admin");
     if (oldestAdmin) {
@@ -389,7 +396,8 @@ export const leaveGroup = async (userId, groupId) => {
     }
   }
 
-  if (group.members.length === 0) {
+  const isGroupDeactivated = group.members.length <= 1;
+  if (isGroupDeactivated) {
     group.isActive = false;
   }
 
@@ -406,18 +414,26 @@ export const leaveGroup = async (userId, groupId) => {
     .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
     .populate("createdBy", "name email avatar");
 
-  const remainingMemberIds = group.members.map((m) => m.user.toString());
-  notifyGroupMembers(remainingMemberIds, "group_updated", {
-    group: populatedGroup,
-    systemMessage: systemMsg,
-  });
+  if (isGroupDeactivated) {
+    notifyGroupMembers(previousMemberIds, "group_removed", {
+      groupId: group._id,
+      message: "Group has been closed because fewer than 2 members remain.",
+    });
+  } else {
+    const remainingMemberIds = group.members.map((m) => m.user.toString());
+    notifyGroupMembers(remainingMemberIds, "group_updated", {
+      group: populatedGroup,
+      systemMessage: systemMsg,
+    });
 
-  notifyGroupMembers([userId], "group_removed", {
-    groupId: group._id,
-  });
+    notifyGroupMembers([userId], "group_removed", {
+      groupId: group._id,
+    });
+  }
 
   return populatedGroup;
 };
+
 
 export const deleteGroup = async (userId, groupId) => {
   const group = await Chat.findOne({

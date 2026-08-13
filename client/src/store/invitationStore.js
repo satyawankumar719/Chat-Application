@@ -7,12 +7,14 @@ export const useInvitationStore = create(function (set, get) {
   return {
     pendingInvitations: [],
     loadingInvitations: false,
+    actionLoadingId: null,
     invitationMessage: null,
 
     reset: function () {
       set({
         pendingInvitations: [],
         loadingInvitations: false,
+        actionLoadingId: null,
         invitationMessage: null,
       });
     },
@@ -95,6 +97,7 @@ export const useInvitationStore = create(function (set, get) {
     },
 
     acceptInvitation: async function (invitationId) {
+      set({ actionLoadingId: invitationId });
       try {
         const res = await invitationApi.acceptInvitation(invitationId);
         const resultData = res.data?.data || res.data;
@@ -118,10 +121,13 @@ export const useInvitationStore = create(function (set, get) {
         const message = err.response?.data?.message || "Unable to accept invitation.";
         set({ invitationMessage: message });
         throw err;
+      } finally {
+        set({ actionLoadingId: null });
       }
     },
 
     rejectInvitation: async function (invitationId) {
+      set({ actionLoadingId: invitationId });
       try {
         const res = await invitationApi.rejectInvitation(invitationId);
 
@@ -139,6 +145,8 @@ export const useInvitationStore = create(function (set, get) {
         const message = err.response?.data?.message || "Unable to reject invitation.";
         set({ invitationMessage: message });
         throw err;
+      } finally {
+        set({ actionLoadingId: null });
       }
     },
 

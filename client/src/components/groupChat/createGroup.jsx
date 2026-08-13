@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Users, X, Search, Check } from "lucide-react";
 import { queryApi } from "@/api/userApi";
 import { useAuthStore } from "@/store/authStore";
-import { useChatStore } from "@/store/chatStore";
+import { useGroupStore } from "@/store/groupStore";
 
 export default function CreateGroupModal({ isOpen, onClose }) {
   const { user } = useAuthStore();
-  const { createGroup } = useChatStore();
+  const { createGroup } = useGroupStore();
   const currentUserId = user?._id?.toString() || user?.id?.toString();
 
   const [name, setName] = useState("");
@@ -81,7 +81,11 @@ export default function CreateGroupModal({ isOpen, onClose }) {
     setLoading(true);
     setError("");
     try {
-      await createGroup({ name, description, memberIds: selectedUserIds });
+      const res = await createGroup({ name, description, memberIds: selectedUserIds });
+      if (res && res.success === false) {
+        setError(res.error || "Failed to create group.");
+        return;
+      }
       setName("");
       setDescription("");
       setSelectedUserIds([]);

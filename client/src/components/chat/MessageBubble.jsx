@@ -1,6 +1,6 @@
 import { useChatStore } from "@/store/chatStore";
 import { useSocketStore } from "@/store/socketStore";
-import { Check, CheckCheck, FileText, Image as ImageIcon, X, RotateCw, Loader2 } from "lucide-react";
+import { Check, CheckCheck, FileText, Image as ImageIcon, X, RotateCw, Loader2, Users } from "lucide-react";
 
 function formatFileSize(bytes) {
   if (!bytes) return "";
@@ -179,6 +179,17 @@ function renderAttachmentList(message, connected) {
 }
 
 function MessageBubble({ message, isMine }) {
+  if (message.type === "system") {
+    return (
+      <div className="my-3 flex items-center justify-center px-4 w-full">
+        <div className="flex items-center gap-2 rounded-full border border-border/60 bg-muted/80 px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-2xs backdrop-blur-xs text-center max-w-[85%] break-words">
+          <Users className="h-3.5 w-3.5 shrink-0 text-primary" />
+          <span>{message.content}</span>
+        </div>
+      </div>
+    );
+  }
+
   const connected = useSocketStore((state) => state.connected);
   const isReconnecting = message.isReconnecting || !connected;
   const attachmentsBlock = renderAttachmentList(message, connected);

@@ -34,6 +34,7 @@ export const API_CONFIG = {
       MEMBER_BY_ID: (groupId, memberId) => `/groups/${groupId}/members/${memberId}`,
       MEMBER_ROLE: (groupId, memberId) => `/groups/${groupId}/members/${memberId}/role`,
       LEAVE: (groupId) => `/groups/${groupId}/leave`,
+      INVITATION : (groupId,recieverId) => `/groups/${groupId}/invite/${recieverId}`
     }
   }
 };

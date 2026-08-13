@@ -11,7 +11,7 @@ import { generateToken } from "../utils/index.js";
 import { ENV } from "../config/envConfig.js";
 
 const COOKIE_OPTIONS = {
-    httpOnly: true,
+    httpOnly: false,
     secure: ENV.NODE_ENV === "production",
     sameSite: ENV.NODE_ENV === "production" ? "strict" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,

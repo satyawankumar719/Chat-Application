@@ -211,5 +211,20 @@ export const useGroupStore = create(function (set, get) {
         set({ loading: false });
       }
     },
+    sendGroupInvitation: async function (groupId, receiverId, message = "") {
+      set({ loading: true, error: null });
+      try {
+        const response = await groupApi.sendGroupInvitation(groupId, receiverId, message);
+        const invitation = response.data || response;
+
+        return { success: true, invitation };
+      } catch (err) {
+        const errorMsg = err.response?.data?.message || err.message || "Failed to send group invitation";
+        set({ error: errorMsg });
+        return { success: false, error: errorMsg };
+      } finally {
+        set({ loading: false });
+      }
+    },
   };
 });

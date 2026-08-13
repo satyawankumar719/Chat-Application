@@ -1,4 +1,6 @@
+import { success } from "zod";
 import * as groupService from "../services/group.service.js";
+import { sendGroupInvitationService } from "../services/invitation.service.js";
 
 export const handleCreateGroup = async (req, res, next) => {
   try {
@@ -127,6 +129,25 @@ export const handleDeleteGroup = async (req, res, next) => {
       success: true,
       message: "Group deleted successfully",
       data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendGroupInvitation = async (req, res, next) => {
+  try {
+    const currentUserId = req.user._id || req.user.id;
+    const { groupId, recieverId } = req.params;
+    const receiverId = recieverId || req.params.receiverId || req.body?.receiverId;
+    const message = req.body?.message || "";
+
+    const invitation = await sendGroupInvitationService(currentUserId, groupId, receiverId, message);
+
+    res.status(201).json({
+      success: true,
+      message: "Group invitation sent successfully.",
+      data: invitation,
     });
   } catch (error) {
     next(error);

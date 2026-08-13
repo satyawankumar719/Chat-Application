@@ -45,4 +45,4 @@ export const authMiddleware = async (req, res, next) => {
       code: 'UNAUTHORIZED'
     });
   }
-};
+};

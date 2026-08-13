@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Users, X, UserPlus, Shield, UserMinus, Search, Check, Edit2, LogOut, Save, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { useChatStore } from "@/store/chatStore";
+import { useGroupStore } from "@/store/groupStore";
 import { queryApi } from "@/api/userApi";
 import { invitationApi } from "@/api/invitationApi";
 
 export default function GroupInfoModal({ isOpen, onClose, chat }) {
   const { user } = useAuthStore();
-  const { addGroupMembers, removeGroupMember, updateGroupMemberRole, updateGroupInfo, leaveGroup, deleteGroup } =
-    useChatStore();
+  const { addMembers, removeMember, updateMemberRole, updateGroupInfo, leaveGroup, deleteGroup, sendGroupInvitation } =
+    useGroupStore();
   const currentUserId = (user?._id || user?.id)?.toString();
 
   const [showAddMembers, setShowAddMembers] = useState(false);
@@ -109,9 +109,14 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
       setError("");
       setInviteSuccess("");
       const msg = inviteMsg[receiverId] || "";
-      const res = await invitationApi.sendInvitation(receiverId, msg);
+      const res = await sendGroupInvitation(chat._id, receiverId, msg);
 
-      setInviteSuccess(res.data?.message || "Invitation sent successfully.");
+      if (res && res.success === false) {
+        setError(res.error || "Failed to send group invitation.");
+        return;
+      }
+
+      setInviteSuccess("Group invitation sent successfully.");
 
       setSearchResults((prev) =>
         prev.map((u) => {
@@ -123,7 +128,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
         })
       );
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to send invitation.");
+      setError(err.response?.data?.message || err.message || "Failed to send group invitation.");
     } finally {
       setInvitingUserId(null);
     }
@@ -149,7 +154,11 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await updateGroupInfo(chat._id, { name, description });
+      const res = await updateGroupInfo(chat._id, { name, description });
+      if (res && res.success === false) {
+        setError(res.error || "Failed to update group info.");
+        return;
+      }
       setIsEditing(false);
     } catch (err) {
       setError(err.message || "Failed to update group info.");
@@ -163,7 +172,11 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await addGroupMembers(chat._id, selectedUserIds);
+      const res = await addMembers(chat._id, selectedUserIds);
+      if (res && res.success === false) {
+        setError(res.error || "Failed to add members.");
+        return;
+      }
       setSelectedUserIds([]);
       setShowAddMembers(false);
     } catch (err) {
@@ -177,7 +190,10 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await removeGroupMember(chat._id, memberId);
+      const res = await removeMember(chat._id, memberId);
+      if (res && res.success === false) {
+        setError(res.error || "Failed to remove member.");
+      }
     } catch (err) {
       setError(err.message || "Failed to remove member.");
     } finally {
@@ -192,7 +208,10 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await updateGroupMemberRole(chat._id, memberId, newRole);
+      const res = await updateMemberRole(chat._id, memberId, newRole);
+      if (res && res.success === false) {
+        setError(res.error || "Failed to update role.");
+      }
     } catch (err) {
       setError(err.message || "Failed to update role.");
     } finally {
@@ -203,7 +222,11 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await deleteGroup(chat._id);
+      const res = await deleteGroup(chat._id);
+      if (res && res.success === false) {
+        setError(res.error || "Failed to delete group.");
+        return;
+      }
       onClose();
     } catch (err) {
       setError(err.message || "Failed to delete group.");
@@ -215,7 +238,11 @@ export default function GroupInfoModal({ isOpen, onClose, chat }) {
     setLoading(true);
     setError("");
     try {
-      await leaveGroup(chat._id);
+      const res = await leaveGroup(chat._id);
+      if (res && res.success === false) {
+        setError(res.error || "Failed to leave group.");
+        return;
+      }
       onClose();
     } catch (err) {
       setError(err.message || "Failed to leave group.");

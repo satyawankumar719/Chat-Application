@@ -12,10 +12,15 @@ import {
 import { isUserOnline } from "./userManager.js";
 
 async function validateSocketUser(socket, messageData, currentUserId) {
-  let token = messageData?.token || socket.authToken;
-  if (!token) {
-    const cookieHeader = socket.request?.headers?.cookie || socket.handshake?.headers?.cookie;
-    token = getTokenFromCookie(cookieHeader) || socket.handshake.auth?.token;
+  let token;
+  if (messageData && typeof messageData === "object" && "token" in messageData) {
+    token = messageData.token;
+  } else {
+    token = socket.authToken;
+    if (!token) {
+      const cookieHeader = socket.request?.headers?.cookie || socket.handshake?.headers?.cookie;
+      token = getTokenFromCookie(cookieHeader) || socket.handshake.auth?.token;
+    }
   }
 
   if (!token) {

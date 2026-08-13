@@ -520,3 +520,244 @@
 {"level":"info","message":"Socket Disconnected: wv4caB5zpaxLkd0wAAAC (User: 6a76ce85c11a4205f784951f)"}
 {"level":"info","message":"Socket Connected: S9FcEFr6qYMarl2nAAAJ (User: 6a76ce85c11a4205f784951f)"}
 {"level":"info","message":"Socket Disconnected: S9FcEFr6qYMarl2nAAAJ (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: ZbVDPe6kr63qhgDUAAAG (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: kjC8CanXaFgV3qT8AAAQ (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 3Xgvs--AVaTKCTavAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: i-BWGgUUTXgcgz-kAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: u9-i48rmLt_7Ngm4AAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: aUnWRFm1VqP1T7aFAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: gHOnPdj2QiSDKvIqAAAE (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: gHOnPdj2QiSDKvIqAAAE (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: aUnWRFm1VqP1T7aFAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: M594rMbjiyNJHhMIAAAH (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: K-3GwGCjw7-TjDTtAAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: PwwygijdEFCynBVAAAAM (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: PwwygijdEFCynBVAAAAM (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: eVwFdOZRliwUkzq1AAAP (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: M594rMbjiyNJHhMIAAAH (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: eVwFdOZRliwUkzq1AAAP (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: qIvuqmzRw4oam0slAAAT (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Disconnected: qIvuqmzRw4oam0slAAAT (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Connected: rluGoNdTz6w_nUjyAAAW (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: l3yRqHWZBZ6bCvqhAAAZ (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: 5MWoD5IqvIY_Fci5AAAb (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Disconnected: 5MWoD5IqvIY_Fci5AAAb (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: F7MAbgxgLOUH8WY3AAAe (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: kmN3gDR8txa5mSk-AAAg (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: g6YOY6b48yAqBX47AAAj (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: E2fONnMI_HvtTy4CAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: K_2JOz9VmeRQrau6AAAD (User: 6a7caf83b629d2daaee04550)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.addMembers (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:230:21)\n    at async handleAddMembers (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:64:19)"}
+{"level":"info","message":"Socket Disconnected: K_2JOz9VmeRQrau6AAAD (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: Q7_Vw3PoMTYQ_A8IAAAG (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: sqj_y69H0J--HygBAAAI (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: Bbkevzm_Aj8Vk5SGAAAC (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: EUwLqmWkUSiEsQC6AAAD (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Disconnected: EUwLqmWkUSiEsQC6AAAD (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: sfQNODjNXspo-jizAAAG (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: zUMYEdJtRsZtvnAxAAAB (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: l635ikM06g89j3EAAAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: tshkb4-qaFVhOwaaAAAC (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: _YHlS4n2CgQkdNz0AAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: UW9NM8E01mF16TpiAAAC (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: qN-LBMQWXa2BwZ43AAAD (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Disconnected: UW9NM8E01mF16TpiAAAC (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: ETHl8dQJFjWUo2THAAAG (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: ETHl8dQJFjWUo2THAAAG (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: TXPTv-WyVrbkZnP9AAAC (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: XKXFbBOog8qLur2HAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: XKXFbBOog8qLur2HAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: a-TPRBOT0VrlmCwhAAAI (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: a-TPRBOT0VrlmCwhAAAI (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 2Fo3ItRz2eaB0PgmAAAL (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: L8obgJpabVLL4Mp2AAAP (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: qCyPeF26fphZyNYXAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: qCyPeF26fphZyNYXAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: pEh35IE7PnUwiqTCAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: DMDkEQCihYur4FVLAAAH (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: BvDL-Xe-fCbj_s2-AAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: lC524jieA5kRNgYQAAAO (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: DMDkEQCihYur4FVLAAAH (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: lC524jieA5kRNgYQAAAO (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: U7pSzPNvlrY4RWjVAAAR (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: fke6_LAhFedNHOfCAAAV (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: UU78Q5XZ3TerZjoJAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: N1QB6PUI6L8iiAWrAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: B4vfMG17BT4ZYaaGAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: B4vfMG17BT4ZYaaGAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: N1QB6PUI6L8iiAWrAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: _6BIoPbqZrKmOrinAAAH (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: YsvOcNXnAI7pH6KvAAAL (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: YsvOcNXnAI7pH6KvAAAL (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: RPjzGZeJZf6DnBzWAAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: RPjzGZeJZf6DnBzWAAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: ZuLY30pJK9TfA7DaAAAF (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: PejcdvP84hj-ihJiAAAH (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: PejcdvP84hj-ihJiAAAH (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: fvsm0UPhpCB0sw-LAAAK (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: BTnN2AwjzZ_Ti7L3AAAN (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Disconnected: BTnN2AwjzZ_Ti7L3AAAN (User: 6a7caf83b629d2daaee04550)"}
+{"level":"info","message":"Socket Connected: 9aOCUd_DdB3xJ10xAAAQ (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: 9aOCUd_DdB3xJ10xAAAQ (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: d8mvhgyBvz12508jAAAT (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: d8mvhgyBvz12508jAAAT (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: WMXyh9B_AXShS6-AAAAW (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: qPGR44XZ3CNEPcboAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: bIao0la2rAkphZKxAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: qPGR44XZ3CNEPcboAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: bIao0la2rAkphZKxAAAE (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 6EpS8RGeoH52ZmMVAAAH (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: 46uP7In_Tb5jp2RIAAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: 46uP7In_Tb5jp2RIAAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 9iMoq6Z_HKDpAXIYAAAN (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: YLso2PGozBfLr23nAAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: yZGHYTHhbTVtcJZ7AAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 9FrKHeMqKkHvVzUCAAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: Q-5S-C3ql4sLmiXVAAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: oZma_m6z6-DjBihSAAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: KInnIh_TloNWSRklAAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: KInnIh_TloNWSRklAAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: pwLasSJ1KN9pp3OTAAAG (User: 6a7d606ad329a2a856cd3e02)"}
+{"level":"info","message":"Socket Connected: SPbQvZgUjYA9qfyGAAAJ (User: 6a7d606ad329a2a856cd3e02)"}
+{"level":"info","message":"Socket Disconnected: pwLasSJ1KN9pp3OTAAAG (User: 6a7d606ad329a2a856cd3e02)"}
+{"level":"info","message":"Socket Connected: D2NgqKbFlykHjO5EAAAM (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: igCPsQUk5cyAIZjTAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: wMRU7s4QZmADILEAAAAF (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: jajhlDn7t7Zbs_0QAAAD (User: 6a7d606ad329a2a856cd3e02)"}
+{"level":"info","message":"Socket Disconnected: jajhlDn7t7Zbs_0QAAAD (User: 6a7d606ad329a2a856cd3e02)"}
+{"level":"info","message":"Socket Connected: 21c9DJRZThyWp9TKAAAI (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 9I_AsL5-ozfd991mAAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: 9I_AsL5-ozfd991mAAAK (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: L9tICSs5nwyb1iQ2AAAC (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: NfatFuFM6cwGavQ3AAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: NfatFuFM6cwGavQ3AAAD (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 7o9iP-XuKrO0IYesAAAG (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 0kz--TxCD9CxoeRcAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: 5cI89eeQII6ocmGeAAAD (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Disconnected: 0kz--TxCD9CxoeRcAAAB (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: gQoOxlMrjo4XLrIDAAAG (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: gQoOxlMrjo4XLrIDAAAG (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: 5DwM0ri19wiZNXX2AAAJ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: 5cI89eeQII6ocmGeAAAD (User: 6a76ce85c11a4205f784951f)"}
+{"level":"info","message":"Socket Connected: f3XY1vTtTxSMKMqmAAAM (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: 5DwM0ri19wiZNXX2AAAJ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: NDbvNpjgVxdR5FRnAAAP (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: f3XY1vTtTxSMKMqmAAAM (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: L9wmSOHLa011-YpVAAAS (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: NDbvNpjgVxdR5FRnAAAP (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: 5xK4Y_9Y9NICNWkqAAAV (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.changeMemberRole (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:351:21)\n    at async handleChangeMemberRole (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:97:19)"}
+{"level":"info","message":"Socket Connected: Jm5-mNshxDq0xHDHAAAY (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Disconnected: 5xK4Y_9Y9NICNWkqAAAV (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: L9wmSOHLa011-YpVAAAS (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: Jm5-mNshxDq0xHDHAAAY (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Connected: 6D1Xg0Hw97KxJwxwAAAd (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Connected: U6fOcTWasWB6PeCgAAAc (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: yDBev_nzDT9rTAS7AAAe (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Connected: TaRy5t-xVbA3ad4sAAAh (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Connected: fJjU6dhuiDt1f-YlAAAm (User: 6a76ca01c246204ec05b2801)"}
+{"level":"info","message":"Socket Disconnected: U6fOcTWasWB6PeCgAAAc (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: zb4RphJDRNNoHLHNAAAp (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.leaveGroup (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:407:21)\n    at async handleLeaveGroup (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:112:19)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: OYG1-C1j7VMGDMxyAAAB (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: OYG1-C1j7VMGDMxyAAAB (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: u4LLhbN9k9-geFIkAAAE (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: wMoakNLXvY6UhCILAAAH (User: 6a7992d9e542fe5a80fb05c1)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.leaveGroup (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:407:21)\n    at async handleLeaveGroup (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:112:19)"}
+{"level":"info","message":"Socket Disconnected: u4LLhbN9k9-geFIkAAAE (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: LknamAmPVKVsRogaAAAK (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: wMoakNLXvY6UhCILAAAH (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Connected: ezgF6NnM2bCq-2TKAAAN (User: 6a7992d9e542fe5a80fb05c1)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.removeMember (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:294:21)\n    at async handleRemoveMember (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:81:19)"}
+{"level":"info","message":"Socket Disconnected: LknamAmPVKVsRogaAAAK (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: eqG_10bE49Hp3pk_AAAQ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: eqG_10bE49Hp3pk_AAAQ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: jBNPd_xF2mD3q2P-AAAT (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: k7oXAIbOgTi4PKDXAAAW (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: k7oXAIbOgTi4PKDXAAAW (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Connected: peHJf9WJ6K79ms8oAAAZ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.leaveGroup (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:407:21)\n    at async handleLeaveGroup (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:112:19)"}
+{"level":"info","message":"Socket Disconnected: ezgF6NnM2bCq-2TKAAAN (User: 6a7992d9e542fe5a80fb05c1)"}
+{"beforeHandshake":false,"cause":{"code":"ECONNRESET","errno":-4077,"syscall":"read"},"errorLabelSet":{},"level":"error","message":"Disconnect Error: read ECONNRESET","stack":"MongoNetworkError: read ECONNRESET\n    at Connection.onSocketError (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongodb\\lib\\cmap\\connection.js:124:22)\n    at TLSSocket.emit (node:events:521:24)\n    at emitErrorNT (node:internal/streams/destroy:170:8)\n    at emitErrorCloseNT (node:internal/streams/destroy:129:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"}
+{"level":"info","message":"Socket Connected: 1Cl_H9E6lJ2Zby0gAAAg (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Socket Disconnected: peHJf9WJ6K79ms8oAAAZ (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: jBNPd_xF2mD3q2P-AAAT (User: 6a7d63dcc38fa3b2d6d9c31e)"}
+{"level":"info","message":"Socket Disconnected: 1Cl_H9E6lJ2Zby0gAAAg (User: 6a7992d9e542fe5a80fb05c1)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: HXVgZJQBl1xHrk5DAAAC (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: HDua93026qiVsGU4AAAF (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: HDua93026qiVsGU4AAAF (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: cvpIYNleGHMH7O6tAAAK (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: o24ifgurbcY6q5VOAAAN (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"_message":"Message validation failed","errors":{"type":{"kind":"enum","message":"`system` is not a valid enum value for path `type`.","name":"ValidatorError","path":"type","properties":{"enumValues":["text","image","file","audio","video"],"length":6,"message":"`system` is not a valid enum value for path `type`.","path":"type","type":"enum","value":"system"},"value":"system"}},"level":"error","message":"Failed to create system message: Message validation failed: type: `system` is not a valid enum value for path `type`.","stack":"ValidationError: Message validation failed: type: `system` is not a valid enum value for path `type`.\n    at model.validate (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\document.js:2864:36)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async model.$__save (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:399:7)\n    at async maybeTracedSave (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:675:7)\n    at async model.create (D:\\Chat Application\\Chat-Application\\server\\node_modules\\mongoose\\lib\\model.js:2763:5)\n    at async createSystemMessage (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:18:27)\n    at async Module.createGroup (file:///D:/Chat%20Application/Chat-Application/server/services/group.service.js:82:21)\n    at async handleCreateGroup (file:///D:/Chat%20Application/Chat-Application/server/controllers/group.controller.js:8:19)"}
+{"level":"info","message":"Socket Disconnected: o24ifgurbcY6q5VOAAAN (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: cvpIYNleGHMH7O6tAAAK (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: YHrHx0KixfLWebtsAAAQ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: Ur-KsZ9NlK9miUrUAAAR (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: YHrHx0KixfLWebtsAAAQ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: qC4wpBqnKCCuVQjPAAAW (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: Ur-KsZ9NlK9miUrUAAAR (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: V92YKkY4WgeqaL03AAAZ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: qC4wpBqnKCCuVQjPAAAW (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: 08BGhA6pR3BJ6LJuAAAc (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: 08BGhA6pR3BJ6LJuAAAc (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: lW1nA_RLCTaUdCjDAAAf (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: QXA8Igzo-0ng5IRBAAAh (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: QXA8Igzo-0ng5IRBAAAh (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: dWPW_u69m6reek66AAAk (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: V92YKkY4WgeqaL03AAAZ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: rioncGWy9gYDss8qAAAn (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: dWPW_u69m6reek66AAAk (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: rioncGWy9gYDss8qAAAn (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 5-dL3mTI3jlTHZXFAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: KCdV4fuiqJeR-yeUAAAH (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: wREYJXEU3azNlwM4AAAJ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: wREYJXEU3azNlwM4AAAJ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: oLopstPJj0-p6gsbAAAM (User: 6a7db4de002539acfaadae80)"}
+{"level":"info","message":"Socket Disconnected: 5-dL3mTI3jlTHZXFAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: iQk-Di00V2WdWd7LAAAP (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: iQk-Di00V2WdWd7LAAAP (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: HXTPKCM9teO-QSJgAAAS (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: e7NwODfPbKABvhAHAAAB (User: 6a7db4de002539acfaadae80)"}
+{"level":"info","message":"Socket Connected: OVqCp2PGpmKL065nAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: e7NwODfPbKABvhAHAAAB (User: 6a7db4de002539acfaadae80)"}
+{"level":"info","message":"Socket Disconnected: OVqCp2PGpmKL065nAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: sJenYEUW5xTh3isGAAAG (User: 6a7db4de002539acfaadae80)"}
+{"level":"info","message":"Socket Connected: 76fxnrB9LQmvnhS1AAAH (User: 6a7d8aa80e76a6ba2adfa278)"}

@@ -1,32 +1,44 @@
 import React from "react";
 import InvitationCard from "./InvitationCard";
-import { MailOpen } from "lucide-react";
+import { MailOpen, Loader2 } from "lucide-react";
+
 function InvitationList({
   invitations,
   loading,
+  actionLoadingId,
   onAccept,
   onReject,
 }) {
-
- 
-  if (!invitations.length) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-        <MailOpen className="h-6 w-6 text-muted-foreground" />
+  if (loading && (!invitations || invitations.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+        <Loader2 className="mb-2 h-6 w-6 animate-spin text-muted-foreground" />
+        <p className="text-sm font-medium text-muted-foreground">
+          Loading invitations...
+        </p>
       </div>
+    );
+  }
 
-      <h3 className="text-base font-semibold">
-        No new invitations
-      </h3>
+  if (!invitations || !invitations.length) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <MailOpen className="h-6 w-6 text-muted-foreground" />
+        </div>
 
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-        You don't have any pending invitations right now. New invitations
-        will appear here when someone invites you.
-      </p>
-    </div>
-  );
-}
+        <h3 className="text-base font-semibold">
+          No new invitations
+        </h3>
+
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          You don't have any pending invitations right now. New invitations
+          will appear here when someone invites you.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-amber-400/40 bg-amber-50 p-2 dark:bg-amber-950/30">
       <div className="mb-2 flex items-center justify-between">
@@ -39,13 +51,12 @@ function InvitationList({
         </span>
       </div>
 
-
       <div className="space-y-2">
         {invitations.map((item) => (
           <InvitationCard
             key={item._id}
             invitation={item}
-            loading={loading}
+            isProcessing={actionLoadingId === item._id}
             onAccept={onAccept}
             onReject={onReject}
           />

@@ -10,6 +10,7 @@ function InvitationsPage() {
   const {
     pendingInvitations,
     loadingInvitations,
+    actionLoadingId,
     acceptInvitation,
     rejectInvitation,
     fetchPendingInvitations,
@@ -34,13 +35,13 @@ function InvitationsPage() {
         </Button>
       </div>
 
- <InvitationList
- invitations={pendingInvitations}
-  loading={loadingInvitations}
-  onAccept={acceptInvitation}
-  onReject={rejectInvitation}
-/>
-  
+      <InvitationList
+        invitations={pendingInvitations}
+        loading={loadingInvitations}
+        actionLoadingId={actionLoadingId}
+        onAccept={acceptInvitation}
+        onReject={rejectInvitation}
+      />
     </div>
   );
 }

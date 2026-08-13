@@ -15,5 +15,5 @@ router.delete("/:groupId/members/:memberId", groupController.handleRemoveMember)
 router.patch("/:groupId/members/:memberId/role", groupController.handleChangeMemberRole);
 router.post("/:groupId/leave", groupController.handleLeaveGroup);
 router.delete("/:groupId", groupController.handleDeleteGroup);
-
+router.post("/:groupId/invite/:recieverId",groupController.sendGroupInvitation)
 export default router;

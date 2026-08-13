@@ -22,7 +22,11 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }) => {
   const isMine = Boolean(senderId && currentUserId && senderId === currentUserId.toString());
 
 
-  const message = isMine
+  const isSystemMsg = chat.lastMessage?.type === "system";
+
+  const message = isSystemMsg
+    ? chat.lastMessage?.content || ""
+    : isMine
     ? `You: ${chat.lastMessage?.content || ""}`
     : chat.lastMessage?.content || "Start a conversation";
 

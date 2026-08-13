@@ -46,4 +46,8 @@ export const groupApi = {
     const response = await apiClient.delete(API_CONFIG.ENDPOINTS.GROUPS.BY_ID(groupId));
     return response.data;
   },
+  sendGroupInvitation: async (groupId, receiverId, message = "") => {
+    const response = await apiClient.post(API_CONFIG.ENDPOINTS.GROUPS.INVITATION(groupId, receiverId), { message });
+    return response.data;
+  },
 };

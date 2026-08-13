@@ -44,7 +44,17 @@ export const getUserChatsService = async (userId) => {
 
   const query = { chat: chatId };
 
+  if (chat.type === "group") {
+    const memberObj = chat.members.find(
+      (m) => (m.user?._id || m.user?.id || m.user).toString() === userId.toString()
+    );
+    if (memberObj && memberObj.joinedAt) {
+      query.createdAt = { $gte: memberObj.joinedAt };
+    }
+  }
+
   const safePage = Math.max(1, Number(page) || 1);
+
   const safeLimit = Math.max(1, Number(limit) || 50);
   const skip = (safePage - 1) * safeLimit;
 
