@@ -270,14 +270,24 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
     }
   }
 
-  if (target.role === "owner" && group.members.length > 1 && !isSelf) {
-    throw new Error("Owner cannot be removed. Transfer ownership or leave group.");
-  }
-
-  const previousMemberIds = group.members.map((m) => m.user.toString());
+  const isTargetOwner = target.role === "owner";
   group.members = group.members.filter((m) => m.user.toString() !== targetMemberId.toString());
 
-  const isGroupDeactivated = group.members.length <= 1;
+  let newOwnerUser = null;
+  if (isTargetOwner && group.members.length > 0) {
+    const oldestAdmin = group.members.find((m) => m.role === "admin");
+    if (oldestAdmin) {
+      oldestAdmin.role = "owner";
+      group.createdBy = oldestAdmin.user;
+      newOwnerUser = await User.findById(oldestAdmin.user);
+    } else {
+      group.members[0].role = "owner";
+      group.createdBy = group.members[0].user;
+      newOwnerUser = await User.findById(group.members[0].user);
+    }
+  }
+
+  const isGroupDeactivated = group.members.length === 0;
   if (isGroupDeactivated) {
     group.isActive = false;
   }
@@ -287,9 +297,16 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
   const requesterUser = await User.findById(userId);
   const targetUser = await User.findById(targetMemberId);
 
-  const actionText = isSelf
-    ? `${targetUser.name} left the group`
-    : `${requesterUser.name} removed ${targetUser.name} from the group`;
+  let actionText;
+  if (isSelf) {
+    actionText = isTargetOwner && newOwnerUser
+      ? `${targetUser?.name || "Owner"} left the group. Ownership transferred to ${newOwnerUser.name}`
+      : `${targetUser?.name || "User"} left the group`;
+  } else {
+    actionText = isTargetOwner && newOwnerUser
+      ? `${requesterUser?.name || "Admin"} removed owner ${targetUser?.name}. Ownership transferred to ${newOwnerUser.name}`
+      : `${requesterUser?.name || "Admin"} removed ${targetUser?.name} from the group`;
+  }
 
   const systemMsg = await createSystemMessage(group._id, userId, actionText);
 
@@ -298,9 +315,9 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
     .populate("createdBy", "name email avatar");
 
   if (isGroupDeactivated) {
-    notifyGroupMembers(previousMemberIds, "group_removed", {
+    notifyGroupMembers([targetMemberId, userId], "group_removed", {
       groupId: group._id,
-      message: "Group has been closed because fewer than 2 members remain.",
+      message: "Group has been closed because no members remain.",
     });
   } else {
     const remainingMemberIds = group.members.map((m) => m.user.toString());
@@ -384,56 +401,66 @@ export const leaveGroup = async (userId, groupId) => {
   }
 
   const isOwner = memberObj.role === "owner";
-  const previousMemberIds = group.members.map((m) => m.user.toString());
+  const leavingUser = await User.findById(userId);
+
   group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
+
+  let newOwnerUser = null;
 
   if (isOwner && group.members.length > 0) {
     const oldestAdmin = group.members.find((m) => m.role === "admin");
     if (oldestAdmin) {
       oldestAdmin.role = "owner";
+      group.createdBy = oldestAdmin.user;
+      newOwnerUser = await User.findById(oldestAdmin.user);
     } else {
       group.members[0].role = "owner";
+      group.createdBy = group.members[0].user;
+      newOwnerUser = await User.findById(group.members[0].user);
     }
   }
 
-  const isGroupDeactivated = group.members.length <= 1;
+  const isGroupDeactivated = group.members.length === 0;
   if (isGroupDeactivated) {
     group.isActive = false;
   }
 
   await group.save();
 
-  const leavingUser = await User.findById(userId);
-  const systemMsg = await createSystemMessage(
-    group._id,
-    userId,
-    `${leavingUser.name} left the group`
-  );
+  if (isGroupDeactivated) {
+    notifyGroupMembers([userId], "group_removed", {
+      groupId: group._id,
+      message: "Group has been closed because no members remain.",
+    });
+    return null;
+  }
 
   const populatedGroup = await Chat.findById(group._id)
     .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
     .populate("createdBy", "name email avatar");
 
-  if (isGroupDeactivated) {
-    notifyGroupMembers(previousMemberIds, "group_removed", {
-      groupId: group._id,
-      message: "Group has been closed because fewer than 2 members remain.",
-    });
-  } else {
-    const remainingMemberIds = group.members.map((m) => m.user.toString());
-    notifyGroupMembers(remainingMemberIds, "group_updated", {
-      group: populatedGroup,
-      systemMessage: systemMsg,
-    });
+  const systemMsgContent = isOwner && newOwnerUser
+    ? `${leavingUser?.name || "Owner"} left the group. Ownership transferred to ${newOwnerUser.name}`
+    : `${leavingUser?.name || "User"} left the group`;
 
-    notifyGroupMembers([userId], "group_removed", {
-      groupId: group._id,
-    });
-  }
+  const systemMsg = await createSystemMessage(
+    group._id,
+    userId,
+    systemMsgContent
+  );
+
+  const remainingMemberIds = group.members.map((m) => m.user.toString());
+  notifyGroupMembers(remainingMemberIds, "group_updated", {
+    group: populatedGroup,
+    systemMessage: systemMsg,
+  });
+
+  notifyGroupMembers([userId], "group_removed", {
+    groupId: group._id,
+  });
 
   return populatedGroup;
 };
-
 
 export const deleteGroup = async (userId, groupId) => {
   const group = await Chat.findOne({
@@ -447,17 +474,66 @@ export const deleteGroup = async (userId, groupId) => {
   }
 
   const memberObj = group.members.find((m) => m.user.toString() === userId.toString());
-  if (!memberObj || !["owner", "admin"].includes(memberObj.role)) {
-    throw new Error("Only group owner or admins can delete the group");
+  if (!memberObj || memberObj.role !== "owner") {
+    throw new Error("Only the group owner can delete the group");
   }
 
-  group.isActive = false;
+  const isOwner = memberObj.role === "owner";
+  const leavingUser = await User.findById(userId);
+
+  group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
+
+  let newOwnerUser = null;
+
+  if (isOwner && group.members.length > 0) {
+    const firstAdmin = group.members.find((m) => m.role === "admin");
+    if (firstAdmin) {
+      firstAdmin.role = "owner";
+      group.createdBy = firstAdmin.user;
+      newOwnerUser = await User.findById(firstAdmin.user);
+    } else {
+      group.members[0].role = "owner";
+      group.createdBy = group.members[0].user;
+      newOwnerUser = await User.findById(group.members[0].user);
+    }
+  }
+
+  const isDeactivated = group.members.length === 0;
+  if (isDeactivated) {
+    group.isActive = false;
+  }
+
   await group.save();
 
-  const allMemberIds = group.members.map((m) => m.user.toString());
-  notifyGroupMembers(allMemberIds, "group_removed", {
+  if (isDeactivated) {
+    notifyGroupMembers([userId], "group_removed", {
+      groupId: group._id,
+      message: "Group has been deleted.",
+    });
+    return { groupId: group._id, message: "Group deleted successfully" };
+  }
+
+  const populatedGroup = await Chat.findById(group._id)
+    .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
+    .populate("createdBy", "name email avatar");
+
+  const systemMsgContent = isOwner && newOwnerUser
+    ? `${leavingUser?.name || "Group owner"} deleted group membership. Ownership transferred to ${newOwnerUser.name}`
+    : `${leavingUser?.name || "Member"} deleted group membership`;
+
+  const systemMsg = await createSystemMessage(group._id, userId, systemMsgContent);
+
+  // Remove group from deleted user's screen
+  notifyGroupMembers([userId], "group_removed", {
     groupId: group._id,
   });
 
-  return { groupId: group._id, message: "Group deleted successfully" };
+  // Update group for all remaining members
+  const remainingMemberIds = group.members.map((m) => m.user.toString());
+  notifyGroupMembers(remainingMemberIds, "group_updated", {
+    group: populatedGroup,
+    systemMessage: systemMsg,
+  });
+
+  return { groupId: group._id, message: "Group deleted from your list and ownership transferred", group: populatedGroup };
 };

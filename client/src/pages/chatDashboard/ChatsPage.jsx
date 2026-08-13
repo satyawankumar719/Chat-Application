@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ChatList from "@/components/chat/chatListContainer/ChatList";
 import ChatContainer from "@/components/chat/ChatContainer";
 import { useAuthStore } from "@/store/authStore";
@@ -8,6 +8,7 @@ import { useInvitationStore } from "@/store/invitationStore";
 
 function ChatsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const { user, checkingAuth } = useAuthStore();
 
@@ -19,13 +20,21 @@ function ChatsPage() {
     fetchChats,
   } = useChatStore();
 
-  const { fetchPendingInvitations } = useInvitationStore();
-
   useEffect(() => {
     if (!checkingAuth && !user) {
       navigate("/login", { replace: true });
     }
   }, [user, checkingAuth, navigate]);
+
+  useEffect(() => {
+    const queryChatId = searchParams.get("chatId");
+    if (queryChatId) {
+      if (selectedChatId !== queryChatId) {
+        setSelectedChatId(queryChatId);
+      }
+      setMobileViewChat(true);
+    }
+  }, [searchParams, selectedChatId, setSelectedChatId]);
 
   const selectedChat = chats.find((chat) => chat._id === selectedChatId) || null;
 
@@ -44,9 +53,8 @@ function ChatsPage() {
     <div className="h-[calc(100vh-8rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
       <div className="flex h-full w-full">
         <aside
-          className={`${
-            mobileViewChat ? "hidden" : "flex"
-          } md:flex h-full w-full flex-col md:w-[360px] md:flex-shrink-0 md:border-r md:border-border`}
+          className={`${mobileViewChat ? "hidden" : "flex"
+            } md:flex h-full w-full flex-col md:w-[360px] md:flex-shrink-0 md:border-r md:border-border`}
         >
           <div className="border-b border-border p-4">
             <h2 className="text-lg font-semibold">Chats</h2>
@@ -63,9 +71,8 @@ function ChatsPage() {
         </aside>
 
         <section
-          className={`${
-            mobileViewChat ? "flex" : "hidden"
-          } md:flex h-full flex-1`}
+          className={`${mobileViewChat ? "flex" : "hidden"
+            } md:flex h-full flex-1`}
         >
           <ChatContainer chat={selectedChat} onBack={handleBack} />
         </section>

@@ -4,6 +4,7 @@ import { useAuthStore } from "./authStore";
 import { useSocketStore } from "./socketStore";
 import { createTempMessage } from "@/lib/messageHelpers";
 import { getCookie } from "@/lib/utils";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 50;
 
@@ -540,6 +541,24 @@ export const useChatStore = create((set, get) => ({
     await get().fetchMessages(current.selectedChatId, current.page + 1);
   },
 
+  getTotalUnreadCount: function () {
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) return 0;
+    const chats = get().chats || [];
+    let total = 0;
+    for (let i = 0; i < chats.length; i++) {
+      const chat = chats[i];
+      if (chat.unreadCount) {
+        if (typeof chat.unreadCount.get === "function") {
+          total += chat.unreadCount.get(currentUserId) || 0;
+        } else if (typeof chat.unreadCount === "object") {
+          total += chat.unreadCount[currentUserId] || 0;
+        }
+      }
+    }
+    return total;
+  },
+
   handleIncomingMessage: function (data) {
     const incomingMessage = data?.message;
     if (!incomingMessage) return;
@@ -551,6 +570,36 @@ export const useChatStore = create((set, get) => ({
     const isForCurrentlySelectedChat = incomingMessage.chat === current.selectedChatId;
 
     if (isForCurrentlySelectedChat && !isMyOwnMessage) useSocketStore.getState().markMessagesRead(current.selectedChatId);
+
+    const isChatActiveOnScreen = isForCurrentlySelectedChat && typeof window !== "undefined" && window.location.pathname === "/chats";
+    if (!isMyOwnMessage && !isChatActiveOnScreen) {
+      const senderObj = typeof incomingMessage.sender === "object" ? incomingMessage.sender : null;
+      const targetChat = current.chats.find((c) => c._id === incomingMessage.chat);
+      const isGroup = targetChat?.type === "group";
+      const title = isGroup
+        ? (targetChat.name || "Group Chat")
+        : (senderObj?.name || "New Message");
+      
+      const snippet = incomingMessage.content || (incomingMessage.attachments?.length ? "Sent an attachment" : "Sent a message");
+
+      toast(title, {
+        description: isGroup && senderObj?.name ? `${senderObj.name}: ${snippet}` : snippet,
+        action: {
+          label: "View Chat",
+          onClick: () => {
+            get().setSelectedChatId(incomingMessage.chat);
+            if (typeof window !== "undefined") {
+              if (window.location.pathname === "/chats") {
+                window.history.pushState({}, "", `/chats?chatId=${incomingMessage.chat}`);
+                window.dispatchEvent(new Event("popstate"));
+              } else {
+                window.location.href = `/chats?chatId=${incomingMessage.chat}`;
+              }
+            }
+          },
+        },
+      });
+    }
 
     set(() => {
       let updatedMessages = current.messages;

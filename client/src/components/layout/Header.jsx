@@ -1,14 +1,31 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { MessageCircle, UserPlus, LogOut, PlusCircle } from "lucide-react";
+import { MessageCircle, Bell, LogOut, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
-import { toast } from 'sonner'
+import { toast } from 'sonner';
 import { useInvitationStore } from "@/store/invitationStore";
+import { useChatStore } from "@/store/chatStore";
+
 function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { pendingInvitations } = useInvitationStore()
+  const { pendingInvitations } = useInvitationStore();
+  const chats = useChatStore((state) => state.chats) || [];
+
+  const currentUserId = user?._id?.toString() || user?.id?.toString();
+  const totalUnreadMessages = chats.reduce((total, chat) => {
+    let unread = 0;
+    if (chat.unreadCount && currentUserId) {
+      if (typeof chat.unreadCount.get === "function") {
+        unread = chat.unreadCount.get(currentUserId) || 0;
+      } else if (typeof chat.unreadCount === "object") {
+        unread = chat.unreadCount[currentUserId] || 0;
+      }
+    }
+    return total + unread;
+  }, 0);
+
   const navClass = ({ isActive }) =>
     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${isActive
       ? "bg-primary/10 text-primary"
@@ -25,7 +42,14 @@ function Header() {
 
         <nav className="flex items-center gap-1">
           <NavLink to="/chats" className={navClass}>
-            <MessageCircle className="h-4 w-4" />
+            <div className="relative">
+              <MessageCircle className="h-4 w-4" />
+              {totalUnreadMessages > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                  {totalUnreadMessages > 99 ? "99+" : totalUnreadMessages}
+                </span>
+              )}
+            </div>
             <span className="hidden sm:inline">Chats</span>
           </NavLink>
           <NavLink to="/groups" className={navClass}>
@@ -34,11 +58,11 @@ function Header() {
           </NavLink>
           <NavLink to="/invitations" className={navClass}>
             <div className="relative">
-              <UserPlus className="h-4 w-4" />
+              <Bell className="h-4 w-4" />
 
               {pendingInvitations?.length > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
-                  {pendingInvitations.length}
+                  {pendingInvitations.length > 99 ? "99+" : pendingInvitations.length}
                 </span>
               )}
             </div>

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { invitationApi } from "@/api/invitationApi";
 import { useChatStore } from "./chatStore";
 import { useSocketStore } from "./socketStore";
+import { toast } from "sonner";
 
 export const useInvitationStore = create(function (set, get) {
   return {
@@ -39,6 +40,25 @@ export const useInvitationStore = create(function (set, get) {
       const invitation = data?.invitation;
       if (!invitation) return;
 
+      const senderName = invitation.invitedBy?.name || "someone";
+      const isGroup = invitation.type === "group";
+      const groupName = invitation.group?.name;
+      const desc = isGroup && groupName
+        ? `${senderName} invited you to join "${groupName}"`
+        : `${senderName} sent you a chat invitation`;
+
+      toast("New Invitation", {
+        description: desc,
+        action: {
+          label: "View",
+          onClick: () => {
+            if (typeof window !== "undefined") {
+              window.location.href = "/invitations";
+            }
+          },
+        },
+      });
+
       set(function (state) {
         const alreadyPresent = state.pendingInvitations.some(function (item) {
           return item._id === invitation._id;
@@ -59,7 +79,7 @@ export const useInvitationStore = create(function (set, get) {
 
         return {
           pendingInvitations: newList,
-          invitationMessage: "New invitation from " + (invitation.invitedBy?.name || "someone"),
+          invitationMessage: "New invitation from " + senderName,
         };
       });
     },
@@ -67,6 +87,27 @@ export const useInvitationStore = create(function (set, get) {
     handleInvitationAccepted: function (data) {
       const invitation = data?.invitation;
       const newChat = data?.chat;
+
+      if (newChat) {
+        const responderName = invitation?.receiver?.name || "User";
+        toast.success("Invitation Accepted", {
+          description: `${responderName} accepted your invitation.`,
+          action: {
+            label: "Open Chat",
+            onClick: () => {
+              useChatStore.getState().setSelectedChatId(newChat._id);
+              if (typeof window !== "undefined") {
+                if (window.location.pathname === "/chats") {
+                  window.history.pushState({}, "", `/chats?chatId=${newChat._id}`);
+                  window.dispatchEvent(new Event("popstate"));
+                } else {
+                  window.location.href = `/chats?chatId=${newChat._id}`;
+                }
+              }
+            },
+          },
+        });
+      }
 
       set(function (state) {
         if (newChat) {
