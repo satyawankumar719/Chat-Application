@@ -1,5 +1,6 @@
 import { LoginPage } from "./pages/authPages/loginPage";
 import SignupPage from "./pages/authPages/signupPage";
+import ForgotPassword from "./pages/authPages/forgotPassword";
 import ChatsPage from "./pages/chatDashboard/ChatsPage";
 import InvitationsPage from "./pages/InvitationsPage";
 import CreateChatPage from "./pages/CreateChatPage";
@@ -13,6 +14,10 @@ export const PUBLIC_ROUTES = [
   {
     path: "/signup",
     element: <SignupPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
   },
 ];
 

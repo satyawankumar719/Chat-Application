@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "./pages/authPages/loginPage";
 import SignupPage from "./pages/authPages/signupPage";
+import ForgotPassword from "./pages/authPages/forgotPassword";
 import ChatsPage from "./pages/chatDashboard/ChatsPage";
 import InvitationsPage from "./pages/InvitationsPage";
 import CreateChatPage from "./pages/CreateChatPage";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/verify-otp" element = {<VerifyOtp/>}/>
+        <Route path="/forgot-password" element = {<ForgotPassword/>}/>
 </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>

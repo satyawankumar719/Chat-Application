@@ -164,10 +164,11 @@ export const sendForgotPasswordOtp = async (email) => {
     
     try {
         await sendEmail(email, "Reset Your Password - OTP", html);
+        return { success: true, message: "Password reset OTP sent to your email" };
     } catch (emailErr) {
         logger.error("Failed to send reset OTP email, but OTP is stored:", OTP);
+        return { success: false, message: "Failed to send reset OTP email", emailErr };
     }
-    return { message: "Password reset OTP sent to your email" };
 };
 
 export const resetPasswordService = async (email, otp, newPassword) => {
