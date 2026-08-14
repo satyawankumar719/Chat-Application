@@ -3,7 +3,6 @@ import { messageApi } from "@/api/messageApi";
 import { useAuthStore } from "./authStore";
 import { useSocketStore } from "./socketStore";
 import { createTempMessage } from "@/lib/messageHelpers";
-import { getCookie } from "@/lib/utils";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 50;
@@ -120,47 +119,18 @@ async function uploadFileResumable(file, chatId, onProgress, uploadId, signal) {
 }
 
 function sortChatsByRecent(chatsArray) {
-  const copy = [...chatsArray];
-
-  for (let i = 0; i < copy.length; i++) {
-    for (let j = i + 1; j < copy.length; j++) {
-      const timeI = new Date(copy[i].updatedAt || copy[i].lastMessage?.createdAt || 0).getTime();
-      const timeJ = new Date(copy[j].updatedAt || copy[j].lastMessage?.createdAt || 0).getTime();
-
-      if (timeJ > timeI) {
-        const temp = copy[i];
-        copy[i] = copy[j];
-        copy[j] = temp;
-      }
-    }
-  }
-
-  return copy;
+  return [...chatsArray].sort((a, b) => {
+    const timeA = new Date(a.updatedAt || a.lastMessage?.createdAt || 0).getTime();
+    const timeB = new Date(b.updatedAt || b.lastMessage?.createdAt || 0).getTime();
+    return timeB - timeA;
+  });
 }
 
 function makeUniqueAndSortMessages(messagesArray) {
-  const map = {};
-  const result = [];
-
-  for (let i = 0; i < messagesArray.length; i++) {
-    const msg = messagesArray[i];
-    if (msg?._id && !map[msg._id]) {
-      map[msg._id] = true;
-      result.push(msg);
-    }
-  }
-
-  for (let i = 0; i < result.length; i++) {
-    for (let j = i + 1; j < result.length; j++) {
-      if (new Date(result[i].createdAt) > new Date(result[j].createdAt)) {
-        const temp = result[i];
-        result[i] = result[j];
-        result[j] = temp;
-      }
-    }
-  }
-
-  return result;
+  const seen = new Set();
+  return messagesArray
+    .filter((msg) => msg?._id && !seen.has(msg._id) && seen.add(msg._id))
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
 
 function getSenderId(sender) {
@@ -170,11 +140,7 @@ function getSenderId(sender) {
 }
 
 function updateLastMessageInChats(chatsArray, chatId, newMessage, isCurrentlySelected, currentUserId) {
-  const result = [];
-
-  for (let i = 0; i < chatsArray.length; i++) {
-    const chat = chatsArray[i];
-
+  const result = chatsArray.map((chat) => {
     if (chat._id === chatId) {
       const senderId = getSenderId(newMessage?.sender);
       const isFromOther = senderId && currentUserId && senderId !== currentUserId.toString();
@@ -187,45 +153,31 @@ function updateLastMessageInChats(chatsArray, chatId, newMessage, isCurrentlySel
         newUnreadCount[currentUserId] = prev + 1;
       }
 
-      result.push({ ...chat, lastMessage: newMessage, updatedAt: newMessage.createdAt, unreadCount: newUnreadCount });
-    } else {
-      result.push(chat);
+      return { ...chat, lastMessage: newMessage, updatedAt: newMessage.createdAt, unreadCount: newUnreadCount };
     }
-  }
+    return chat;
+  });
 
   return sortChatsByRecent(result);
 }
 
 function updateUserStatusInChats(chatsArray, userId, isOnline, lastSeen) {
   if (!userId || !Array.isArray(chatsArray)) return chatsArray || [];
-
-  const result = [];
   const userIdStr = userId.toString();
 
-  for (let i = 0; i < chatsArray.length; i++) {
-    const chat = chatsArray[i];
-    if (!chat) continue;
-
-    const newMembers = [];
-
-    for (let j = 0; j < (chat.members || []).length; j++) {
-      const member = chat.members[j];
-      if (!member) continue;
-
+  return chatsArray.map((chat) => {
+    if (!chat || !chat.members) return chat;
+    const newMembers = chat.members.map((member) => {
       const userObj = typeof member.user === "object" && member.user !== null ? member.user : null;
       const memberId = (userObj?._id || userObj?.id || member.user || "").toString();
 
       if (memberId === userIdStr && userObj) {
-        newMembers.push({ ...member, user: { ...userObj, isOnline, lastSeen: lastSeen || userObj.lastSeen } });
-      } else {
-        newMembers.push(member);
+        return { ...member, user: { ...userObj, isOnline, lastSeen: lastSeen || userObj.lastSeen } };
       }
-    }
-
-    result.push({ ...chat, members: newMembers });
-  }
-
-  return result;
+      return member;
+    });
+    return { ...chat, members: newMembers };
+  });
 }
 
 export const useChatStore = create((set, get) => ({
@@ -439,41 +391,24 @@ export const useChatStore = create((set, get) => ({
 
       set({ chats: sortChatsByRecent(updatedChats) });
 
-      const savedSelectedChatId = get().selectedChatId;
-
-      if (!savedSelectedChatId && chats.length > 0) {
-        const firstChatId = chats[0]._id;
-
-        set({ selectedChatId: firstChatId, messages: [], page: 1, hasMore: true });
-        useSocketStore.getState().joinChat(firstChatId);
-        get().fetchMessages(firstChatId);
-        return;
-      }
-
-      let chatStillExists = false;
-
-      for (let i = 0; i < chats.length; i++) {
-        if (chats[i]._id === savedSelectedChatId) {
-          chatStillExists = true;
-          break;
+      let savedSelectedChatId = get().selectedChatId;
+      if (!savedSelectedChatId && typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlChatId = urlParams.get("chatId");
+        if (urlChatId && chats.some((c) => c._id === urlChatId)) {
+          savedSelectedChatId = urlChatId;
         }
       }
 
-      if (savedSelectedChatId && !chatStillExists) {
-        if (chats.length > 0) {
-          const firstChatId = chats[0]._id;
-
-          set({ selectedChatId: firstChatId, messages: [], page: 1, hasMore: true });
-          useSocketStore.getState().joinChat(firstChatId);
-          get().fetchMessages(firstChatId);
+      if (savedSelectedChatId) {
+        const chatExists = chats.some((c) => c._id === savedSelectedChatId);
+        if (chatExists) {
+          set({ selectedChatId: savedSelectedChatId });
+          useSocketStore.getState().joinChat(savedSelectedChatId);
         } else {
           set({ selectedChatId: null, messages: [] });
         }
-
-        return;
       }
-
-      if (savedSelectedChatId) useSocketStore.getState().joinChat(savedSelectedChatId);
     } catch (err) {
       set({ error: err.response?.data?.message || "Unable to load chats." });
     } finally {
@@ -567,11 +502,12 @@ export const useChatStore = create((set, get) => ({
     const currentUserId = getCurrentUserId();
     const senderId = getSenderId(incomingMessage.sender);
     const isMyOwnMessage = senderId && currentUserId && senderId === currentUserId.toString();
-    const isForCurrentlySelectedChat = incomingMessage.chat === current.selectedChatId;
+    const isForCurrentlySelectedChat = Boolean(current.selectedChatId && incomingMessage.chat === current.selectedChatId);
+    const isChatActiveOnScreen = isForCurrentlySelectedChat && typeof window !== "undefined" && document.hasFocus();
 
-    if (isForCurrentlySelectedChat && !isMyOwnMessage) useSocketStore.getState().markMessagesRead(current.selectedChatId);
-
-    const isChatActiveOnScreen = isForCurrentlySelectedChat && typeof window !== "undefined" && window.location.pathname === "/chats";
+    if (isChatActiveOnScreen && !isMyOwnMessage) {
+      useSocketStore.getState().markMessagesRead(current.selectedChatId);
+    }
     if (!isMyOwnMessage && !isChatActiveOnScreen) {
       const senderObj = typeof incomingMessage.sender === "object" ? incomingMessage.sender : null;
       const targetChat = current.chats.find((c) => c._id === incomingMessage.chat);
@@ -579,7 +515,7 @@ export const useChatStore = create((set, get) => ({
       const title = isGroup
         ? (targetChat.name || "Group Chat")
         : (senderObj?.name || "New Message");
-      
+
       const snippet = incomingMessage.content || (incomingMessage.attachments?.length ? "Sent an attachment" : "Sent a message");
 
       toast(title, {
@@ -772,16 +708,6 @@ export const useChatStore = create((set, get) => ({
     if (!attachments) attachments = [];
     if (!chatId) return null;
 
-    const currentToken = getCookie("Chat_token");
-    if (!currentToken) {
-      useSocketStore.getState().disconnectSocket();
-      useAuthStore.getState().setUser(null);
-      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-      return null;
-    }
-
     const text = content?.trim();
     const hasAttachments = attachments.length > 0;
 
@@ -837,7 +763,7 @@ export const useChatStore = create((set, get) => ({
       sendingMessage: true,
       error: null,
       messages: [...state.messages, tempMessage],
-      chats: updateLastMessageInChats(state.chats, chatId,   tempMessage)
+      chats: updateLastMessageInChats(state.chats, chatId, tempMessage)
     }));
 
     let serverUploadedFiles = [];

@@ -1,3 +1,4 @@
+import redisClient from "../config/redis.js";
 import { logger } from "../logger.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
@@ -10,6 +11,8 @@ import {
   notifyMessageSenders,
 } from "./socketHelpers.js";
 import { isUserOnline } from "./userManager.js";
+import cacheService, { CACHE_KEYS, CACHE_TTL } from "../services/cache.service.js";
+
 
 async function validateSocketUser(socket, messageData, currentUserId) {
   let token;
@@ -180,6 +183,7 @@ function handleSendMessage(io, socket, currentUserId) {
         }
       }
 
+      
       const savedMessage = await Message.create({
         chat: chatId,
         sender: currentUserId,
@@ -200,6 +204,32 @@ function handleSendMessage(io, socket, currentUserId) {
       }
 
       await chat.save();
+
+      // --- US-13: Invalidate & Refresh Caches on New Message ---
+      await cacheService.refreshChatMessages(chatId, async () => {
+        const recentMessages = await Message.find({ chat: chatId })
+          .populate("sender", "name email avatar")
+          .sort({ _id: -1 })
+          .limit(51);
+
+        const hasMore = recentMessages.length > 50;
+        if (hasMore) {
+          recentMessages.pop();
+        }
+        recentMessages.reverse();
+
+        return {
+          messages: recentMessages,
+          hasMore,
+        };
+      });
+
+      chat.members.forEach((member) => {
+        const memberId = (member.user?._id || member.user?.id || member.user)?.toString();
+        if (memberId) {
+          cacheService.invalidateUserConversations(memberId);
+        }
+      });
 
       const populatedMessage = await Message.findById(
         savedMessage._id

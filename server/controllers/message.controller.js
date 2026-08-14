@@ -1,9 +1,7 @@
 import {
   getUserChatsService,
   getChatMessagesService,
-  
 } from "../services/message.service.js";
-import upload from "../middlewares/uploadMiddleware.js";
 
 export const handleGetUserChats = async (req, res, next) => {
   try {

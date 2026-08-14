@@ -4,7 +4,6 @@ import User from "../models/User.js";
 import { getSocketByUserId } from "../socket/userManager.js";
 import { logger } from "../logger.js";
 
-// Helper function to emit socket events to group members
 function notifyGroupMembers(memberUserIds, eventName, payload) {
   memberUserIds.forEach((id) => {
     const socket = getSocketByUserId(id.toString());
@@ -12,7 +11,6 @@ function notifyGroupMembers(memberUserIds, eventName, payload) {
   });
 }
 
-// Helper to create and broadcast a system activity message in group
 async function createSystemMessage(groupId, senderId, content) {
   try {
     const systemMessage = await Message.create({
@@ -38,6 +36,23 @@ async function createSystemMessage(groupId, senderId, content) {
     logger.error("Failed to create system message:", error);
     return null;
   }
+}
+
+// Helper to get fully populated group document
+async function getPopulatedGroup(groupId) {
+  return Chat.findById(groupId)
+    .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
+    .populate("createdBy", "name email avatar");
+}
+
+// Helper to transfer group ownership to admin or first member if owner leaves or is removed
+async function transferOwnershipIfNeeded(group, isOwnerTarget) {
+  if (!isOwnerTarget || group.members.length === 0) return null;
+
+  const nextOwner = group.members.find((m) => m.role === "admin") || group.members[0];
+  nextOwner.role = "owner";
+  group.createdBy = nextOwner.user;
+  return User.findById(nextOwner.user);
 }
 
 export const createGroup = async (creatorId, { name, description, memberIds = [], avatar }) => {
@@ -273,19 +288,7 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
   const isTargetOwner = target.role === "owner";
   group.members = group.members.filter((m) => m.user.toString() !== targetMemberId.toString());
 
-  let newOwnerUser = null;
-  if (isTargetOwner && group.members.length > 0) {
-    const oldestAdmin = group.members.find((m) => m.role === "admin");
-    if (oldestAdmin) {
-      oldestAdmin.role = "owner";
-      group.createdBy = oldestAdmin.user;
-      newOwnerUser = await User.findById(oldestAdmin.user);
-    } else {
-      group.members[0].role = "owner";
-      group.createdBy = group.members[0].user;
-      newOwnerUser = await User.findById(group.members[0].user);
-    }
-  }
+  const newOwnerUser = await transferOwnershipIfNeeded(group, isTargetOwner);
 
   const isGroupDeactivated = group.members.length === 0;
   if (isGroupDeactivated) {
@@ -310,9 +313,7 @@ export const removeMember = async (userId, groupId, targetMemberId) => {
 
   const systemMsg = await createSystemMessage(group._id, userId, actionText);
 
-  const populatedGroup = await Chat.findById(group._id)
-    .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
-    .populate("createdBy", "name email avatar");
+  const populatedGroup = await getPopulatedGroup(group._id);
 
   if (isGroupDeactivated) {
     notifyGroupMembers([targetMemberId, userId], "group_removed", {
@@ -405,20 +406,7 @@ export const leaveGroup = async (userId, groupId) => {
 
   group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
 
-  let newOwnerUser = null;
-
-  if (isOwner && group.members.length > 0) {
-    const oldestAdmin = group.members.find((m) => m.role === "admin");
-    if (oldestAdmin) {
-      oldestAdmin.role = "owner";
-      group.createdBy = oldestAdmin.user;
-      newOwnerUser = await User.findById(oldestAdmin.user);
-    } else {
-      group.members[0].role = "owner";
-      group.createdBy = group.members[0].user;
-      newOwnerUser = await User.findById(group.members[0].user);
-    }
-  }
+  const newOwnerUser = await transferOwnershipIfNeeded(group, isOwner);
 
   const isGroupDeactivated = group.members.length === 0;
   if (isGroupDeactivated) {
@@ -435,9 +423,7 @@ export const leaveGroup = async (userId, groupId) => {
     return null;
   }
 
-  const populatedGroup = await Chat.findById(group._id)
-    .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
-    .populate("createdBy", "name email avatar");
+  const populatedGroup = await getPopulatedGroup(group._id);
 
   const systemMsgContent = isOwner && newOwnerUser
     ? `${leavingUser?.name || "Owner"} left the group. Ownership transferred to ${newOwnerUser.name}`
@@ -483,20 +469,7 @@ export const deleteGroup = async (userId, groupId) => {
 
   group.members = group.members.filter((m) => m.user.toString() !== userId.toString());
 
-  let newOwnerUser = null;
-
-  if (isOwner && group.members.length > 0) {
-    const firstAdmin = group.members.find((m) => m.role === "admin");
-    if (firstAdmin) {
-      firstAdmin.role = "owner";
-      group.createdBy = firstAdmin.user;
-      newOwnerUser = await User.findById(firstAdmin.user);
-    } else {
-      group.members[0].role = "owner";
-      group.createdBy = group.members[0].user;
-      newOwnerUser = await User.findById(group.members[0].user);
-    }
-  }
+  const newOwnerUser = await transferOwnershipIfNeeded(group, isOwner);
 
   const isDeactivated = group.members.length === 0;
   if (isDeactivated) {
@@ -513,9 +486,7 @@ export const deleteGroup = async (userId, groupId) => {
     return { groupId: group._id, message: "Group deleted successfully" };
   }
 
-  const populatedGroup = await Chat.findById(group._id)
-    .populate("members.user", "name email phoneNumber avatar isOnline lastSeen bio")
-    .populate("createdBy", "name email avatar");
+  const populatedGroup = await getPopulatedGroup(group._id);
 
   const systemMsgContent = isOwner && newOwnerUser
     ? `${leavingUser?.name || "Group owner"} deleted group membership. Ownership transferred to ${newOwnerUser.name}`

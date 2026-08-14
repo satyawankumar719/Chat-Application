@@ -834,3 +834,797 @@
 {"level":"info","message":"Socket Connected: 78OZhymC_i0Z36hfAAAB (User: 6a7d86aa897b827175791704)"}
 {"level":"info","message":"Socket Disconnected: 78OZhymC_i0Z36hfAAAB (User: 6a7d86aa897b827175791704)"}
 {"level":"info","message":"Socket Connected: JOxT389FC3z7TAHLAAAH (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 4uNpiOP6ebJz5ZoFAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: CHq7t624FajuxGtmAAAH (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: Eupj3QrKwCjTPveYAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: j67cCX0a_zM-z8feAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Disconnected: Eupj3QrKwCjTPveYAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: 6cg_qp_8juUTeAvAAAAG (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: j67cCX0a_zM-z8feAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Disconnected: 6cg_qp_8juUTeAvAAAAG (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: M1yCAxdtYpGiJdeKAAAE (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: 2pfNqAdAHuHxAeAXAAAH (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: 2pfNqAdAHuHxAeAXAAAH (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: neyUNg5Ek64HYDCKAAAM (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: MFuxEuG6yv4a-GIlAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: Z2Ae3mJ-yUqGmTYmAAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: oAi7Kh8v3XLKXBcZAAAB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: MbrrvDHg8iUz3exnAAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: 9kmOE5hWLIqE9XiPAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: BQgPs6vm7DgrvUNSAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: PRu0guQkvY0xEpMKAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: _z2envsCVN-sXVfWAAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: I4bOFnDeAayD3__3AAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: TbjRrGAlI5mDjY3nAAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: DCmNEXNP2O6qKKPgAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: Z_uDRob136Qupf_VAAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: giFEsMSuIb2UCbvOAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: gDBHJc3Rsqvxuh3GAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: xj99--s5Q6oMlFwXAAAB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: r7IU-4xOimvdiIFDAAAB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: G5Z4FN_e6XI-uqaNAAAB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: O30wvyKCBFBZ7yZuAAAE (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: b07BH-S4j-TFmwG8AAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: b07BH-S4j-TFmwG8AAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: QAkm0hScYRt3LXCCAAAM (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: YizVQj5GcGw1XLqJAAAO (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: qf6qdoKesqTklzX8AAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: wuYhIovZGlZCQkT6AAAB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: hoVuZo4VvzTgxqBiAAAF (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: 3yFARBmh4TIodRv4AAAI (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: gBCiCirL8NvDM2-AAAAL (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"Socket Disconnected: hoVuZo4VvzTgxqBiAAAF (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: gBCiCirL8NvDM2-AAAAL (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: X4rl5gIczW_IdVAXAAAQ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: X4rl5gIczW_IdVAXAAAQ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: uRUwRbJd4NCVs55hAAAT (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: 5vR7M3y4G5aviiJGAAAV (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: 5vR7M3y4G5aviiJGAAAV (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: OuDbisQbwhkagZddAAAa (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: OuDbisQbwhkagZddAAAa (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: NTRr0ZQLtQmm5ZVSAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: 6swoPxhcfQYkbrhFAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Connected: Ay2pnCGxuIZr6o_OAAAF (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: XPNVgdMHlDBmYzxqAAAK (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: XPNVgdMHlDBmYzxqAAAK (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: lzaDL3c4l5-kJVJXAAAP (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: lzaDL3c4l5-kJVJXAAAP (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: NyXG_MOdZiKI9B0rAAAS (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: w4MtYHF-D2f4TognAAAU (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"Socket Disconnected: 6swoPxhcfQYkbrhFAAAD (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Disconnected: NTRr0ZQLtQmm5ZVSAAAC (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Disconnected: Ay2pnCGxuIZr6o_OAAAF (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Socket Disconnected: w4MtYHF-D2f4TognAAAU (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: _7onnVCbxdrrmcXRAAAX (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: 0ec8tJdQWktdLfY_AAAZ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: 0ec8tJdQWktdLfY_AAAZ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: Bc6332KmeiPwY6YSAAAe (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"Socket Disconnected: Bc6332KmeiPwY6YSAAAe (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: 0t4rXEWOHzhznl-uAAAj (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: HiJO0Xhad9OpGmqDAAAo (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: 5qx4tkhfx6_HX8UVAAAt (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7db9f0520e58679a4b4b75:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"Socket Disconnected: 0t4rXEWOHzhznl-uAAAj (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: FiCg8eTfHO4RREbzAAAw (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: Ue7ZLnxBa0ATdwj7AAAy (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"Socket Disconnected: Ue7ZLnxBa0ATdwj7AAAy (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: z4MHVxO-vgiGNZviAAA1 (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: NS0CtIidCAZ-EKMnAAA3 (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"Socket Disconnected: HiJO0Xhad9OpGmqDAAAo (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: NS0CtIidCAZ-EKMnAAA3 (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7f13e2dda86c46a9208ce2:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7defe4c980055edc440635:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: 5qx4tkhfx6_HX8UVAAAt (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: mR11V2d3e_LGWQBfAAA8 (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: mR11V2d3e_LGWQBfAAA8 (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: FVaJx--7-gQEx2IaAAA_ (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"Socket Connected: pTK51N-wi0pjCoHDAABB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7de84a5ca034f4360ec3d3"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: U3-XF2ruW9Cee5GAAABG (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Disconnected: U3-XF2ruW9Cee5GAAABG (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: pTK51N-wi0pjCoHDAABB (User: 6a7de84a5ca034f4360ec3d3)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: v7IfTJTiZEvuPo4qAAAC (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: kO6rUQZxx2eU1aaJAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: kO6rUQZxx2eU1aaJAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: Jn5ygJoD6ybPT8G6AAAH (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: 33_F6xLHWoOTACf1AAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: 33_F6xLHWoOTACf1AAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: JNf03gnLGWd813KsAAAN (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: VCctkPKzKucFVhyBAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: DRFglzjMs977Jf6KAAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: DRFglzjMs977Jf6KAAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: 2pgoQ_kUsAsga2T5AAAN (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: oN1mxV50cyItgH5IAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: oN1mxV50cyItgH5IAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: XBCgl8DViqwZcaZfAAAF (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: mgq3vY6zjmIKYBHaAAAI (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: 6qTzXha1HbHKiTWfAAAK (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: dVWeDloElXS_P_RqAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: 4w3xqbZhRBZTdWnAAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: Z4AYfkbR_p8Gno99AAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: e8Suzv5b5cVww_V1AAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: -TlVzBffYXxs96UiAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: -OOwqm9zA0RXBZHwAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: Buc58bHgAYeazCtIAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: PBZf-sgDzVkEQiQzAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: PFXsPninHFHPwb7cAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: TgK4a8pG2xfa-22rAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: FVvUo5PUurD5SLmkAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: 9uDW8ofQcg4JDk2iAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: D1KSdiK8UAQBmlFdAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: T5_6qrYVN9B_BJTpAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: VRcNflvPqgrZNF0BAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: moyfKkjlmX6zSHpbAAAD (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Socket Connected: RchKO29iGhl3J6xIAAAC (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Connected: NGvMWU_qNBwEOfZ1AAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: zgLcd-PJso_aV4NuAAAG (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"Socket Connected: wBP4kbMSQMKWtS5WAAAJ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d8aa80e76a6ba2adfa278"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Socket Disconnected: NGvMWU_qNBwEOfZ1AAAD (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: zgLcd-PJso_aV4NuAAAG (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: RchKO29iGhl3J6xIAAAC (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"Socket Disconnected: wBP4kbMSQMKWtS5WAAAJ (User: 6a7d8aa80e76a6ba2adfa278)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: YpVL0iD12gwAbVzqAAAN (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: YpVL0iD12gwAbVzqAAAN (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: fiTUrFaEP56BdAvxAAAR (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: zbhz9RDMcyHVOUvvAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Connected: oj1bcGBgLyalEQ0sAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Disconnected: oj1bcGBgLyalEQ0sAAAB (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"Socket Disconnected: zbhz9RDMcyHVOUvvAAAE (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a7d86aa897b827175791704"}
+{"level":"info","message":"Socket Connected: 3OEzJXi5DDvnjoJZAAAJ (User: 6a7d86aa897b827175791704)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7de8d6bda14915e769b89a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7dbb22520e58679a4b4ec7:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d8b1d0e76a6ba2adfa279:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a7d86aa897b827175791704"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a7d91430e76a6ba2adfa62e:limit50"}

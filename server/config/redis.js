@@ -25,8 +25,7 @@ export const connectRedis = async () => {
   try {
     await redisClient.connect();
   } catch (error) {
-    console.error("Failed to connect to Redis:", error);
-    process.exit(1);
+    console.warn("Failed to connect to Redis. Falling back to MemCache layer:", error?.message || error);
   }
 };
 

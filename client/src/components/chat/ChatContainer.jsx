@@ -81,46 +81,46 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp })
     );
   }
 
- let unreadCount = 0;
+  let unreadCount = 0;
 
-if (Array.isArray(messages)) {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const msg = messages[i];
+  if (Array.isArray(messages)) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
 
-    const senderObj = msg?.sender;
-    const senderId = (
-      typeof senderObj === "object"
-        ? (senderObj?._id || senderObj?.id)
-        : senderObj
-    )?.toString() || "";
+      const senderObj = msg?.sender;
+      const senderId = (
+        typeof senderObj === "object"
+          ? (senderObj?._id || senderObj?.id)
+          : senderObj
+      )?.toString() || "";
 
-    const isFromOther =
-      senderId &&
-      currentUserId &&
-      senderId !== currentUserId.toString();
+      const isFromOther =
+        senderId &&
+        currentUserId &&
+        senderId !== currentUserId.toString();
 
-    const isRead =
-      msg.status === "read" ||
-      (msg.readBy &&
-        msg.readBy.some(
-          (r) =>
-            (r.user?._id || r.user || "").toString() ===
-            currentUserId.toString()
-        ));
+      const isRead =
+        msg.status === "read" ||
+        (msg.readBy &&
+          msg.readBy.some(
+            (r) =>
+              (r.user?._id || r.user || "").toString() ===
+              currentUserId.toString()
+          ));
 
-    const isUnread = isFromOther && !isRead;
+      const isUnread = isFromOther && !isRead;
 
-    if (isUnread) {
-      unreadCount++;
+      if (isUnread) {
+        unreadCount++;
 
-      // Keep the oldest unread message as firstUnreadId
-      savedUnreadIdRef.current = msg._id || msg.id;
-    } else if (unreadCount > 0) {
-      // We found the last read message before the unread sequence
-      break;
+        // Keep the oldest unread message as firstUnreadId
+        savedUnreadIdRef.current = msg._id || msg.id;
+      } else if (unreadCount > 0) {
+        // We found the last read message before the unread sequence
+        break;
+      }
     }
   }
-}
 
 
   const firstUnreadId = savedUnreadIdRef.current;

@@ -5,22 +5,26 @@ import { otpEmailTemplate } from "../templates/otpEmail.js";
 import sendEmail from "../utils/sendEmail.js";
 import { generateOtp } from "../utils/index.js";
 import { logger } from "../logger.js";
+import cacheService, { CACHE_KEYS, CACHE_TTL } from "./cache.service.js";
+
+const sanitizeUser = (user) => {
+    if (!user) return null;
+    const u = typeof user.toObject === "function" ? user.toObject() : user;
+    const { password, __v, ...safeUser } = u;
+    return { ...safeUser, id: u._id };
+};
 
 export const login = async (data) => {
     const { email, password } = data;
-if (!email || !password) {
-        throw { status: 400, message: "Email and password are required" };}
-        const user = await User.findOne({ email });
-    if (!user) {
+    if (!email || !password) {
+        throw { status: 400, message: "Email and password are required" };
+    }
+    const user = await User.findOne({ email });
+    if (!user || !user.password) {
         throw { status: 401, message: "Invalid email or password" };
     }
-
     if (!user.isVerified) {
         throw { status: 403, message: "Please verify your email before logging in" };
-    }
-
-    if (!user.password) {
-        throw { status: 401, message: "Invalid email or password" };
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -28,18 +32,7 @@ if (!email || !password) {
         throw { status: 401, message: "Invalid email or password" };
     }
 
-    return {
-        _id: user._id,
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        phoneNumber: user.phoneNumber,
-        avatar: user.avatar,
-        bio: user.bio,
-        isOnline: user.isOnline,
-        lastSeen: user.lastSeen,
-    };
+    return sanitizeUser(user);
 };
 
 export const sendOtpToEmail = async (email) => {
@@ -64,11 +57,8 @@ export const sendOtpToEmail = async (email) => {
 
 export const verifyEmailOtp = async (email, otp) => {
     const storedOtp = await redisClient.get(`otp:${email}`);
-    if (!storedOtp) {
-        throw { status: 400, message: "OTP has expired or is invalid" };
-    }
-    if (storedOtp !== otp) {
-        throw { status: 400, message: "Invalid OTP" };
+    if (!storedOtp || storedOtp !== otp) {
+        throw { status: 400, message: "Invalid or expired OTP" };
     }
 
     const user = await User.findOne({ email });
@@ -78,19 +68,9 @@ export const verifyEmailOtp = async (email, otp) => {
 
     user.isVerified = true;
     await user.save();
-
     await redisClient.del(`otp:${email}`);
 
-    return {
-        _id: user._id,
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        phoneNumber: user.phoneNumber,
-        avatar: user.avatar,
-        bio: user.bio,
-    };
+    return sanitizeUser(user);
 };
 
 export const signup = async (data) => {
@@ -129,26 +109,19 @@ export const signup = async (data) => {
 };
 
 export const fetchUser = async (userId) => {
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-        throw { status: 404, message: "User not found" };
-    }
+    const cacheKey = CACHE_KEYS.USER_PROFILE(userId);
 
-    return {
-        _id: user._id,
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        phoneNumber: user.phoneNumber,
-        avatar: user.avatar,
-        bio: user.bio,
-        isOnline: user.isOnline,
-        lastSeen: user.lastSeen,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-    };
+    return cacheService.getOrSet(
+        cacheKey,
+        async () => {
+            const user = await User.findById(userId).select("-password");
+            if (!user) {
+                throw { status: 404, message: "User not found" };
+            }
+            return sanitizeUser(user);
+        },
+        CACHE_TTL.USER_PROFILE
+    );
 };
 
 export const sendForgotPasswordOtp = async (email) => {
