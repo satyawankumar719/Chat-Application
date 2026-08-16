@@ -48,5 +48,11 @@ export const messageApi = {
 
   markMessagesRead: async (chatId) =>
     apiClient.post(API_CONFIG.ENDPOINTS.MESSAGES.MARK_READ, { chatId }),
+
+  editMessage: async (messageId, content) =>
+    apiClient.patch(API_CONFIG.ENDPOINTS.MESSAGES.EDIT(messageId), { content }),
+
+  deleteMessage: async (messageId) =>
+    apiClient.delete(API_CONFIG.ENDPOINTS.MESSAGES.DELETE(messageId)),
 };
 

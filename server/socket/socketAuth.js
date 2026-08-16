@@ -1,5 +1,6 @@
 import { verifyToken } from "../utils/index.js";
 import User from "../models/User.js";
+import sessionService from "../services/session.service.js";
 
 function getTokenFromCookie(cookieHeader) {
   if (!cookieHeader) return null;
@@ -23,7 +24,7 @@ async function socketAuthMiddleware(socket, next) {
     token = getTokenFromCookie(cookieHeader);
   }
 
-  if (!token) {
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
     return next(new Error("UNAUTHORIZED: Token missing"));
   }
 
@@ -32,6 +33,15 @@ async function socketAuthMiddleware(socket, next) {
 
     if (!decodedUser || !decodedUser.id) {
       return next(new Error("UNAUTHORIZED: Invalid token payload"));
+    }
+
+    if (!decodedUser.jti) {
+      return next(new Error("UNAUTHORIZED: Session expired or logged out"));
+    }
+
+    const activeSession = await sessionService.getSession(decodedUser.jti);
+    if (!activeSession) {
+      return next(new Error("UNAUTHORIZED: Session expired or logged out"));
     }
 
     const dbUser = await User.findById(decodedUser.id).select("-password");

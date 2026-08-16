@@ -149,5 +149,28 @@ export const useAuthStore = create(function (set) {
         set({ loading: false });
       }
     },
+    updateProfile: async function (formData) {
+      try {
+        set({ loading: true });
+        const { queryApi } = await import("@/api/userApi");
+        const response = await queryApi.updateProfile(formData);
+        const updatedUser = response.data?.data || null;
+
+        if (updatedUser) {
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...updatedUser,
+            },
+          }));
+        }
+
+        return { success: true, message: response.data?.message || "Profile updated successfully.", user: updatedUser };
+      } catch (err) {
+        return handleError(err);
+      } finally {
+        set({ loading: false });
+      }
+    },
   };
 });

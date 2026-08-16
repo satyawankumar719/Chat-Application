@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { MessageCircle, Bell, LogOut, PlusCircle } from "lucide-react";
+import { MessageCircle, Bell, LogOut, PlusCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from 'sonner';
@@ -73,14 +73,30 @@ function Header() {
             <PlusCircle className="h-4 w-4" />
             <span className="hidden sm:inline">New Chat</span>
           </NavLink>
-
+          <NavLink to="/profile" className={navClass}>
+            <User className="h-4 w-4" />
+            <span className="hidden sm:inline">Profile</span>
+          </NavLink>
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="text-xs font-medium leading-none">{user?.name}</p>
-            <p className="text-[11px] text-muted-foreground">{user?.email}</p>
-          </div>
+          <NavLink
+            to="/profile"
+            className="flex items-center gap-2.5 rounded-full p-1 transition hover:bg-muted/80"
+            title="View Profile"
+          >
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 font-semibold text-xs text-primary overflow-hidden border border-primary/20">
+              {user?.avatar?.url ? (
+                <img src={user.avatar.url} alt={user.name} className="h-full w-full object-cover" />
+              ) : (
+                <span>{user?.name?.[0]?.toUpperCase() || "U"}</span>
+              )}
+            </div>
+            <div className="hidden text-right sm:block">
+              <p className="text-xs font-medium leading-none">{user?.name}</p>
+              <p className="text-[11px] text-muted-foreground">{user?.email}</p>
+            </div>
+          </NavLink>
           <Button
             variant="ghost"
             size="sm"

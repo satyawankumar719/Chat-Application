@@ -2,22 +2,14 @@ import redisClient from "../config/redis.js";
 import { memCache } from "../utils/memcache.js";
 import { logger } from "../logger.js";
 
-/**
- * Cache TTL Constants
- * US-13 Acceptance Criteria:
- * - 1 hour for user profiles
- * - 5 minutes for messages (and conversations/status)
- */
 export const CACHE_TTL = {
-  USER_PROFILE: 3600,   // 1 hour in seconds
-  MESSAGES: 300,        // 5 minutes in seconds
-  CONVERSATIONS: 300,   // 5 minutes in seconds
-  ONLINE_STATUS: 300,   // 5 minutes in seconds
+  USER_PROFILE: 3600,  
+  MESSAGES: 300,       
+  CONVERSATIONS: 300,   
+  ONLINE_STATUS: 300,  
 };
 
-/**
- * Standardized Cache Key Generators
- */
+
 export const CACHE_KEYS = {
   USER_PROFILE: (userId) => `user:profile:${userId.toString()}`,
   USER_CONVERSATIONS: (userId) => `user:conversations:${userId.toString()}`,
@@ -27,21 +19,10 @@ export const CACHE_KEYS = {
 };
 
 class CacheService {
-  /**
-   * Helper to check if Redis is currently connected and operational.
-   * @returns {boolean}
-   */
+
   isRedisAvailable() {
     return Boolean(redisClient && redisClient.isReady);
   }
-
-  /**
-   * Retrieve cached value by key.
-   * Tries Redis first (Primary Cache). If Redis misses, fails, or is offline,
-   * falls back to MemCache (Fallback Layer).
-   * @param {string} key
-   * @returns {Promise<*|null>}
-   */
   async get(key) {
     if (this.isRedisAvailable()) {
       try {
@@ -54,8 +35,6 @@ class CacheService {
         logger.warn(`Redis get error for key "${key}". Falling back to MemCache:`, err.message);
       }
     }
-
-    // MemCache fallback
     const memData = memCache.get(key);
     if (memData !== null && memData !== undefined) {
       logger.info(`[CACHE HIT - MEMCACHE] Key: ${key}`);
@@ -66,19 +45,11 @@ class CacheService {
     return null;
   }
 
-  /**
-   * Store key-value pair in cache with specified TTL in seconds.
-   * Sets value in MemCache fallback layer and Redis (Primary Cache).
-   * @param {string} key
-   * @param {*} value
-   * @param {number} ttlSeconds
-   * @returns {Promise<void>}
-   */
+
   async set(key, value, ttlSeconds = CACHE_TTL.MESSAGES) {
-    // Populate MemCache (fallback layer)
+
     memCache.set(key, value, ttlSeconds);
 
-    // Populate Redis (primary layer)
     if (this.isRedisAvailable()) {
       try {
         const payload = JSON.stringify(value);
@@ -89,11 +60,6 @@ class CacheService {
     }
   }
 
-  /**
-   * Remove key from both MemCache and Redis.
-   * @param {string} key
-   * @returns {Promise<void>}
-   */
   async del(key) {
     memCache.del(key);
 
@@ -106,11 +72,6 @@ class CacheService {
     }
   }
 
-  /**
-   * Remove keys matching a pattern from both MemCache and Redis.
-   * @param {string} pattern E.g. "user:conversations:*"
-   * @returns {Promise<void>}
-   */
   async delPattern(pattern) {
     memCache.delPattern(pattern);
 
@@ -126,22 +87,12 @@ class CacheService {
     }
   }
 
-  /**
-   * Cache-Aside Helper:
-   * Returns cached value if present. On cache miss, fetches fresh data from MongoDB via fetchFn,
-   * stores the result in cache with specified TTL, and returns it.
-   * @param {string} key
-   * @param {Function} fetchFn Async function fetching data from MongoDB on cache miss
-   * @param {number} ttlSeconds
-   * @returns {Promise<*>}
-   */
   async getOrSet(key, fetchFn, ttlSeconds = CACHE_TTL.MESSAGES) {
     const cachedData = await this.get(key);
     if (cachedData !== null && cachedData !== undefined) {
       return cachedData;
     }
 
-    // Cache Miss -> Fetch from MongoDB
     logger.info(`[FETCHING FROM MONGODB] Key: ${key}`);
     const freshData = await fetchFn();
     if (freshData !== null && freshData !== undefined) {
@@ -149,42 +100,20 @@ class CacheService {
     }
     return freshData;
   }
-
-  // --- Specific Domain Helpers ---
-
-  /**
-   * Invalidate user profile cache entry.
-   * @param {string} userId
-   */
   async invalidateUserProfile(userId) {
     if (!userId) return;
     await this.del(CACHE_KEYS.USER_PROFILE(userId));
   }
 
-  /**
-   * Invalidate user conversation list cache entry.
-   * @param {string} userId
-   */
   async invalidateUserConversations(userId) {
     if (!userId) return;
     await this.del(CACHE_KEYS.USER_CONVERSATIONS(userId));
   }
-
-  /**
-   * Invalidate recent messages cache entry for a chat.
-   * @param {string} chatId
-   */
   async invalidateChatMessages(chatId) {
     if (!chatId) return;
     await this.del(CACHE_KEYS.CHAT_MESSAGES(chatId));
   }
 
-  /**
-   * Invalidate and refresh recent messages cache entry for a chat.
-   * Requirement US-13: "On new message, the relevant cache entry is invalidated and refreshed."
-   * @param {string} chatId
-   * @param {Function} fetchFn Async function returning recent messages from DB
-   */
   async refreshChatMessages(chatId, fetchFn) {
     if (!chatId) return;
     const cacheKey = CACHE_KEYS.CHAT_MESSAGES(chatId);

@@ -1,11 +1,18 @@
 import { Router } from "express";
-import { handleSearchUsers } from "../controllers/user.controller.js";
+import {
+  handleSearchUsers,
+  handleGetProfile,
+  handleUpdateProfile,
+} from "../controllers/user.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { validateQuery } from "../middlewares/validation.js";
-import { userSearchQuerySchema } from "../validations/user.validation.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = Router();
 
-router.get("/search", authMiddleware, handleSearchUsers);
+router.use(authMiddleware);
+
+router.get("/search", handleSearchUsers);
+router.get("/profile", handleGetProfile);
+router.put("/profile", upload.single("avatar"), handleUpdateProfile);
 
 export default router;

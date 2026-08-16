@@ -33,7 +33,9 @@ function ChatList({
     <div className="flex h-full flex-col gap-2 overflow-hidden p-2">
       <SearchRecentUsers
         setSearching={setSearching}
-        setFilteredChats={setSearchResults}
+        setSearchResults={setSearchResults}
+        chats={chats}
+        currentUserId={currentUserId}
       />
 
       {!list.length ? (

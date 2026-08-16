@@ -9,6 +9,7 @@ const PAGE_SIZE = 50;
 
 function getCurrentUserId() {
   const user = useAuthStore.getState().user;
+  
   return user?._id?.toString() || user?.id?.toString() || null;
 }
 
@@ -277,6 +278,8 @@ export const useChatStore = create((set, get) => ({
     if (!socket) return;
 
     socket.off("receive_message");
+    socket.off("receive_edited_message");
+    socket.off("receive_deleted_message");
     socket.off("message_status_update");
     socket.off("user_status_changed");
     socket.off("get_online_users");
@@ -284,6 +287,26 @@ export const useChatStore = create((set, get) => ({
     socket.off("group_removed");
 
     socket.on("receive_message", get().handleIncomingMessage);
+
+    socket.on("receive_edited_message", function (editedMessage) {
+      if (!editedMessage?._id) return;
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m._id === editedMessage._id ? { ...m, ...editedMessage } : m
+        ),
+      }));
+    });
+
+    socket.on("receive_deleted_message", function (deletedInfo) {
+      if (!deletedInfo?._id) return;
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m._id === deletedInfo._id
+            ? { ...m, isDeleted: true, content: "This message was deleted", attachments: [], fileUrl: null }
+            : m
+        ),
+      }));
+    });
 
     socket.on("group_updated", function (data) {
       const updatedGroup = data?.group;
@@ -324,11 +347,23 @@ export const useChatStore = create((set, get) => ({
       const stringIds = onlineUserIds.map((id) => id.toString());
 
       set((state) => {
-        let updatedChats = state.chats;
-
-        for (let i = 0; i < stringIds.length; i++) {
-          updatedChats = updateUserStatusInChats(updatedChats, stringIds[i], true);
-        }
+        const updatedChats = (state.chats || []).map((chat) => {
+          if (!chat || !chat.members) return chat;
+          const newMembers = chat.members.map((member) => {
+            const userObj = typeof member.user === "object" && member.user !== null ? member.user : null;
+            if (!userObj) return member;
+            const memberId = (userObj._id || userObj.id || "").toString();
+            const isOnline = stringIds.includes(memberId);
+            return {
+              ...member,
+              user: {
+                ...userObj,
+                isOnline,
+              },
+            };
+          });
+          return { ...chat, members: newMembers };
+        });
 
         return { onlineUserIds: stringIds, chats: updatedChats };
       });
@@ -383,11 +418,24 @@ export const useChatStore = create((set, get) => ({
       const response = await messageApi.getUserChats();
       const chats = response.data?.data || response.data || [];
       const onlineIds = get().onlineUserIds || [];
-      let updatedChats = chats;
 
-      for (let i = 0; i < onlineIds.length; i++) {
-        updatedChats = updateUserStatusInChats(updatedChats, onlineIds[i], true);
-      }
+      const updatedChats = chats.map((chat) => {
+        if (!chat || !chat.members) return chat;
+        const newMembers = chat.members.map((member) => {
+          const userObj = typeof member.user === "object" && member.user !== null ? member.user : null;
+          if (!userObj) return member;
+          const memberId = (userObj._id || userObj.id || "").toString();
+          const isOnline = onlineIds.includes(memberId);
+          return {
+            ...member,
+            user: {
+              ...userObj,
+              isOnline,
+            },
+          };
+        });
+        return { ...chat, members: newMembers };
+      });
 
       set({ chats: sortChatsByRecent(updatedChats) });
 
@@ -879,5 +927,82 @@ export const useChatStore = create((set, get) => ({
 
       return changed ? { messages: updated } : state;
     });
+  },
+
+  editMessage: async function (messageId, newContent) {
+    if (!messageId || messageId.toString().startsWith("temp-")) {
+      toast.error("Please wait until the message finishes sending.");
+      return { success: false, message: "Unsaved temporary message" };
+    }
+
+    try {
+      const socketStore = useSocketStore.getState();
+      if (socketStore.connected && socketStore.socket) {
+        return new Promise((resolve) => {
+          socketStore.socket.emit("edit_message", { messageId, content: newContent }, (res) => {
+            if (res?.success) {
+              toast.success("Message updated successfully");
+              resolve({ success: true });
+            } else {
+              toast.error(res?.error || "Failed to edit message");
+              resolve({ success: false, message: res?.error });
+            }
+          });
+        });
+      }
+
+      const response = await messageApi.editMessage(messageId, newContent);
+      const updated = response.data?.data;
+      if (updated) {
+        set((state) => ({
+          messages: state.messages.map((m) => (m._id === messageId ? updated : m)),
+        }));
+      }
+      toast.success("Message updated successfully");
+      return { success: true };
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to edit message");
+      return { success: false, message: err.response?.data?.message };
+    }
+  },
+
+  deleteMessage: async function (messageId) {
+    if (!messageId || messageId.toString().startsWith("temp-")) {
+      toast.error("Please wait until the message finishes sending.");
+      return { success: false, message: "Unsaved temporary message" };
+    }
+
+    try {
+      const socketStore = useSocketStore.getState();
+      if (socketStore.connected && socketStore.socket) {
+        return new Promise((resolve) => {
+          socketStore.socket.emit("delete_message", { messageId }, (res) => {
+            if (res?.success) {
+              toast.success("Message deleted successfully");
+              resolve({ success: true });
+            } else {
+              toast.error(res?.error || "Failed to delete message");
+              resolve({ success: false, message: res?.error });
+            }
+          });
+        });
+      }
+
+      const response = await messageApi.deleteMessage(messageId);
+      if (response.data?.success) {
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m._id === messageId
+              ? { ...m, isDeleted: true, content: "This message was deleted", attachments: [], fileUrl: null }
+              : m
+          ),
+        }));
+      }
+      toast.success("Message deleted successfully");
+      return { success: true };
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete message");
+      return { success: false, message: err.response?.data?.message };
+    }
   }
 }));

@@ -1,6 +1,11 @@
 import { socketAuthMiddleware } from "./socketAuth.js";
 import { handleJoinChat, handleLeaveChat, handleTyping } from "./roomHandlers.js";
-import { handleMarkMessagesRead, handleSendMessage } from "./messageHandlers.js";
+import {
+  handleMarkMessagesRead,
+  handleSendMessage,
+  handleEditMessageSocket,
+  handleDeleteMessageSocket,
+} from "./messageHandlers.js";
 import { handleUserConnect, handleUserDisconnect } from "./statusHandlers.js";
 import { logger } from "../logger.js";
 export { getSocketByUserId } from "./userManager.js";
@@ -24,6 +29,8 @@ export const socketHandler = (io) => {
     handleTyping(socket, currentUserId);
     handleMarkMessagesRead(socket, currentUserId);
     handleSendMessage(io, socket, currentUserId);
+    handleEditMessageSocket(io, socket, currentUserId);
+    handleDeleteMessageSocket(io, socket, currentUserId);
 
     socket.on("disconnect", async () => {
       await handleUserDisconnect(io, socket, currentUserId);

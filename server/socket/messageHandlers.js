@@ -62,6 +62,7 @@ function handleMarkMessagesRead(socket, currentUserId) {
 
       setUserUnreadCount(chat, currentUserId, 0);
       await chat.save();
+      await cacheService.invalidateUserConversations(currentUserId);
 
       if (unreadMessages.length === 0) return;
 
@@ -268,5 +269,45 @@ function handleSendMessage(io, socket, currentUserId) {
   });
 }
 
-export { handleMarkMessagesRead, handleSendMessage };
+function handleEditMessageSocket(io, socket, currentUserId) {
+  socket.on("edit_message", async ({ messageId, content }, acknowledge) => {
+    try {
+      if (!messageId || !content || !content.trim()) {
+        return acknowledge?.({ success: false, error: "Message ID and content are required." });
+      }
+
+      const { editMessageService } = await import("../services/message.service.js");
+      const updatedMessage = await editMessageService(messageId, currentUserId, content);
+
+      io.to(`chat:${updatedMessage.chat}`).emit("receive_edited_message", updatedMessage);
+
+      acknowledge?.({ success: true, message: updatedMessage });
+    } catch (error) {
+      logger.error("Edit Message Error:", error);
+      acknowledge?.({ success: false, error: error.message || "Failed to edit message" });
+    }
+  });
+}
+
+function handleDeleteMessageSocket(io, socket, currentUserId) {
+  socket.on("delete_message", async ({ messageId }, acknowledge) => {
+    try {
+      if (!messageId) {
+        return acknowledge?.({ success: false, error: "Message ID is required." });
+      }
+
+      const { deleteMessageService } = await import("../services/message.service.js");
+      const result = await deleteMessageService(messageId, currentUserId);
+
+      io.to(`chat:${result.chat}`).emit("receive_deleted_message", result);
+
+      acknowledge?.({ success: true, message: result });
+    } catch (error) {
+      logger.error("Delete Message Error:", error);
+      acknowledge?.({ success: false, error: error.message || "Failed to delete message" });
+    }
+  });
+}
+
+export { handleMarkMessagesRead, handleSendMessage, handleEditMessageSocket, handleDeleteMessageSocket };
 

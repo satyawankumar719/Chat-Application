@@ -41,7 +41,10 @@ export const initUpload = async (req, res, next) => {
         tempFilePath: tempPath,
       });
 
-      // Ensure empty file created
+      // Ensure temp directory and empty file created
+      if (!fs.existsSync(TEMP_DIR)) {
+        fs.mkdirSync(TEMP_DIR, { recursive: true });
+      }
       fs.writeFileSync(tempPath, Buffer.alloc(0));
     }
 
@@ -82,16 +85,18 @@ export const uploadChunk = async (req, res, next) => {
     const start = Number(startByte || 0);
     const chunkBuffer = fs.readFileSync(chunkFile.path);
 
-    // Append chunk to temp file
-    if (fs.existsSync(session.tempFilePath)) {
-      const fileStream = fs.createWriteStream(session.tempFilePath, {
-        flags: start === 0 ? 'w' : 'r+',
-        start,
-      });
-      fileStream.write(chunkBuffer);
-      fileStream.end();
-    } else {
-      fs.writeFileSync(session.tempFilePath, chunkBuffer);
+    // Ensure parent temp directory exists before writing
+    const tempDir = path.dirname(session.tempFilePath);
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Write chunk synchronously to specified byte position safely
+    const fd = fs.openSync(session.tempFilePath, start === 0 || !fs.existsSync(session.tempFilePath) ? 'w+' : 'r+');
+    try {
+      fs.writeSync(fd, chunkBuffer, 0, chunkBuffer.length, start);
+    } finally {
+      fs.closeSync(fd);
     }
 
     // Remove uploaded chunk temp file from multer
@@ -104,14 +109,37 @@ export const uploadChunk = async (req, res, next) => {
     session.status = 'uploading';
 
     if (newUploadedBytes >= session.fileSize) {
+      let subfolder = 'files';
+      if (
+        session.fileType === 'avatar' ||
+        session.fileName.includes('avatar')
+      ) {
+        subfolder = 'avatars';
+      } else if (
+        session.fileType === 'image' ||
+        session.fileName.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
+      ) {
+        subfolder = 'images';
+      } else if (
+        session.fileType === 'video' ||
+        session.fileName.match(/\.(mp4|webm|mkv|mov|avi)$/i)
+      ) {
+        subfolder = 'videos';
+      }
+
+      const targetDir = path.join(UPLOADS_DIR, subfolder);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
       const finalFileName = `${Date.now()}-${session.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-      const finalPath = path.join(UPLOADS_DIR, finalFileName);
+      const finalPath = path.join(targetDir, finalFileName);
 
       fs.renameSync(session.tempFilePath, finalPath);
 
       const protocol = req.protocol;
       const host = req.get('host');
-      const fileUrl = `${protocol}://${host}/uploads/${finalFileName}`;
+      const fileUrl = `${protocol}://${host}/uploads/${subfolder}/${finalFileName}`;
 
       session.status = 'upload_completed';
       session.finalUrl = fileUrl;

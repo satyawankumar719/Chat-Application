@@ -31,6 +31,7 @@ function MessageList({
   currentUserId,
   firstUnreadId,
   unreadCount = 0,
+  isGroup = false,
 }) {
   const messagesEndRef = useRef(null);
   const unreadRef = useRef(null);
@@ -199,7 +200,7 @@ function MessageList({
                   </div>
                 )}
 
-                <MessageBubble message={message} isMine={isMine} />
+                <MessageBubble message={message} isMine={isMine} isGroup={isGroup} />
               </React.Fragment>
             );
           })}

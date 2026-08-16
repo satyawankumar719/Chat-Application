@@ -11,10 +11,9 @@ import PublicRoutes from "./components/publicRoutes";
 import VerifyOtp from "./pages/authPages/verifyOtp";
 import { Toaster } from "sonner";
 import GroupChat from "./pages/chatDashboard/groupChat";
-// import ProfilePage from "./pages/ProfilePage";
+import ProfilePage from "./pages/ProfilePage";
+
 function App() {
-
-
   return (
     <BrowserRouter>
       <Routes>
@@ -28,7 +27,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route index element={<Navigate to="/chats" replace />} />
             <Route path="/chats" element={<ChatsPage />} />
-            {/* <Route path="/profile" element={<ProfilePage />} /> */}
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/groups" element={<GroupChat />} />
             <Route path="/chats/create" element={<CreateChatPage />} />
             <Route path="/invitations" element={<InvitationsPage />} />

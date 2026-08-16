@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Chat from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import { isUserOnline } from "../socket/userManager.js";
@@ -21,7 +22,13 @@ export const getUserChatsService = async (userId) => {
       })
       .sort({ updatedAt: -1 });
 
-    return chats.map((chat) => chat.toObject());
+    return chats.map((chat) => {
+      const chatObj = chat.toObject({ flattenMaps: true });
+      if (chat.unreadCount && typeof chat.unreadCount.get === "function") {
+        chatObj.unreadCount = Object.fromEntries(chat.unreadCount);
+      }
+      return chatObj;
+    });
   };
 
   const chats = await cacheService.getOrSet(
@@ -30,7 +37,6 @@ export const getUserChatsService = async (userId) => {
     CACHE_TTL.CONVERSATIONS
   );
 
-  // Dynamically overlay live online status
   return chats.map((chatObj) => {
     if (chatObj.members) {
       const updatedMembers = chatObj.members.map((member) => {
@@ -40,7 +46,7 @@ export const getUserChatsService = async (userId) => {
             ...member,
             user: {
               ...member.user,
-              isOnline: onlineNow || Boolean(member.user.isOnline),
+              isOnline: onlineNow,
             },
           };
         }
@@ -111,4 +117,61 @@ export const getChatMessagesService = async (chatId, userId, page = 1, limit = 5
   }
 
   return result;
+};
+
+export const editMessageService = async (messageId, userId, newContent) => {
+  if (!messageId || typeof messageId !== "string" || !mongoose.Types.ObjectId.isValid(messageId) || messageId.startsWith("temp-")) {
+    throw { status: 400, message: "Invalid message ID." };
+  }
+
+  const message = await Message.findById(messageId);
+  if (!message) {
+    throw { status: 404, message: "Message not found." };
+  }
+
+  if (message.sender.toString() !== userId.toString()) {
+    throw { status: 403, message: "Forbidden: You can only edit your own messages." };
+  }
+
+  if (message.isDeleted) {
+    throw { status: 400, message: "Cannot edit a deleted message." };
+  }
+
+  message.content = newContent.trim();
+  message.edited = true;
+  message.editedAt = new Date();
+  await message.save();
+
+  await cacheService.del(CACHE_KEYS.CHAT_MESSAGES(message.chat));
+
+  return Message.findById(message._id).populate("sender", "name email avatar");
+};
+
+export const deleteMessageService = async (messageId, userId) => {
+  if (!messageId || typeof messageId !== "string" || !mongoose.Types.ObjectId.isValid(messageId) || messageId.startsWith("temp-")) {
+    throw { status: 400, message: "Invalid message ID." };
+  }
+
+  const message = await Message.findById(messageId);
+  if (!message) {
+    throw { status: 404, message: "Message not found." };
+  }
+
+  if (message.sender.toString() !== userId.toString()) {
+    throw { status: 403, message: "Forbidden: You can only delete your own messages." };
+  }
+
+  message.isDeleted = true;
+  message.deletedAt = new Date();
+  message.content = "This message was deleted";
+  await message.save();
+
+  await cacheService.del(CACHE_KEYS.CHAT_MESSAGES(message.chat));
+
+  return {
+    _id: message._id,
+    chat: message.chat,
+    isDeleted: true,
+    content: message.content,
+  };
 };

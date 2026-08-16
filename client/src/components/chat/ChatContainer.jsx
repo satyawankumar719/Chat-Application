@@ -145,6 +145,7 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp })
         currentUserId={currentUserId}
         firstUnreadId={firstUnreadId}
         unreadCount={unreadCount}
+        isGroup={chat.type === "group"}
       />
 
       <MessageInput

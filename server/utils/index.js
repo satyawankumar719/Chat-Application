@@ -18,10 +18,12 @@ export const generateToken = (user) => {
 
 
 export const verifyToken = (token) => {
+    if (!token || typeof token !== "string" || token === "undefined" || token === "null" || token.trim() === "") {
+        throw { status: 401, message: "Invalid or missing token" };
+    }
     try {
         return jwt.verify(token, ENV.JWT_SECRET);
     } catch (error) {
-        console.error("Token verification failed:", error);
         throw { status: 401, message: "Invalid or expired token" };
     }
 }

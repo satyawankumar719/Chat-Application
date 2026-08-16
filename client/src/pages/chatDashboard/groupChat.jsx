@@ -32,6 +32,20 @@ export default function GroupChat() {
 
   const groupChats = chats.filter((c) => c.type === "group");
 
+  useEffect(() => {
+    if (loadingChats) return;
+
+    const isSelectedGroupValid = groupChats.some((c) => c._id === selectedChatId);
+
+    if (!isSelectedGroupValid) {
+      if (groupChats.length > 0) {
+        setSelectedChatId(groupChats[0]._id);
+      } else if (selectedChatId !== null) {
+        setSelectedChatId(null);
+      }
+    }
+  }, [chats, selectedChatId, loadingChats, setSelectedChatId]);
+
   const filteredGroups = groupChats.filter((group) => {
     const matchesSearch =
       group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -52,7 +66,7 @@ export default function GroupChat() {
     return true;
   });
 
-  const selectedGroup = chats.find((c) => c._id === selectedChatId && c.type === "group") || (groupChats.length > 0 ? groupChats[0] : null);
+  const selectedGroup = groupChats.find((c) => c._id === selectedChatId) || null;
 
   const handleSelectGroup = (groupId) => {
     setSelectedChatId(groupId);
@@ -180,6 +194,15 @@ export default function GroupChat() {
                 const lastMsg = group.lastMessage?.content || "No messages yet";
                 const time = group.lastMessage?.createdAt || group.updatedAt;
 
+                let unread = 0;
+                if (group.unreadCount && currentUserId) {
+                  if (typeof group.unreadCount.get === "function") {
+                    unread = group.unreadCount.get(currentUserId) || 0;
+                  } else if (typeof group.unreadCount === "object") {
+                    unread = group.unreadCount[currentUserId] || 0;
+                  }
+                }
+
                 return (
                   <button
                     key={group._id}
@@ -233,6 +256,12 @@ export default function GroupChat() {
                           <span>•</span>
                           <span className="text-green-600 font-semibold">{onlineCount} online</span>
                         </span>
+
+                        {unread > 0 && (
+                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-xs animate-bounce">
+                            {unread > 99 ? "99+" : unread}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </button>

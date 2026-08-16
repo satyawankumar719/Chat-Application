@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useChatStore } from "@/store/chatStore";
 import { useSocketStore } from "@/store/socketStore";
-import { Check, CheckCheck, FileText, Image as ImageIcon, X, RotateCw, Loader2, Users } from "lucide-react";
+import { Check, CheckCheck, FileText, Image as ImageIcon, X, RotateCw, Loader2, Users, MoreVertical } from "lucide-react";
+import MessageActionDialog from "./MessageActionDialog";
 
 function formatFileSize(bytes) {
   if (!bytes) return "";
@@ -10,6 +12,8 @@ function formatFileSize(bytes) {
 }
 
 function renderAttachmentList(message, connected) {
+  if (message.isDeleted) return null;
+
   let attachments = [];
 
   if (message.attachments && message.attachments.length > 0) {
@@ -95,7 +99,7 @@ function renderAttachmentList(message, connected) {
                       type="button"
                       onClick={handleCancel}
                       title="Cancel Upload"
-                      className="absolute rounded-full bg-black/60 p-2 text-white transition hover:bg-black/90 hover:scale-110 active:scale-95"
+                      className="absolute rounded-full bg-black/60 p-2 text-white transition hover:bg-black/90 hover:scale-110 active:scale-95 cursor-pointer"
                     >
                       <X size={16} />
                     </button>
@@ -149,7 +153,7 @@ function renderAttachmentList(message, connected) {
                 type="button"
                 onClick={handleCancel}
                 title="Cancel Upload"
-                className="rounded-full bg-black/40 p-1.5 text-white hover:bg-black/70 shrink-0 transition"
+                className="rounded-full bg-black/40 p-1.5 text-white hover:bg-black/70 shrink-0 transition cursor-pointer"
               >
                 <X size={14} />
               </button>
@@ -178,7 +182,9 @@ function renderAttachmentList(message, connected) {
   return attachmentElements;
 }
 
-function MessageBubble({ message, isMine }) {
+function MessageBubble({ message, isMine, isGroup }) {
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+
   if (message.type === "system") {
     return (
       <div className="my-3 flex items-center justify-center px-4 w-full">
@@ -208,79 +214,110 @@ function MessageBubble({ message, isMine }) {
     message.status === "failed";
 
   const senderName = message.sender?.name;
+  const isDeleted = Boolean(message.isDeleted);
+  const isEdited = Boolean(message.edited);
 
   return (
-    <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[75%] rounded-2xl px-3.5 py-2 shadow-xs transition-all ${
-          isMine
-            ? isFailed
-              ? "bg-destructive text-destructive-foreground"
-              : "bg-primary text-primary-foreground rounded-br-xs"
-            : "bg-muted rounded-bl-xs"
-        }`}
-      >
-        {!isMine && senderName && (
-          <p className="mb-1 text-[11px] font-semibold text-primary">
-            {senderName}
-          </p>
-        )}
+    <>
+      <div className={`flex ${isMine ? "justify-end" : "justify-start"} group relative`}>
+        <div
+          className={`max-w-[75%] rounded-2xl px-3.5 py-2 shadow-xs transition-all relative ${
+            isMine
+              ? isFailed
+                ? "bg-destructive text-destructive-foreground"
+                : isDeleted
+                ? "bg-muted/70 text-muted-foreground italic rounded-br-xs border border-border/40"
+                : "bg-primary text-primary-foreground rounded-br-xs"
+              : isDeleted
+              ? "bg-muted/70 text-muted-foreground italic rounded-bl-xs border border-border/40"
+              : "bg-muted rounded-bl-xs"
+          }`}
+        >
+          {/* Note: Sender name is shown ONLY in group chats for messages from others */}
+          {!isMine && isGroup && senderName && !isDeleted && (
+            <p className="mb-1 text-[11px] font-semibold text-primary">
+              {senderName}
+            </p>
+          )}
 
-        {attachmentsBlock}
+          {!isDeleted && attachmentsBlock}
 
-        {showContent ? (
-          <p className="break-words text-sm leading-relaxed">
-            {message.content}
-          </p>
-        ) : null}
+          {showContent ? (
+            <p className={`break-words text-sm leading-relaxed ${isDeleted ? "italic opacity-80" : ""}`}>
+              {isDeleted ? "This message was deleted" : message.content}
+            </p>
+          ) : null}
 
-        {isReconnecting && message.isUploading && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-amber-200 font-medium animate-pulse">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            <span>Reconnecting...</span>
+          {isReconnecting && message.isUploading && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-amber-200 font-medium animate-pulse">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Reconnecting...</span>
+            </div>
+          )}
+
+          {isFailed && (
+            <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/20 pt-1.5 text-xs">
+              <span>{message.uploadError || "Upload failed"}</span>
+              <button
+                type="button"
+                onClick={() =>
+                  useChatStore
+                    .getState()
+                    .retryUpload(message._id)
+                }
+                className="flex items-center gap-1 rounded-md bg-black/30 px-2 py-1 text-[11px] font-medium hover:bg-black/50 transition cursor-pointer"
+              >
+                <RotateCw size={12} />
+                <span>Retry</span>
+              </button>
+            </div>
+          )}
+
+          <div className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-75">
+            {isEdited && !isDeleted && (
+              <span className="italic mr-1 text-[9px] opacity-90">(edited)</span>
+            )}
+
+            <span>
+              {new Date(message.createdAt || Date.now()).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+
+            {isMine &&
+              !isFailed &&
+              !isDeleted &&
+              (message.status === "read" ? (
+                <CheckCheck size={14} className="text-sky-400" />
+              ) : message.status === "delivered" ? (
+                <CheckCheck size={14} />
+              ) : (
+                <Check size={14} />
+              ))}
           </div>
-        )}
 
-        {isFailed && (
-          <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/20 pt-1.5 text-xs">
-            <span>{message.uploadError || "Upload failed"}</span>
+          {/* Option trigger button ONLY for own messages that are saved on server and not deleted */}
+          {isMine && !isDeleted && !message.isUploading && !isFailed && message._id && !message._id.toString().startsWith("temp-") && (
             <button
               type="button"
-              onClick={() =>
-                useChatStore
-                  .getState()
-                  .retryUpload(message._id)
-              }
-              className="flex items-center gap-1 rounded-md bg-black/30 px-2 py-1 text-[11px] font-medium hover:bg-black/50 transition cursor-pointer"
+              onClick={() => setShowOptionsDialog(true)}
+              className="absolute top-2 right-2 rounded-full p-1 opacity-0 group-hover:opacity-100 bg-black/20 hover:bg-black/40 text-white transition cursor-pointer"
+              title="Message options"
             >
-              <RotateCw size={12} />
-              <span>Retry</span>
+              <MoreVertical size={13} />
             </button>
-          </div>
-        )}
-
-        <div className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-75">
-          <span>
-            {new Date(message.createdAt || Date.now()).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
-
-          {isMine &&
-            !isFailed &&
-            (message.status === "read" ? (
-              <CheckCheck size={14} className="text-sky-400" />
-            ) : message.status === "delivered" ? (
-              <CheckCheck size={14} />
-            ) : (
-              <Check size={14} />
-            ))}
+          )}
         </div>
       </div>
-    </div>
+
+      <MessageActionDialog
+        message={message}
+        isOpen={showOptionsDialog}
+        onClose={() => setShowOptionsDialog(false)}
+      />
+    </>
   );
 }
-
 
 export default MessageBubble;

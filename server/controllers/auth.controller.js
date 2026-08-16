@@ -9,6 +9,7 @@ import {
 } from "../services/auth.service.js";
 import { generateToken } from "../utils/index.js";
 import { ENV } from "../config/envConfig.js";
+import sessionService from "../services/session.service.js";
 
 const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -23,6 +24,7 @@ export const handleLogin = async (req, res, next) => {
         const { email, password } = req.body;
         const user = await login({ email, password });
         const token = generateToken(user);
+        await sessionService.createSession(token, user.id || user._id);
         res.cookie("Chat_token", token, COOKIE_OPTIONS);
         return res.status(200).json({
             success: true,
@@ -75,6 +77,7 @@ export const verifyOtp = async (req, res, next) => {
         const { email, otp } = req.body;
         const user = await verifyEmailOtp(email, otp);
         const token = generateToken(user);
+        await sessionService.createSession(token, user.id || user._id);
         res.cookie("Chat_token", token, COOKIE_OPTIONS);
         return res.status(200).json({
             success: true,
@@ -87,7 +90,11 @@ export const verifyOtp = async (req, res, next) => {
     }
 };
 
-export const handleLogout = (req, res) => {
+export const handleLogout = async (req, res) => {
+    const token = req.token || req.cookies?.Chat_token || (req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.split(" ")[1] : null);
+    if (token) {
+        await sessionService.deleteSession(token);
+    }
     res.clearCookie("Chat_token", COOKIE_OPTIONS);
     return res.status(200).json({
         success: true,

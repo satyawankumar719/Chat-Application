@@ -2,7 +2,9 @@ import { Router } from "express";
 import {
   handleGetUserChats,
   handleGetChatMessages,
-  handleUploadFile
+  handleUploadFile,
+  handleEditMessage,
+  handleDeleteMessage,
 } from "../controllers/message.controller.js";
 import {
   initUpload,
@@ -25,6 +27,9 @@ router.post("/upload/init", initUpload);
 router.post("/upload/chunk", upload.single("chunk"), uploadChunk);
 router.get("/upload/status/:uploadId", getUploadStatus);
 router.post("/upload/interrupt", interruptUpload);
+
+router.patch("/:messageId", handleEditMessage);
+router.delete("/:messageId", handleDeleteMessage);
 
 router.get("/:chatId", validateParams(chatIdParamSchema), handleGetChatMessages);
 

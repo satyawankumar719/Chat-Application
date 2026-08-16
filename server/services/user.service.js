@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Invitation from "../models/Invitation.js";
 import Chat from "../models/Conversation.js";
+import { isUserOnline } from "../socket/userManager.js";
 
 function escapeRegex(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -67,7 +68,7 @@ export const searchUsers = async (currentUserId, searchQuery) => {
     if (connectedUserIds.has(candidateId)) {
       connectionStatus = "connected";
     } else {
-      
+
       const invitation = invitations.find(
         (inv) =>
           inv.invitedBy.toString() === candidateId ||
@@ -98,7 +99,7 @@ export const searchUsers = async (currentUserId, searchQuery) => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       avatar: user.avatar,
-      isOnline: user.isOnline,
+      isOnline: isUserOnline(user._id),
       lastSeen: user.lastSeen,
       bio: user.bio,
       connectionStatus,
@@ -108,4 +109,39 @@ export const searchUsers = async (currentUserId, searchQuery) => {
   });
 
   return userResults;
+};
+
+export const getUserProfileService = async (userId) => {
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw { status: 404, message: "User not found." };
+  }
+  return user;
+};
+
+export const updateUserProfileService = async (userId, { name, bio, avatarUrl }) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw { status: 404, message: "User not found." };
+  }
+
+  if (name && typeof name === "string" && name.trim()) {
+    user.name = name.trim();
+  }
+
+  if (bio !== undefined && typeof bio === "string") {
+    user.bio = bio.trim();
+  }
+
+  if (avatarUrl) {
+    user.avatar = {
+      url: avatarUrl,
+      publicId: "",
+    };
+  }
+
+  // NOTE: Email and phoneNumber are explicitly excluded from updates as requested
+  await user.save();
+
+  return User.findById(userId).select("-password");
 };

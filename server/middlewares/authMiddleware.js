@@ -1,5 +1,6 @@
 import { verifyToken } from '../utils/index.js';
 import User from '../models/User.js';
+import sessionService from '../services/session.service.js';
 
 export const authMiddleware = async (req, res, next) => {
   let token = req.cookies?.Chat_token;
@@ -8,7 +9,7 @@ export const authMiddleware = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
 
-  if (!token) {
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
     return res.status(401).json({
       success: false,
       message: 'Unauthorized access. Token is missing.',
@@ -22,6 +23,23 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Unauthorized access. Invalid token payload.',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    if (!decoded.jti) {
+      return res.status(401).json({
+        success: false,
+        message: 'Session expired or logged out',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    const activeSession = await sessionService.getSession(decoded.jti);
+    if (!activeSession) {
+      return res.status(401).json({
+        success: false,
+        message: 'Session expired or logged out',
         code: 'UNAUTHORIZED'
       });
     }

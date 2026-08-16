@@ -35,7 +35,8 @@ async function handleUserConnect(io, socket, currentUserId) {
     CACHE_TTL.ONLINE_STATUS
   );
 
-  socket.emit("get_online_users", onlineUserIds);
+  // Broadcast updated online user list to ALL connected sockets
+  io.emit("get_online_users", onlineUserIds);
 
   socket.join(`user:${currentUserId}`);
   await deliverPendingMessages(currentUserId);
@@ -81,7 +82,10 @@ async function handleUserDisconnect(io, socket, currentUserId) {
       isOnline: false,
       lastSeen,
     });
-    
+
+    // Broadcast updated online user list to ALL connected sockets
+    io.emit("get_online_users", onlineUserIds);
+
   } catch (error) {
     logger.error("Disconnect Error:", error);
   }

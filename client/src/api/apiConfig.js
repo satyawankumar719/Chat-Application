@@ -12,7 +12,8 @@ export const API_CONFIG = {
       RESET_PASSWORD: "/auth/reset-password"
     },
     USERS: {
-      SEARCH: "/users/search"
+      SEARCH: "/users/search",
+      PROFILE: "/users/profile"
     },
     INVITATIONS: {
       SEND: "/invitation/send",
@@ -26,6 +27,8 @@ export const API_CONFIG = {
       UPLOAD_MULTIPLE: "/messages/upload/multiple",
       BY_CHAT_ID: (chatId, page = 1, limit = 20) =>
         `/messages/${chatId}?page=${page}&limit=${limit}`,
+      EDIT: (id) => `/messages/${id}`,
+      DELETE: (id) => `/messages/${id}`,
     },
     GROUPS: {
       BASE: "/groups",
