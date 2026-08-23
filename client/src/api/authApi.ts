@@ -1,0 +1,58 @@
+import apiClient from "./apiClient";
+import { API_CONFIG } from "./apiConfig";
+import type {
+  LoginData,
+  SignupData,
+  SendOtpData,
+  VerifyOtpData,
+  ForgotPasswordData,
+  ResetPasswordData,
+} from "@/types";
+
+export const authApi = {
+  login: async (data: LoginData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.LOGIN,
+      data
+    ),
+
+  logout: async () =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.LOGOUT
+    ),
+
+  me: async () =>
+    apiClient.get(
+      API_CONFIG.ENDPOINTS.AUTH.ME
+    ),
+
+  sendOtp: async (data: SendOtpData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.SEND_OTP,
+      data
+    ),
+
+  verifyOtp: async (data: VerifyOtpData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.VERIFY_OTP,
+      data
+    ),
+
+  signup: async (data: SignupData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.SIGNUP,
+      data
+    ),
+
+  forgotPassword: async (data: ForgotPasswordData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD,
+      data
+    ),
+
+  resetPassword: async (data: ResetPasswordData) =>
+    apiClient.post(
+      API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD,
+      data
+    ),
+};
