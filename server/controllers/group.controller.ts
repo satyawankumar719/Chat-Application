@@ -6,7 +6,7 @@ import { sendGroupInvitationService } from "../services/invitation.service.js";
 export const handleCreateGroup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const currentUserId  = req.user?._id ;
-    const group = await groupService.createGroup(currentUserId!, req.body);
+    const group = await groupService.createGroup(currentUserId!, req.body || {});
     res.status(201).json({
       success: true,
       message: "Group created successfully",
@@ -60,7 +60,7 @@ export const handleUpdateGroupInfo = async (req: Request, res: Response, next: N
         message: "Invalid group ID",
       });
     }
-    const group = await groupService.updateGroupInfo(currentUserId!, groupId!, req.body);
+    const group = await groupService.updateGroupInfo(currentUserId!, groupId!, req.body || {});
     res.status(200).json({
       success: true,
       message: "Group information updated successfully",
@@ -75,7 +75,7 @@ export const handleAddMembers = async (req: Request, res: Response, next: NextFu
   try {
     const currentUserId = req.user?._id;
     const { groupId } = req.params;
-    const { memberIds } = req.body;
+    const { memberIds } = req.body || {};
     if (typeof groupId !== "string") {
       return res.status(400).json({
         success: false,
@@ -118,7 +118,7 @@ export const handleChangeMemberRole = async (req: Request, res: Response, next: 
   try {
     const currentUserId = req.user?._id || req.user?.id;
     const { groupId, memberId } = req.params;
-    const { role } = req.body;
+    const { role } = req.body || {};
        if (typeof groupId !== "string" || typeof memberId !== "string") {
       return res.status(400).json({
         success: false,

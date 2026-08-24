@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
-import { Chat, User } from "@/types";
+import { Chat } from "@/types";
+import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
 export interface SearchRecentUsersProps {
   setSearchResults: (results: Chat[]) => void;
@@ -13,7 +14,7 @@ function SearchRecentUsers({
   setSearchResults,
   chats = [],
   setSearching,
-  currentUserId,
+  currentUserId: currentUserIdProp,
 }: SearchRecentUsersProps) {
   const [searchText, setSearchText] = useState("");
 
@@ -29,7 +30,7 @@ function SearchRecentUsers({
       return;
     }
 
-    const currentId = currentUserId?.toString();
+    const currentId = getResolvedCurrentUserId(currentUserIdProp);
 
     const filtered = chats.filter((chat) => {
       if (chat.type === "group") {
@@ -38,18 +39,12 @@ function SearchRecentUsers({
       }
 
       if (chat.type === "direct" || chat.type === "private") {
-        const otherMember = chat.members?.find((member) => {
-          const userObj = typeof member.user === "object" ? (member.user as User) : null;
-          if (!userObj) return false;
+        const otherUser = getOtherUser(chat, currentId);
+        const userName = (otherUser?.name || "").toLowerCase();
+       
 
-          const memberId = (userObj._id || userObj.id || "").toString();
-          return memberId !== currentId;
-        });
-
-        const userObj = typeof otherMember?.user === "object" ? (otherMember.user as User) : null;
-        const userName = (userObj?.name || "").toLowerCase();
-
-        return userName.includes(query);
+         return userName.includes(query) 
+   
       }
 
       return false;

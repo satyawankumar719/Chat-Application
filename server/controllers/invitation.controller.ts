@@ -10,7 +10,7 @@ import { getSocketByUserId } from "../socket/socketHandler.js";
 
 export const handleSendInvitation = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { receiverId, message } = req.body;
+    const { receiverId, message } = req.body || {};
     const invitedBy = req.user?.id || req.user?._id;
 
     const result = await sendInvitationService(invitedBy, receiverId, message);

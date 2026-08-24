@@ -85,7 +85,7 @@ export interface AuthState {
   signup: (data: SignupData) => Promise<AuthResult>;
   forgotPassword: (data: ForgotPasswordData) => Promise<AuthResult>;
   resetPassword: (data: ResetPasswordData) => Promise<AuthResult>;
-  updateProfile: (formData: FormData) => Promise<AuthResult>;
+  updateProfile: (data: FormData | { name?: string; bio?: string; avatarUrl?: string; avatarKey?: string }) => Promise<AuthResult>;
 }
 
 export interface Attachment {

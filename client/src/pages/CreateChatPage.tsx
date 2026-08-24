@@ -21,7 +21,7 @@ function CreateChatPage() {
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState<"info" | "error" | "success">("info");
-
+  
   const handleSearch = async (value: string) => {
     const searchValue = value.trim();
 

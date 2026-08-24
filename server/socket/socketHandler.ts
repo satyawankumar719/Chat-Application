@@ -6,7 +6,7 @@ import {
   handleEditMessageSocket,
   handleDeleteMessageSocket,
 } from "./messageHandlers.js";
-import { handleUserConnect, handleUserDisconnect } from "./statusHandlers.js";
+import { handleUserConnect, handleUserDisconnect, handleGetOnlineUsers } from "./statusHandlers.js";
 import { logger } from "../logger.js";
 export { getSocketByUserId } from "./userManager.js";
 import type {Server} from "socket.io"
@@ -23,6 +23,10 @@ export const socketHandler = (io:Server) => {
     );
 
     await handleUserConnect(io, socket, currentUserId);
+
+    socket.on("get_online_users", () => {
+      handleGetOnlineUsers(socket);
+    });
 
     handleJoinChat(socket, currentUserId);
     handleLeaveChat(socket);

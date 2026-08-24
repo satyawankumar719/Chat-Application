@@ -28,7 +28,8 @@ export const login = async (data : SignupInterface) => {
     if (!email || !password) {
         throw { status: 400, message: "Email and password are required" };
     }
-    const user = await User.findOne({ email  });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user || !user.password) {
         throw { status: 401, message: "Invalid email or password" };
     }
@@ -45,19 +46,19 @@ export const login = async (data : SignupInterface) => {
 };
 
 export const sendOtpToEmail = async (email :string ) => {
-   
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser && existingUser.isVerified) {
         throw { status: 409, message: "User with this email already exists" };
     }
 
     const OTP : string = generateOtp();
-    await redisClient.set(`otp:${email}`, OTP, { EX: 300 });
+    await redisClient.set(`otp:${normalizedEmail}`, OTP, { EX: 300 });
 
     const html = otpEmailTemplate(OTP);
     
     try {
-        await sendEmail(email, "Your OTP Code", html);
+        await sendEmail(normalizedEmail, "Your OTP Code", html);
         return { success: true, message: "OTP sent successfully" };
     } catch (emailErr) {
         logger.error("Failed to send OTP email, but OTP is stored:", OTP);
@@ -65,29 +66,31 @@ export const sendOtpToEmail = async (email :string ) => {
     }
 };
 
-export const verifyEmailOtp = async ({email } : SignupInterface ,otp : string) => {
-    const storedOtp = await redisClient.get(`otp:${email}`);
-    if (!storedOtp || storedOtp !== otp) {
+export const verifyEmailOtp = async (email: string, otp: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanOtp = otp.trim();
+    const storedOtp = await redisClient.get(`otp:${normalizedEmail}`);
+    if (!storedOtp || storedOtp !== cleanOtp) {
         throw { status: 400, message: "Invalid or expired OTP" };
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
         throw { status: 404, message: "User not found. Please sign up again." };
     }
 
     user.isVerified = true;
     await user.save();
-    await redisClient.del(`otp:${email}`);
+    await redisClient.del(`otp:${normalizedEmail}`);
 
     return sanitizeUser(user);
 };
 
 export const signup = async (data : SignupInterface) => {
-  
     const { name, email, password, phoneNumber } = data;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
     if (user && user.isVerified) {
         throw { status: 409, message: "User with this email already exists" };
     }
@@ -104,14 +107,14 @@ export const signup = async (data : SignupInterface) => {
     } else {
         user = await User.create({
             name,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
             phoneNumber,
             isVerified: false,
         });
     }
 
-    const otpResult = await sendOtpToEmail(email);
+    const otpResult = await sendOtpToEmail(normalizedEmail);
 
     return {
         success: true,
@@ -138,18 +141,19 @@ export const fetchUser = async (userId :string) => {
 };
 
 export const sendForgotPasswordOtp = async (email :string) => {
-    const user = await User.findOne({ email, isVerified: true });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail, isVerified: true });
     if (!user) {
         throw { status: 404, message: "No verified user found with this email" };
     }
 
     const OTP: string = generateOtp();
-    await redisClient.set(`reset-otp:${email}`, OTP, { EX: 600 });
+    await redisClient.set(`reset-otp:${normalizedEmail}`, OTP, { EX: 600 });
 
     const html = otpEmailTemplate(OTP);
     
     try {
-        await sendEmail(email, "Reset Your Password - OTP", html);
+        await sendEmail(normalizedEmail, "Reset Your Password - OTP", html);
         return { success: true, message: "Password reset OTP sent to your email" };
     } catch (emailErr) {
         logger.error("Failed to send reset OTP email, but OTP is stored:", OTP);
@@ -158,16 +162,19 @@ export const sendForgotPasswordOtp = async (email :string) => {
 };
 
 export const resetPasswordService = async (email :string, otp:string, newPassword:string) => {
-    const user = await User.findOne({ email, isVerified: true });
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanOtp = otp.trim();
+
+    const user = await User.findOne({ email: normalizedEmail, isVerified: true });
     if (!user) {
         throw { status: 404, message: "No verified user found with this email" };
     }
 
-    const storedOtp = await redisClient.get(`reset-otp:${email}`);
+    const storedOtp = await redisClient.get(`reset-otp:${normalizedEmail}`);
     if (!storedOtp) {
         throw { status: 400, message: "OTP has expired or is invalid" };
     }
-    if (storedOtp !== otp) {
+    if (storedOtp !== cleanOtp) {
         throw { status: 400, message: "Invalid OTP" };
     }
 
@@ -175,6 +182,6 @@ export const resetPasswordService = async (email :string, otp:string, newPasswor
     user.password = hashedPassword;
     await user.save();
 
-    await redisClient.del(`reset-otp:${email}`);
+    await redisClient.del(`reset-otp:${normalizedEmail}`);
     return { message: "Password reset successfully" };
 };

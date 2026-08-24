@@ -47,49 +47,10 @@ export const handleGetChatMessages = async (req: AuthRequest, res: Response, nex
   }
 };
 
-export const handleUploadFile = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded.",
-      });
-    }
-
-    const subfolder = req.file.subfolder || (
-      req.file.mimetype.startsWith("image/")
-        ? "images"
-        : req.file.mimetype.startsWith("video/")
-        ? "videos"
-        : "files"
-    );
-
-    const fileType = req.file.mimetype.startsWith("image/")
-      ? "image"
-      : req.file.mimetype.startsWith("video/")
-      ? "video"
-      : "file";
-
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${subfolder}/${req.file.filename}`;
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        fileUrl,
-        fileName: req.file.originalname,
-        fileSize: req.file.size,
-        type: fileType,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const handleEditMessage = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { messageId } = req.params;
-    const { content } = req.body;
+    const { content } = req.body || {};
     const userId = req.user?.id || req.user?._id;
 
     if (!content || !content.trim()) {

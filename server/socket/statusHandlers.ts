@@ -91,4 +91,9 @@ async function handleUserDisconnect(io: Server, socket: any, currentUserId: stri
   }
 }
 
-export { handleUserConnect, handleUserDisconnect };
+function handleGetOnlineUsers(socket: any) {
+  const onlineUserIds = getAllOnlineUserIds();
+  socket.emit("get_online_users", onlineUserIds);
+}
+
+export { handleUserConnect, handleUserDisconnect, handleGetOnlineUsers };

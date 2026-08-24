@@ -176,11 +176,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  updateProfile: async (formData: FormData): Promise<AuthResult> => {
+  updateProfile: async (data: FormData | { name?: string; bio?: string; avatarUrl?: string; avatarKey?: string }): Promise<AuthResult> => {
     try {
       set({ loading: true });
       const { queryApi } = await import("@/api/userApi");
-      const response = await queryApi.updateProfile(formData);
+      const response = data instanceof FormData
+        ? await queryApi.updateProfile(data)
+        : await queryApi.updateProfileJson(data);
       const updatedUser: User | null = response.data?.data || null;
 
       if (updatedUser) {

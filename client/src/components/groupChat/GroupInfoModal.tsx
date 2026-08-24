@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Users, X, UserPlus, Shield, UserMinus, Search, Check, Edit2, LogOut, Save, Trash2 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useChatStore } from "@/store/chatStore";
 import { useGroupStore } from "@/store/groupStore";
 import { queryApi } from "@/api/userApi";
 import { Chat, User } from "@/types";
@@ -13,6 +14,7 @@ export interface GroupInfoModalProps {
 
 export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModalProps) {
   const { user } = useAuthStore();
+  const onlineUserIds = useChatStore((state) => state.onlineUserIds) || [];
   const { addMembers, removeMember, updateMemberRole, updateGroupInfo, leaveGroup, deleteGroup, sendGroupInvitation } =
     useGroupStore();
   const currentUserId = (user?._id || user?.id)?.toString();
@@ -509,7 +511,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                 if (!u) return null;
                 const uid = (u._id || u.id)?.toString();
                 const isMe = uid === currentUserId;
-                const isOnline = u.isOnline;
+                const isOnline = Boolean(uid && onlineUserIds.includes(uid)) || Boolean(u.isOnline);
 
                 const myRole = currentMember?.role;
                 const targetRole = m.role;

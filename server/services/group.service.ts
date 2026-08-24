@@ -146,6 +146,10 @@ export const createGroup = async (
     new Set(memberIds.map((id) => id.toString()))
   ).filter((id) => id !== creatorId.toString());
 
+  if (uniqueMemberIds.length < 1) {
+    throw new Error("A group must have at least 2 members (select at least 1 other contact)");
+  }
+
   const members: GroupMember[] = [
     {
       user: creatorId,
@@ -491,7 +495,7 @@ export const removeMember = async (
     );
 
   const isGroupDeactivated =
-    group.members.length === 0;
+    group.members.length <= 1;
 
   if (isGroupDeactivated) {
     group.isActive = false;
@@ -524,15 +528,25 @@ export const removeMember = async (
   );
 
   if (isGroupDeactivated) {
+    const allAffectedMemberIds = Array.from(
+      new Set([
+        ...group.members.map((member: GroupMember) => member.user.toString()),
+        targetMemberId.toString(),
+        userId.toString(),
+      ])
+    );
+
     notifyGroupMembers(
-      [targetMemberId, userId],
+      allAffectedMemberIds,
       "group_removed",
       {
         groupId: group._id,
         message:
-          "Group has been closed because no members remain.",
+          "Group has been closed because 1 or fewer members remain.",
       }
     );
+
+    return null;
   } else {
     const remainingMemberIds = group.members.map(
       (member: GroupMember) =>
@@ -679,7 +693,7 @@ export const leaveGroup = async (
     );
 
   const isGroupDeactivated =
-    group.members.length === 0;
+    group.members.length <= 1;
 
   if (isGroupDeactivated) {
     group.isActive = false;
@@ -688,13 +702,20 @@ export const leaveGroup = async (
   await group.save();
 
   if (isGroupDeactivated) {
+    const allAffectedMemberIds = Array.from(
+      new Set([
+        ...group.members.map((member: GroupMember) => member.user.toString()),
+        userId.toString(),
+      ])
+    );
+
     notifyGroupMembers(
-      [userId],
+      allAffectedMemberIds,
       "group_removed",
       {
         groupId: group._id,
         message:
-          "Group has been closed because no members remain.",
+          "Group has been closed because 1 or fewer members remain.",
       }
     );
 

@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { Circle, Clock } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
 import { Chat, User } from "@/types";
+import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
 export interface ChatCardProps {
   chat: Chat;
@@ -10,26 +11,18 @@ export interface ChatCardProps {
   onSelectChat: (chatId: string) => void;
 }
 
-const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }: ChatCardProps) => {
+const ChatCard = ({ chat, currentUserId: currentUserIdProp, selectedChatId, onSelectChat }: ChatCardProps) => {
   const onlineUserIds = useChatStore((state) => state.onlineUserIds) || [];
+  const currentUserId = getResolvedCurrentUserId(currentUserIdProp);
 
-  const otherMember = chat.members?.find((member) => {
-    const userObj = typeof member.user === "object" ? (member.user as User) : null;
-    if (!userObj) return false;
-    const memberId = (userObj._id || userObj.id || "").toString();
-    return memberId !== currentUserId;
-  });
-
-  const displayUser = (typeof otherMember?.user === "object" ? (otherMember.user as User) : null) ||
-    (typeof chat.members?.[0]?.user === "object" ? (chat.members[0].user as User) : null);
-
+  const displayUser = getOtherUser(chat, currentUserId);
   const displayUserId = (displayUser?._id || displayUser?.id || "").toString();
-  const isOnline = onlineUserIds.includes(displayUserId);
+  const isOnline = onlineUserIds.includes(displayUserId) || Boolean(displayUser?.isOnline);
 
   const lastSender = chat.lastMessage?.sender;
   const senderId = (typeof lastSender === "object" ? (lastSender?._id || lastSender?.id) : lastSender)?.toString() || "";
 
-  const isMine = Boolean(senderId && currentUserId && senderId === currentUserId.toString());
+  const isMine = Boolean(senderId && currentUserId && senderId === currentUserId);
   const isSystemMsg = chat.lastMessage?.type === "system";
 
   const message = isSystemMsg
@@ -108,11 +101,11 @@ const ChatCard = ({ chat, currentUserId, selectedChatId, onSelectChat }: ChatCar
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-xs animate-bounce">
                 {unread > 99 ? "99+" : unread}
               </span>
-            ) : isOnline ? (
+            ) : isOnline && (
               <Circle className="h-3 w-3 fill-emerald-500 text-emerald-500" />
-            ) : (
-              <Clock className="h-3 w-3 text-muted-foreground" />
-            )}
+            ) 
+              
+            }
           </div>
         </div>
       </div>

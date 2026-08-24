@@ -25,7 +25,7 @@ export const handleGetProfile = async (req: AuthRequest, res: Response, next: Ne
   try {
     const currentUserId = req.user?.id || req.user?._id;
     const user = await getUserProfileService(currentUserId);
-
+   console.log(user)
     return res.status(200).json({
       success: true,
       data: user,
@@ -38,18 +38,13 @@ export const handleGetProfile = async (req: AuthRequest, res: Response, next: Ne
 export const handleUpdateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const currentUserId = req.user?.id || req.user?._id;
-    const { name, bio } = req.body;
-    let avatarUrl: string | null = null;
-
-    if (req.file) {
-      const subfolder = req.file.subfolder || "avatars";
-      avatarUrl = `${req.protocol}://${req.get("host")}/uploads/${subfolder}/${req.file.filename}`;
-    }
+    const { name, bio, avatarUrl, avatarKey } = req.body || {};
 
     const updatedUser = await updateUserProfileService(currentUserId, {
       name,
       bio,
       avatarUrl,
+      avatarKey,
     });
 
     return res.status(200).json({

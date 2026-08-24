@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
 import { SocketState, Attachment } from "@/types";
+import { useAuthStore } from "./authStore";
 
 function handleAuthError(get: () => SocketState, set: (state: Partial<SocketState>) => void) {
   const activeSocket = get().socket;
@@ -25,12 +26,17 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     if (oldSocket) {
       oldSocket.disconnect();
     }
+
+    const userToken = useAuthStore.getState().user?.token;
+
     const newSocket = io(SOCKET_SERVER_URL, {
       withCredentials: true,
+      auth: userToken ? { token: userToken } : undefined,
     });
     newSocket.on("connect", () => {
       console.log("Socket connected, ID =", newSocket.id);
       set({ connected: true });
+      newSocket.emit("get_online_users");
     });
     newSocket.on("disconnect", () => {
       console.log("Socket disconnected");

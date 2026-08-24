@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { messageApi } from "@/api/messageApi";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Camera, Lock, Save, User as UserIcon, Mail, Phone, FileText, Loader2 } from "lucide-react";
@@ -69,14 +71,45 @@ function ProfilePage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", data.name.trim());
-    formData.append("bio", (data.bio || "").trim());
+    let avatarUrl: string | undefined = undefined;
+    let avatarKey: string | undefined = undefined;
+
     if (selectedFile) {
-      formData.append("avatar", selectedFile);
+      try {
+        const presignedRes = await messageApi.getPresignedUrl({
+          fileName: selectedFile.name,
+          fileType: selectedFile.type || "image/jpeg",
+          folder: "avatars",
+        });
+
+        const presignedData = presignedRes.data?.data;
+        if (presignedData?.uploadUrl) {
+          await axios.put(presignedData.uploadUrl, selectedFile, {
+            headers: {
+              "Content-Type": selectedFile.type || "image/jpeg",
+            },
+          });
+          avatarUrl = presignedData.fileUrl;
+          avatarKey = presignedData.key;
+        } else {
+          toast.error("Failed to obtain S3 presigned URL.");
+          return;
+        }
+      } catch (e: any) {
+        console.error("S3 upload error:", e);
+        const errMsg = e.response?.data?.message || e.message || "Failed to upload file to S3";
+        toast.error(`AWS S3 Upload Error: ${errMsg}`);
+        return;
+      }
     }
 
-    const res = await updateProfile(formData);
+    const res = await updateProfile({
+      name: data.name.trim(),
+      bio: (data.bio || "").trim(),
+      avatarUrl,
+      avatarKey,
+    });
+
     if (res.success) {
       toast.success(res.message || "Profile updated successfully!");
       setSelectedFile(null);

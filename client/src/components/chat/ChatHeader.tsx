@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowLeft, Users, Info } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
 import { Chat, User } from "@/types";
+import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
 export interface ChatHeaderProps {
   chat: Chat | null;
@@ -13,7 +14,7 @@ export interface ChatHeaderProps {
 
 function ChatHeader({
   chat,
-  currentUserId,
+  currentUserId: currentUserIdProp,
   onBack,
   setShowGroupInfo,
   isTyping,
@@ -22,7 +23,7 @@ function ChatHeader({
 
   if (!chat) return null;
 
-  const myId = currentUserId?.toString() || "";
+  const myId = getResolvedCurrentUserId(currentUserIdProp);
 
   const handleOpen = () => {
     if (setShowGroupInfo) {
@@ -79,28 +80,10 @@ function ChatHeader({
     );
   }
 
-  let otherUser: User | null = null;
-
-  if (Array.isArray(chat.members)) {
-    for (const member of chat.members) {
-      const userObj = typeof member.user === "object" ? (member.user as User) : null;
-      if (!userObj) continue;
-
-      const memberId = (userObj._id || userObj.id || "").toString();
-
-      if (memberId !== myId) {
-        otherUser = userObj;
-        break;
-      }
-    }
-  }
-
-  const displayUser =
-    otherUser ||
-    (typeof chat.members?.[0]?.user === "object" ? (chat.members[0].user as User) : null);
+  const displayUser = getOtherUser(chat, myId);
 
   const otherUserId = (displayUser?._id || displayUser?.id || "").toString();
-  const isOnline = onlineUserIds.includes(otherUserId);
+  const isOnline = onlineUserIds.includes(otherUserId) || Boolean(displayUser?.isOnline);
 
   let statusText = "Offline";
   if (isOnline) {

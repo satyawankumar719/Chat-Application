@@ -12,4 +12,6 @@ export const queryApi = {
         "Content-Type": "multipart/form-data",
       },
     }),
+  updateProfileJson: async (data: { name?: string; bio?: string; avatarUrl?: string; avatarKey?: string }) =>
+    apiClient.put(API_CONFIG.ENDPOINTS.USERS.PROFILE, data),
 };

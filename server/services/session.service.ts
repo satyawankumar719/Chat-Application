@@ -41,7 +41,6 @@ class SessionService {
     }
   }
 
-  // Verify if Refresh Token exists in Redis or MemCache
   async isRefreshTokenValid(userId: UserId, jti: string): Promise<boolean> {
     if (!userId || !jti) return false;
     const key = `refresh_token:${userId}:${jti}`;
@@ -68,7 +67,6 @@ class SessionService {
     return false;
   }
 
-  // Revoke Refresh Token on Logout
   async revokeRefreshToken(userId: UserId, jti: string): Promise<void> {
     if (!userId || !jti) return;
     const key = `refresh_token:${userId}:${jti}`;
@@ -87,7 +85,6 @@ class SessionService {
     }
   }
 
-  // --- Backward compatibility helpers ---
   async createSession(token: string, userId?: UserId): Promise<{ jti: string; userId: string } | null> {
     if (!token) return null;
     const decoded = jwt.decode(token) as any;
@@ -99,7 +96,7 @@ class SessionService {
   }
 
   async getSession(jti: string): Promise<boolean> {
-    return true; // Access tokens verified statelessly in CPU memory
+    return true; 
   }
 
   async deleteSession(tokenOrJti: string): Promise<void> {

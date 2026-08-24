@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import Invitation from "../models/Invitation.js";
 import Chat from "../models/Conversation.js";
 import { isUserOnline } from "../socket/userManager.js";
-import type { Types } from "mongoose";
+import mongoose, { type Types } from "mongoose";
 
 type UserId = string | Types.ObjectId;
 
@@ -10,6 +10,7 @@ export interface UpdateUserProfileInput {
   name?: string;
   bio?: string;
   avatarUrl?: string | null;
+  avatarKey?: string | null;
 }
 
 export interface SearchUserResult {
@@ -37,8 +38,12 @@ export const searchUsers = async (
   currentUserId: UserId,
   searchQuery?: string
 ): Promise<SearchUserResult[]> => {
+  const currentObjId = mongoose.Types.ObjectId.isValid(currentUserId.toString())
+    ? new mongoose.Types.ObjectId(currentUserId.toString())
+    : currentUserId;
+
   const filter: any = {
-    _id: { $ne: currentUserId },
+    _id: { $ne: currentObjId },
   };
 
   if (searchQuery && searchQuery.trim()) {
@@ -148,7 +153,7 @@ export const getUserProfileService = async (userId: UserId) => {
 
 export const updateUserProfileService = async (
   userId: UserId,
-  { name, bio, avatarUrl }: UpdateUserProfileInput
+  { name, bio, avatarUrl, avatarKey }: UpdateUserProfileInput
 ) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -166,7 +171,7 @@ export const updateUserProfileService = async (
   if (avatarUrl) {
     user.avatar = {
       url: avatarUrl,
-      publicId: "",
+      publicId: avatarKey || user.avatar?.publicId || "",
     };
   }
 

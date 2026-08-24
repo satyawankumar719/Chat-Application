@@ -26,8 +26,19 @@ async function socketAuthMiddleware(socket: AuthenticatedSocket, next: (err?: Er
   let token: string | undefined = socket.handshake.auth?.token;
 
   if (!token) {
+    const authHeader = socket.handshake?.headers?.authorization;
+    if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
+  }
+
+  if (!token) {
     const cookieHeader = socket.request?.headers?.cookie || socket.handshake?.headers?.cookie;
     token = getTokenFromCookie(cookieHeader) ?? undefined;
+  }
+
+  if (token && typeof token === "string" && token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
   }
 
   if (!token || token === "undefined" || token === "null" || token.trim() === "") {

@@ -1,19 +1,36 @@
 import express from 'express';
-import type { Request,Response,NextFunction,Application } from 'express';
+import type { Request, Response, NextFunction, Application } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import routes from './routes/index.routes.js';
+import { ENV } from './config/envConfig.js';
 
 const app: Application = express();
+
+const allowedOrigins = [
+  ENV.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+].filter(Boolean);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || ENV.NODE_ENV === "development") {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,8 +52,6 @@ app.get('/', (req: Request, res: Response) => {
     message: "Server is healthy"
   });
 });
-
-app.use('/uploads', express.static('uploads'));
 
 app.use('/api', routes);
 

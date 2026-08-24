@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import axios from "axios";
 import { messageApi } from "@/api/messageApi";
 import { useAuthStore } from "./authStore";
 import { useSocketStore } from "./socketStore";
@@ -70,78 +71,38 @@ async function uploadFileResumable(
   uploadId: string,
   signal?: AbortSignal
 ): Promise<Attachment> {
-  const CHUNK_SIZE = 1 * 1024 * 1024;
-  const fileType = file.type.startsWith("image") ? "image" : "file";
-  let startByte = 0;
-  let currentUploadId = uploadId;
+  const fileType = file.type.startsWith("image") ? "image" : file.type.startsWith("video") ? "video" : "file";
 
-  try {
-    const initRes = await messageApi.initUpload({ uploadId, chatId, fileName: file.name, fileSize: file.size, fileType });
-    const session = initRes.data?.data;
-    startByte = session?.uploadedBytes || 0;
-    currentUploadId = session?.uploadId || uploadId;
+  const presignedRes = await messageApi.getPresignedUrl({
+    fileName: file.name,
+    fileType: file.type || "application/octet-stream",
+  });
 
-    if (session?.status === "upload_completed" && session?.finalUrl) {
-      return { fileUrl: session.finalUrl, fileName: file.name, fileSize: file.size, type: fileType };
-    }
-  } catch (e) {}
-
-  const handleUnload = () => {
-    try {
-      const payload = JSON.stringify({ uploadId: currentUploadId });
-      if (navigator.sendBeacon) navigator.sendBeacon("/api/messages/upload/interrupt", payload);
-    } catch {}
-  };
-
-  window.addEventListener("beforeunload", handleUnload);
-
-  try {
-    while (startByte < file.size) {
-      if (signal?.aborted) throw new Error("ERR_CANCELED");
-
-      if (typeof navigator !== "undefined" && !navigator.onLine) {
-        onProgress({ loaded: startByte, total: file.size, isReconnecting: true });
-        await new Promise<void>((resolve) => {
-          const handleOnline = () => {
-            window.removeEventListener("online", handleOnline);
-            resolve();
-          };
-          window.addEventListener("online", handleOnline);
-        });
-
-        try {
-          const statusRes = await messageApi.getUploadStatus(currentUploadId);
-          startByte = statusRes.data?.data?.uploadedBytes || startByte;
-        } catch {}
-      }
-
-      const endByte = Math.min(file.size, startByte + CHUNK_SIZE);
-      const chunkBlob = file.slice(startByte, endByte);
-      const formData = new FormData();
-
-      formData.append("uploadId", currentUploadId);
-      formData.append("startByte", startByte.toString());
-      formData.append("chunk", chunkBlob, file.name);
-
-      const chunkRes = await messageApi.uploadChunk(formData, (pEvent) => {
-        const currentLoaded = pEvent.loaded || 0;
-        const totalLoaded = Math.min(file.size, startByte + currentLoaded);
-        onProgress({ loaded: totalLoaded, total: file.size, isReconnecting: false });
-      }, signal);
-
-      const chunkData = chunkRes.data?.data;
-
-      if (chunkData?.completed && chunkData?.fileUrl) {
-        return { fileUrl: chunkData.fileUrl, fileName: file.name, fileSize: file.size, type: fileType };
-      }
-
-      startByte = chunkData?.uploadedBytes || endByte;
-    }
-  } finally {
-    window.removeEventListener("beforeunload", handleUnload);
+  const presignedData = presignedRes.data?.data;
+  if (!presignedData?.uploadUrl) {
+    throw new Error("Failed to obtain presigned URL from server.");
   }
 
-  throw new Error("Upload ended without URL.");
+  await axios.put(presignedData.uploadUrl, file, {
+    headers: {
+      "Content-Type": file.type || "application/octet-stream",
+    },
+    onUploadProgress: (progressEvent) => {
+      onProgress({
+        loaded: progressEvent.loaded || 0,
+        total: progressEvent.total || file.size,
+        isReconnecting: false,
+      });
+    },
+    signal,
+  });
+
+  return {
+    fileUrl: presignedData.fileUrl,
+    fileName: file.name,
+    fileSize: file.size,
+    type: fileType,
+  };
 }
 
 function sortChatsByRecent(chatsArray: Chat[]): Chat[] {
@@ -423,6 +384,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       get().handleUserStatusChanged(data.userId, Boolean(data.isOnline), data.lastSeen);
     });
 
+    socket.emit("get_online_users");
+
     set({ socketListenersAttached: true });
   },
 
@@ -430,9 +393,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (!userId) return;
 
     const targetId = userId.toString();
-    const currentUserId = getCurrentUserId();
-
-    if (targetId === currentUserId?.toString()) return;
 
     set((state) => {
       let newOnlineIds = state.onlineUserIds || [];
@@ -453,7 +413,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       const response = await messageApi.getUserChats();
       const chats: Chat[] = response.data?.data || response.data || [];
-      const onlineIds = get().onlineUserIds || [];
+      const currentOnlineSet = new Set<string>(get().onlineUserIds || []);
+
+      chats.forEach((chat) => {
+        if (!chat || !chat.members) return;
+        chat.members.forEach((member) => {
+          const userObj = typeof member.user === "object" && member.user !== null ? (member.user as User) : null;
+          if (userObj && userObj.isOnline) {
+            const memberId = (userObj._id || userObj.id || "").toString();
+            if (memberId) currentOnlineSet.add(memberId);
+          }
+        });
+      });
+
+      const updatedOnlineIds = Array.from(currentOnlineSet);
 
       const updatedChats = chats.map((chat) => {
         if (!chat || !chat.members) return chat;
@@ -461,7 +434,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           const userObj = typeof member.user === "object" && member.user !== null ? (member.user as User) : null;
           if (!userObj) return member;
           const memberId = (userObj._id || userObj.id || "").toString();
-          const isOnline = onlineIds.includes(memberId);
+          const isOnline = updatedOnlineIds.includes(memberId) || Boolean(userObj.isOnline);
           return {
             ...member,
             user: {
@@ -473,7 +446,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         return { ...chat, members: newMembers };
       });
 
-      set({ chats: sortChatsByRecent(updatedChats) });
+      set({ onlineUserIds: updatedOnlineIds, chats: sortChatsByRecent(updatedChats) });
 
       let savedSelectedChatId = get().selectedChatId;
       if (!savedSelectedChatId && typeof window !== "undefined") {

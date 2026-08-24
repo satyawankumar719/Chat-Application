@@ -20,7 +20,11 @@ const envSchema = z.object({
     EMAIL_USER:z.string().nonempty("EMAIL_USER is required"),
     EMAIL_PASS:z.string().nonempty("EMAIL_PASS is required"),
     REDIS_URL:z.string().nonempty("REDIS_URL is required"),
-    CLIENT_URL:z.string().default("http://localhost:5173")
+    CLIENT_URL:z.string().default("http://localhost:5173"),
+    AWS_ACCESS_KEY_ID: z.string().optional().default(""),
+    AWS_SECRET_ACCESS_KEY: z.string().optional().default(""),
+    AWS_REGION: z.string().optional().default("us-east-1"),
+    AWS_S3_BUCKET_NAME: z.string().optional().default("")
 })
 
 export const ENV=envSchema.parse(process.env);
