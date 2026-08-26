@@ -8,22 +8,22 @@ import { logger } from "../logger.js";
 import cacheService, { CACHE_KEYS, CACHE_TTL } from "./cache.service.js";
 
 
- export interface SignupInterface{
-    name :string;
-    email : string;
+export interface SignupInterface {
+    name: string;
+    email: string;
     password: string;
-    phoneNumber:string;
-    isVerified : boolean;
+    phoneNumber: string;
+    isVerified: boolean;
 }
- 
-const sanitizeUser = (user : any ) => {
+
+const sanitizeUser = (user: any) => {
     if (!user) return null;
     const u = typeof user.toObject === "function" ? user.toObject() : user;
-    const { password, __v, ...safeUser } = u;
+    const { password: _password, __v, ...safeUser } = u;
     return { ...safeUser, id: u._id };
 };
 
-export const login = async (data : SignupInterface) => {
+export const login = async (data: SignupInterface) => {
     const { email, password } = data;
     if (!email || !password) {
         throw { status: 400, message: "Email and password are required" };
@@ -33,30 +33,36 @@ export const login = async (data : SignupInterface) => {
     if (!user || !user.password) {
         throw { status: 401, message: "Invalid email or password" };
     }
-    if (!user.isVerified) {
-        throw { status: 403, message: "Please verify your email before logging in" };
-    }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
         throw { status: 401, message: "Invalid email or password" };
     }
 
+    if (!user.isVerified) {
+        await sendOtpToEmail(normalizedEmail);
+        throw {
+            status: 403,
+            message: "Email not verified. A new OTP has been sent to your email.",
+            isVerified: false,
+            email: normalizedEmail,
+        };
+    }
+
     return sanitizeUser(user);
 };
 
-export const sendOtpToEmail = async (email :string ) => {
+export const sendOtpToEmail = async (email: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser && existingUser.isVerified) {
         throw { status: 409, message: "User with this email already exists" };
     }
 
-    const OTP : string = generateOtp();
+    const OTP: string = generateOtp();
     await redisClient.set(`otp:${normalizedEmail}`, OTP, { EX: 300 });
 
     const html = otpEmailTemplate(OTP);
-    
+
     try {
         await sendEmail(normalizedEmail, "Your OTP Code", html);
         return { success: true, message: "OTP sent successfully" };
@@ -70,6 +76,7 @@ export const verifyEmailOtp = async (email: string, otp: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     const cleanOtp = otp.trim();
     const storedOtp = await redisClient.get(`otp:${normalizedEmail}`);
+    console.log(storedOtp,cleanOtp)
     if (!storedOtp || storedOtp !== cleanOtp) {
         throw { status: 400, message: "Invalid or expired OTP" };
     }
@@ -86,7 +93,7 @@ export const verifyEmailOtp = async (email: string, otp: string) => {
     return sanitizeUser(user);
 };
 
-export const signup = async (data : SignupInterface) => {
+export const signup = async (data: SignupInterface) => {
     const { name, email, password, phoneNumber } = data;
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -96,14 +103,14 @@ export const signup = async (data : SignupInterface) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-   
+
     if (user) {
         user.name = name;
         user.password = hashedPassword;
         user.phoneNumber = phoneNumber || user.phoneNumber;
         user.isVerified = false;
         await user.save();
-          
+
     } else {
         user = await User.create({
             name,
@@ -124,7 +131,7 @@ export const signup = async (data : SignupInterface) => {
     };
 };
 
-export const fetchUser = async (userId :string) => {
+export const fetchUser = async (userId: string) => {
     const cacheKey = CACHE_KEYS.USER_PROFILE(userId);
 
     return cacheService.getOrSet(
@@ -140,7 +147,7 @@ export const fetchUser = async (userId :string) => {
     );
 };
 
-export const sendForgotPasswordOtp = async (email :string) => {
+export const sendForgotPasswordOtp = async (email: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     const user = await User.findOne({ email: normalizedEmail, isVerified: true });
     if (!user) {
@@ -151,7 +158,7 @@ export const sendForgotPasswordOtp = async (email :string) => {
     await redisClient.set(`reset-otp:${normalizedEmail}`, OTP, { EX: 600 });
 
     const html = otpEmailTemplate(OTP);
-    
+
     try {
         await sendEmail(normalizedEmail, "Reset Your Password - OTP", html);
         return { success: true, message: "Password reset OTP sent to your email" };
@@ -161,7 +168,7 @@ export const sendForgotPasswordOtp = async (email :string) => {
     }
 };
 
-export const resetPasswordService = async (email :string, otp:string, newPassword:string) => {
+export const resetPasswordService = async (email: string, otp: string, newPassword: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     const cleanOtp = otp.trim();
 

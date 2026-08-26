@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowLeft, Users, Info } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
-import { Chat, User } from "@/types";
+import { Chat } from "@/types";
 import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
 export interface ChatHeaderProps {

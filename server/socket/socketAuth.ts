@@ -69,7 +69,7 @@ async function socketAuthMiddleware(socket: AuthenticatedSocket, next: (err?: Er
     socket.user = dbUser;
     socket.authToken = token;
     next();
-  } catch (error) {
+  } catch {
     next(new Error("UNAUTHORIZED: Invalid token"));
   }
 }

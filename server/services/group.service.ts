@@ -82,7 +82,7 @@ async function createSystemMessage(
 
     const populatedMessage = await Message.findById(
       systemMessage._id
-    ).populate("sender", "name email avatar");
+      ).populate( "sender", "name email avatar");
 
     return populatedMessage;
   } catch (error) {

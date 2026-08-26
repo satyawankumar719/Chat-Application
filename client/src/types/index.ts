@@ -34,6 +34,7 @@ export interface AuthResult {
   message?: string;
   user?: User | null;
   email?: string;
+  isVerified?: boolean;
   errors?: ApiFieldError[] | null;
 }
 

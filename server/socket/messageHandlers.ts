@@ -1,5 +1,4 @@
 import type { Server } from "socket.io";
-import redisClient from "../config/redis.js";
 import { logger } from "../logger.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
@@ -12,7 +11,7 @@ import {
   notifyMessageSenders,
 } from "./socketHelpers.js";
 import { isUserOnline } from "./userManager.js";
-import cacheService, { CACHE_KEYS, CACHE_TTL } from "../services/cache.service.js";
+import cacheService from "../services/cache.service.js";
 
 interface sendMessageI {
   chatId: string;
@@ -125,7 +124,7 @@ function handleSendMessage(io: Server, socket: any, currentUserId: string) {
     try {
       try {
         await validateSocketUser(socket, messageData, currentUserId);
-      } catch (authErr) {
+      } catch {
         socket.emit("auth_error", { message: "Session expired or invalid token" });
         return acknowledge?.({
           success: false,

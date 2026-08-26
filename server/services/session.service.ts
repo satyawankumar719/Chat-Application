@@ -95,7 +95,7 @@ class SessionService {
     return { jti: decoded.jti, userId: uid };
   }
 
-  async getSession(jti: string): Promise<boolean> {
+  async getSession(_jti: string): Promise<boolean> {
     return true; 
   }
 

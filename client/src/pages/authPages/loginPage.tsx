@@ -56,6 +56,15 @@ export function LoginPage() {
       }, 500);
     } else {
       const errMsg = result.message || "Failed to log in. Please check your credentials.";
+
+      if (result.isVerified === false) {
+        const targetEmail = result.email || data.email.trim();
+        toast.info(errMsg);
+        localStorage.setItem("pendingEmail", targetEmail);
+        navigate("/verify-otp", { state: { email: targetEmail } });
+        return;
+      }
+
       setFeedback({ type: "error", message: errMsg });
       setError("root", { type: "manual", message: errMsg });
       toast.error(errMsg);

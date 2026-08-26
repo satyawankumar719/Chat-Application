@@ -6010,3 +6010,161 @@
 {"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bec9987b4445e6da9d88b"}
 {"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:profile:6a8bec9987b4445e6da9d88b"}
 {"level":"info","message":"[CACHE HIT - MEMCACHE] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"Server is running on port 5000"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8e7df8d8580f7116780dda:e1cc96b4-6acb-4b45-a18e-66ee8110d349 (TTL: 604800s)"}
+{"level":"info","message":"Socket Connected: 6RjGFHKZXhLArJcbAAAC (User: 6a8e7df8d8580f7116780dda)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"Socket Connected: NoSVJQyepCV8mM_BAAAG (User: 6a8bee03c4654bec2e543957)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[REFRESH TOKEN REVOKED - REDIS] Key: refresh_token:6a8bee03c4654bec2e543957:20f909c1-bf67-4254-b5a2-94dacb4e6040"}
+{"level":"info","message":"Socket Disconnected: NoSVJQyepCV8mM_BAAAG (User: 6a8bee03c4654bec2e543957)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bee03c4654bec2e543957"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8bec9987b4445e6da9d88b:d1947b80-360e-4639-a48a-9c0a457e3041 (TTL: 604800s)"}
+{"level":"info","message":"Socket Connected: a2BMS1PsbvMKYMXoAAAO (User: 6a8bec9987b4445e6da9d88b)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a8e8422aabeb3c443bc603f:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a8e8422aabeb3c443bc603f:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: chat:messages:6a8beeccc4654bec2e54395a:limit50"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: chat:messages:6a8e8422aabeb3c443bc603f:limit50"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"Socket Connected: dqcncsMuKTKcvs5rAAAS (User: 6a8e7df8d8580f7116780dda)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[REFRESH TOKEN REVOKED - REDIS] Key: refresh_token:6a8e7df8d8580f7116780dda:e1cc96b4-6acb-4b45-a18e-66ee8110d349"}
+{"level":"info","message":"Socket Disconnected: dqcncsMuKTKcvs5rAAAS (User: 6a8e7df8d8580f7116780dda)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e7df8d8580f7116780dda"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8e86c6aabeb3c443bc604e:b84bb052-96d7-419f-96a5-983aced5104e (TTL: 604800s)"}
+{"level":"info","message":"Socket Connected: Pjlw3d0Ji0UFDoK1AAAZ (User: 6a8e86c6aabeb3c443bc604e)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e86c6aabeb3c443bc604e"}
+{"level":"info","message":"[REFRESH TOKEN REVOKED - REDIS] Key: refresh_token:6a8bec9987b4445e6da9d88b:d1947b80-360e-4639-a48a-9c0a457e3041"}
+{"level":"info","message":"Socket Disconnected: a2BMS1PsbvMKYMXoAAAO (User: 6a8bec9987b4445e6da9d88b)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8bec9987b4445e6da9d88b"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8e8751aabeb3c443bc604f:3c1a91dd-1c1c-4560-81d7-8837bcc27ca3 (TTL: 604800s)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"Socket Connected: kCFWVFDhO_TRWD4TAAAg (User: 6a8e8751aabeb3c443bc604f)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[REFRESH TOKEN REVOKED - REDIS] Key: refresh_token:6a8e8751aabeb3c443bc604f:3c1a91dd-1c1c-4560-81d7-8837bcc27ca3"}
+{"level":"info","message":"Socket Disconnected: kCFWVFDhO_TRWD4TAAAg (User: 6a8e8751aabeb3c443bc604f)"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e8751aabeb3c443bc604f"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8e87ceaabeb3c443bc6050:c82840df-54b0-4f09-8d73-deec1c900fd6 (TTL: 604800s)"}
+{"level":"info","message":"Socket Connected: jAwzJaIwTd48ZfKxAAAn (User: 6a8e87ceaabeb3c443bc6050)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"Socket Disconnected: Pjlw3d0Ji0UFDoK1AAAZ (User: 6a8e86c6aabeb3c443bc604e)"}
+{"level":"info","message":"Socket Disconnected: jAwzJaIwTd48ZfKxAAAn (User: 6a8e87ceaabeb3c443bc6050)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:profile:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"Socket Connected: LODUrXtXnQILDDKnAAAq (User: 6a8e87ceaabeb3c443bc6050)"}
+{"level":"info","message":"Socket Connected: 2PCV1xbtYy4MzXY-AAAs (User: 6a8e87ceaabeb3c443bc6050)"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e87ceaabeb3c443bc6050"}
+{"level":"info","message":"[REFRESH TOKEN STORED - REDIS] Key: refresh_token:6a8e8d56aabeb3c443bc6051:13d5a503-cf31-4ae6-a2a0-6f6b2ccef390 (TTL: 604800s)"}
+{"level":"info","message":"Socket Connected: aUxaV5Imo7iIWbU4AAAv (User: 6a8e8d56aabeb3c443bc6051)"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE MISS] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE MISS] Key: user:profile:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[FETCHING FROM MONGODB] Key: user:profile:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}
+{"level":"info","message":"[CACHE HIT - REDIS] Key: user:conversations:6a8e8d56aabeb3c443bc6051"}

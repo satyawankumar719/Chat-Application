@@ -15,7 +15,6 @@ async function handleUserConnect(io:Server, socket:any, currentUserId:string) {
     });
   }
 
-  // --- US-13: Cache Online User Status ---
   await cacheService.set(
     CACHE_KEYS.ONLINE_STATUS(currentUserId),
     { isOnline: true },
@@ -35,9 +34,8 @@ async function handleUserConnect(io:Server, socket:any, currentUserId:string) {
     CACHE_TTL.ONLINE_STATUS
   );
 
-  // Broadcast updated online user list to ALL connected sockets
-  io.emit("get_online_users", onlineUserIds);
-
+  io.emit("get_online_users", onlineUserIds)
+;
   socket.join(`user:${currentUserId}`);
   await deliverPendingMessages(currentUserId);
 }
@@ -62,7 +60,6 @@ async function handleUserDisconnect(io: Server, socket: any, currentUserId: stri
       lastSeen,
     });
 
-    // --- US-13: Cache Offline User Status ---
     await cacheService.set(
       CACHE_KEYS.ONLINE_STATUS(currentUserId),
       { isOnline: false, lastSeen },
@@ -83,7 +80,6 @@ async function handleUserDisconnect(io: Server, socket: any, currentUserId: stri
       lastSeen,
     });
 
-    // Broadcast updated online user list to ALL connected sockets
     io.emit("get_online_users", onlineUserIds);
 
   } catch (error) {

@@ -7,7 +7,7 @@ import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import GroupInfoModal from "@/components/groupChat/GroupInfoModal";
-import { Chat, ChatMessage, User } from "@/types";
+import { Chat, User } from "@/types";
 
 export interface ChatContainerProps {
   chat: Chat | null;

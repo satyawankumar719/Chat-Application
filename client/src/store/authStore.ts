@@ -40,6 +40,8 @@ function handleError(error: any): AuthResult {
     success: false,
     message: message,
     errors: errors,
+    isVerified: error?.response?.data?.isVerified,
+    email: error?.response?.data?.email,
   };
 }
 

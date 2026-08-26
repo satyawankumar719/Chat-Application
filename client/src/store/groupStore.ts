@@ -2,9 +2,9 @@ import { create } from "zustand";
 import { groupApi } from "@/api/groupApi";
 import { useChatStore } from "./chatStore";
 import { useSocketStore } from "./socketStore";
-import { GroupState, Chat, Invitation } from "@/types";
+import { GroupState, Chat } from "@/types";
 
-export const useGroupStore = create<GroupState>((set, get) => ({
+export const useGroupStore = create<GroupState>((set) => ({
   loading: false,
   error: null,
 

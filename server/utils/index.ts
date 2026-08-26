@@ -33,7 +33,7 @@ export const verifyToken = <T = TokenPayload>(token: string): T => {
     }
     try {
         return jwt.verify(token, ENV.JWT_SECRET) as T;
-    } catch (error) {
+    } catch {
         throw { status: 401, message: "Invalid or expired token" };
     }
 }

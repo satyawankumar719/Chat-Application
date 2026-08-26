@@ -18,7 +18,6 @@ export default function GroupChat() {
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "managed" | "member">("all");
-  const [showGroupInfo, setShowGroupInfo] = useState(false);
 
   useEffect(() => {
     if (!checkingAuth && !user) {
@@ -44,7 +43,7 @@ export default function GroupChat() {
         setSelectedChatId(null);
       }
     }
-  }, [chats, selectedChatId, loadingChats, setSelectedChatId]);
+  }, [chats, selectedChatId, loadingChats, setSelectedChatId, groupChats]);
 
   const filteredGroups = groupChats.filter((group) => {
     const matchesSearch =
@@ -281,7 +280,7 @@ export default function GroupChat() {
             } md:flex h-full flex-1`}
         >
           {selectedGroup ? (
-            <ChatContainer chat={selectedGroup} onBack={handleBack} setShowGroupInfo={setShowGroupInfo} />
+            <ChatContainer chat={selectedGroup} onBack={handleBack} />
           ) : (
             <div className="flex flex-col items-center justify-center h-full w-full p-8 text-center bg-muted/10">
               <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary mb-4">

@@ -26,7 +26,7 @@ function InvitationCard({
     setActionState("accept");
     try {
       await onAccept(invitation._id);
-    } catch (err) {
+    } catch {
       setActionState(null);
     }
   };
@@ -37,7 +37,7 @@ function InvitationCard({
     setActionState("decline");
     try {
       await onReject(invitation._id);
-    } catch (err) {
+    } catch {
       setActionState(null);
     }
   };

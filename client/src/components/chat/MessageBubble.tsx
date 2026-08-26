@@ -191,6 +191,7 @@ export interface MessageBubbleProps {
 
 function MessageBubble({ message, isMine, isGroup }: MessageBubbleProps) {
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+  const connected = useSocketStore((state) => state.connected);
 
   if (message.type === "system") {
     return (
@@ -203,7 +204,6 @@ function MessageBubble({ message, isMine, isGroup }: MessageBubbleProps) {
     );
   }
 
-  const connected = useSocketStore((state) => state.connected);
   const isReconnecting = message.isReconnecting || !connected;
   const attachmentsBlock = renderAttachmentList(message, connected);
   let showContent = true;

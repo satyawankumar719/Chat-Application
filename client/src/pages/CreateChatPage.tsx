@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { UserPlus, Search, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SearchResultCard from "@/components/chat/chatListContainer/searchResultCard";
@@ -22,7 +22,7 @@ function CreateChatPage() {
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState<"info" | "error" | "success">("info");
   
-  const handleSearch = async (value: string) => {
+  const handleSearch = useCallback(async (value: string) => {
     const searchValue = value.trim();
 
     if (!searchValue) {
@@ -50,14 +50,14 @@ function CreateChatPage() {
       }
 
       setSearchResults(filteredUsers);
-    } catch (error) {
+    } catch {
       setSearchResults([]);
       setFeedback("Something went wrong searching users.");
       setFeedbackType("error");
     } finally {
       setSearching(false);
     }
-  };
+  }, [currentUserId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -65,7 +65,7 @@ function CreateChatPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, handleSearch]);
 
   const handleInvite = async (id: string) => {
     try {

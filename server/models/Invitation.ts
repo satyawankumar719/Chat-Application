@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 export type InvitationType = "direct" | "group";
 export type InvitationStatus = "pending" | "accepted" | "rejected" | "expired";

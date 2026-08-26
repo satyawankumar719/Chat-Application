@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 export type MemberRole = "owner" | "admin" | "member";
 export type ChatType = "direct" | "group";

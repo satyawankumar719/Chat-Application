@@ -66,7 +66,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
         const res = await queryApi.searchUsers(trimmedQuery);
         let users: User[] = res.data?.data || res.data || [];
         setSearchResults(users.filter((u) => (u._id || u.id)?.toString() !== currentUserId));
-      } catch (err) {
+      } catch {
         setSearchResults([]);
       } finally {
         setSearching(false);

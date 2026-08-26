@@ -1,7 +1,7 @@
 import React, { memo } from "react";
-import { Circle, Clock } from "lucide-react";
+import { Circle } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
-import { Chat, User } from "@/types";
+import { Chat } from "@/types";
 import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
 export interface ChatCardProps {
