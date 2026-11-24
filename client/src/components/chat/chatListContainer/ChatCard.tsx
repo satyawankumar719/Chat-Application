@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Circle, Check, CheckCheck } from "lucide-react";
+import { Check, CheckCheck } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
 import { Chat } from "@/types";
 import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
@@ -31,7 +31,9 @@ const ChatCard = ({
   const isOnline = Boolean(isOnlineInStore);
 
   const lastSender = chat.lastMessage?.sender;
-  const senderId = (typeof lastSender === "object" ? (lastSender?._id || lastSender?.id) : lastSender)?.toString() || "";
+  const senderId =
+    (typeof lastSender === "object" ? lastSender?._id || lastSender?.id : lastSender)?.toString() ||
+    "";
 
   const isMine = Boolean(senderId && currentUserId && senderId === currentUserId);
   const isSystemMsg = chat.lastMessage?.type === "system";
@@ -52,8 +54,9 @@ const ChatCard = ({
   }
 
   const isGroup = chat.type === "group";
-  const title = isGroup ? chat.name || "Group Chat" : (displayUser?.name || "Unknown User");
-  const avatarUrl = typeof displayUser?.avatar === "string" ? displayUser.avatar : displayUser?.avatar?.url;
+  const title = isGroup ? chat.name || "Group Chat" : displayUser?.name || "Unknown User";
+  const avatarUrl =
+    typeof displayUser?.avatar === "string" ? displayUser.avatar : displayUser?.avatar?.url;
   const isSelected = selectedChatId === chat._id;
 
   return (
@@ -87,12 +90,12 @@ const ChatCard = ({
       {/* WhatsApp Message Metadata & Snippet */}
       <div className="min-w-0 flex-1">
         <div className="flex justify-between items-baseline mb-0.5">
-          <p className="truncate font-semibold text-sm text-foreground">
-            {title}
-          </p>
+          <p className="truncate font-semibold text-sm text-foreground">{title}</p>
 
           {time && (
-            <span className={`text-[11px] shrink-0 font-medium ${unread > 0 ? "text-primary font-bold" : "text-muted-foreground"}`}>
+            <span
+              className={`text-[11px] shrink-0 font-medium ${unread > 0 ? "text-primary font-bold" : "text-muted-foreground"}`}
+            >
               {new Date(time).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -103,18 +106,16 @@ const ChatCard = ({
 
         <div className="flex items-center justify-between gap-1">
           <div className="flex items-center gap-1 min-w-0 flex-1">
-            {isMine && !isSystemMsg && (
-              chat.lastMessage?.status === "read" ? (
+            {isMine &&
+              !isSystemMsg &&
+              (chat.lastMessage?.status === "read" ? (
                 <CheckCheck className="h-3.5 w-3.5 text-sky-400 shrink-0" />
               ) : chat.lastMessage?.status === "delivered" ? (
                 <CheckCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               ) : (
                 <Check className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              )
-            )}
-            <p className="truncate text-xs text-muted-foreground">
-              {message}
-            </p>
+              ))}
+            <p className="truncate text-xs text-muted-foreground">{message}</p>
           </div>
 
           {unread > 0 && (

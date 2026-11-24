@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
-import { MessageSquare, Lock, ShieldCheck, Laptop } from "lucide-react";
+import { Lock, ShieldCheck, Laptop } from "lucide-react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
@@ -15,7 +15,11 @@ export interface ChatContainerProps {
   setShowGroupInfo?: (show: boolean) => void;
 }
 
-function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }: ChatContainerProps) {
+function ChatContainer({
+  chat,
+  onBack,
+  setShowGroupInfo: setShowGroupInfoProp,
+}: ChatContainerProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const currentChatIdRef = useRef<string | null>(null);
@@ -30,13 +34,8 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
   const { user } = useAuthStore();
   const { socket, markMessagesRead } = useSocketStore();
 
-  const {
-    messages,
-    loadingMessages,
-    sendingMessage,
-    sendMessage,
-    loadMoreMessages,
-  } = useChatStore();
+  const { messages, loadingMessages, sendingMessage, sendMessage, loadMoreMessages } =
+    useChatStore();
 
   const currentUserId = user?._id || user?.id;
 
@@ -76,8 +75,17 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
   useEffect(() => {
     if (!chat?._id || !messages || messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
-    const senderId = (typeof lastMsg.sender === "object" ? (lastMsg.sender?._id || lastMsg.sender?.id) : lastMsg.sender)?.toString();
-    if (senderId && currentUserId && senderId !== currentUserId.toString() && lastMsg.status !== "read") {
+    const senderId = (
+      typeof lastMsg.sender === "object"
+        ? lastMsg.sender?._id || lastMsg.sender?.id
+        : lastMsg.sender
+    )?.toString();
+    if (
+      senderId &&
+      currentUserId &&
+      senderId !== currentUserId.toString() &&
+      lastMsg.status !== "read"
+    ) {
       markMessagesRead(chat._id);
     }
   }, [messages, chat?._id, currentUserId, markMessagesRead]);
@@ -90,9 +98,7 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
           <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary ring-12 ring-primary/5">
             <Laptop className="h-12 w-12" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            ChatApp Web
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">ChatApp Web</h2>
           <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
             Send and receive messages seamlessly without keeping your phone online.
           </p>
@@ -117,16 +123,13 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
       const msg = messages[i];
 
       const senderObj = msg?.sender;
-      const senderId = (
-        typeof senderObj === "object"
-          ? ((senderObj as User)?._id || (senderObj as User)?.id)
+      const senderId =
+        (typeof senderObj === "object"
+          ? (senderObj as User)?._id || (senderObj as User)?.id
           : senderObj
-      )?.toString() || "";
+        )?.toString() || "";
 
-      const isFromOther =
-        senderId &&
-        currentUserId &&
-        senderId !== currentUserId.toString();
+      const isFromOther = senderId && currentUserId && senderId !== currentUserId.toString();
 
       const isRead =
         msg.status === "read" ||
@@ -171,17 +174,9 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
         isGroup={chat.type === "group"}
       />
 
-      <MessageInput
-        chat={chat}
-        onSendMessage={sendMessage}
-        sendingMessage={sendingMessage}
-      />
+      <MessageInput chat={chat} onSendMessage={sendMessage} sendingMessage={sendingMessage} />
 
-      <GroupInfoModal
-        isOpen={showGroupInfo}
-        onClose={() => setShowGroupInfo(false)}
-        chat={chat}
-      />
+      <GroupInfoModal isOpen={showGroupInfo} onClose={() => setShowGroupInfo(false)} chat={chat} />
     </div>
   );
 }

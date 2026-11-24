@@ -9,7 +9,6 @@ import {
   Sun,
   Moon,
   LogOut,
-  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
@@ -26,7 +25,8 @@ function AppLayout() {
   const { user, logout } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
   const { connectSocket, socket } = useSocketStore();
-  const { pendingInvitations, fetchPendingInvitations, initInvitationListeners } = useInvitationStore();
+  const { pendingInvitations, fetchPendingInvitations, initInvitationListeners } =
+    useInvitationStore();
   const { chats, fetchChats, initSocketListeners } = useChatStore();
   const { initGroupListeners } = useGroupStore();
 
@@ -83,7 +83,9 @@ function AppLayout() {
       isActive ? "text-primary" : "text-muted-foreground"
     }`;
 
-  const isChatDetailPage = location.pathname.startsWith("/chats") && Boolean(new URLSearchParams(location.search).get("chatId"));
+  const isChatDetailPage =
+    location.pathname.startsWith("/chats") &&
+    Boolean(new URLSearchParams(location.search).get("chatId"));
 
   return (
     <div className="h-screen h-dvh w-screen overflow-hidden flex bg-background text-foreground transition-colors duration-200">
