@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { PlusCircle, Users, MessageSquarePlus } from "lucide-react";
+import { Users, MessageSquarePlus } from "lucide-react";
 import ChatList from "@/components/chat/chatListContainer/ChatList";
 import ChatContainer from "@/components/chat/ChatContainer";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
-import { Button } from "@/components/ui/button";
 
 function ChatsPage() {
   const navigate = useNavigate();
@@ -13,12 +12,7 @@ function ChatsPage() {
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const { user, checkingAuth } = useAuthStore();
 
-  const {
-    chats,
-    selectedChatId,
-    loadingChats,
-    setSelectedChatId,
-  } = useChatStore();
+  const { chats, selectedChatId, loadingChats, setSelectedChatId } = useChatStore();
 
   useEffect(() => {
     if (!checkingAuth && !user) {
