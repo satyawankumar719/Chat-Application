@@ -183,7 +183,9 @@ const messageSchema = new Schema<IMessage>(
   }
 );
 
+messageSchema.index({ chat: 1, _id: -1 });
 messageSchema.index({ chat: 1, createdAt: -1 });
+messageSchema.index({ chat: 1, status: 1 });
 messageSchema.index({ sender: 1 });
 
 const Message = mongoose.model<IMessage>("Message", messageSchema);

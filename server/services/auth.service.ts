@@ -20,7 +20,8 @@ const sanitizeUser = (user: any) => {
     if (!user) return null;
     const u = typeof user.toObject === "function" ? user.toObject() : user;
     const { password: _password, __v, ...safeUser } = u;
-    return { ...safeUser, id: u._id };
+    const stringId = u._id ? u._id.toString() : (u.id ? u.id.toString() : "");
+    return { ...safeUser, id: stringId, _id: stringId };
 };
 
 export const login = async (data: SignupInterface) => {
@@ -96,10 +97,18 @@ export const verifyEmailOtp = async (email: string, otp: string) => {
 export const signup = async (data: SignupInterface) => {
     const { name, email, password, phoneNumber } = data;
     const normalizedEmail = email.trim().toLowerCase();
+    const cleanPhone = phoneNumber ? phoneNumber.trim() : "";
 
     let user = await User.findOne({ email: normalizedEmail });
     if (user && user.isVerified) {
         throw { status: 409, message: "User with this email already exists" };
+    }
+
+    if (cleanPhone) {
+        const existingPhone = await User.findOne({ phoneNumber: cleanPhone, isVerified: true });
+        if (existingPhone && (!user || existingPhone._id.toString() !== user._id.toString())) {
+            throw { status: 409, message: "Phone number is already registered. Please use another one." };
+        }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -107,18 +116,21 @@ export const signup = async (data: SignupInterface) => {
     if (user) {
         user.name = name;
         user.password = hashedPassword;
-        user.phoneNumber = phoneNumber || user.phoneNumber;
+        if (cleanPhone) user.phoneNumber = cleanPhone;
         user.isVerified = false;
         await user.save();
 
     } else {
-        user = await User.create({
+        const createPayload: Record<string, any> = {
             name,
             email: normalizedEmail,
             password: hashedPassword,
-            phoneNumber,
             isVerified: false,
-        });
+        };
+        if (cleanPhone) {
+            createPayload.phoneNumber = cleanPhone;
+        }
+        user = await User.create(createPayload);
     }
 
     const otpResult = await sendOtpToEmail(normalizedEmail);
@@ -131,15 +143,17 @@ export const signup = async (data: SignupInterface) => {
     };
 };
 
-export const fetchUser = async (userId: string) => {
-    const cacheKey = CACHE_KEYS.USER_PROFILE(userId);
+export const fetchUser = async (userId: string | any) => {
+    if (!userId) return null;
+    const uid = userId.toString();
+    const cacheKey = CACHE_KEYS.USER_PROFILE(uid);
 
     return cacheService.getOrSet(
         cacheKey,
         async () => {
-            const user = await User.findById(userId).select("-password");
+            const user = await User.findById(uid).select("-password").lean();
             if (!user) {
-                throw { status: 404, message: "User not found" };
+                return null;
             }
             return sanitizeUser(user);
         },

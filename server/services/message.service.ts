@@ -23,12 +23,17 @@ export const getUserChatsService = async (userId: UserId) => {
           select: "name avatar"
         }
       })
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
-    return chats.map((chat) => {
-      const chatObj: any = chat.toObject({ flattenMaps: true });
-      if (chat.unreadCount && typeof chat.unreadCount.get === "function") {
-        chatObj.unreadCount = Object.fromEntries(chat.unreadCount);
+    return chats.map((chat: any) => {
+      const chatObj = { ...chat };
+      if (chat.unreadCount) {
+        if (typeof chat.unreadCount.get === "function") {
+          chatObj.unreadCount = Object.fromEntries(chat.unreadCount);
+        } else if (chat.unreadCount instanceof Map) {
+          chatObj.unreadCount = Object.fromEntries(chat.unreadCount);
+        }
       }
       return chatObj;
     });
@@ -83,14 +88,16 @@ export const getChatMessagesService = async (
     }
   }
 
-  const chat = await Chat.findOne({ _id: chatId, "members.user": userId, isActive: true });
+  const chat = await Chat.findOne({ _id: chatId, "members.user": userId, isActive: true })
+    .select("_id type members")
+    .lean();
   if (!chat) {
     throw { status: 403, message: "Forbidden: You are not authorized to view messages in this chat." };
   }
 
   const query: any = { chat: chatId };
 
-  if (chat.type === "group") {
+  if (chat.type === "group" && chat.members) {
     const memberObj = chat.members.find(
       (m: any) => (m.user?._id || m.user?.id || m.user).toString() === userId.toString()
     );
@@ -105,7 +112,8 @@ export const getChatMessagesService = async (
     .populate("sender", "name email avatar")
     .sort({ _id: -1 })
     .skip(skip)
-    .limit(safeLimit + 1);
+    .limit(safeLimit + 1)
+    .lean();
 
   const hasMore = messages.length > safeLimit;
 

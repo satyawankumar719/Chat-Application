@@ -104,8 +104,10 @@ const chatSchema = new Schema<IChat>(
   }
 );
 
+chatSchema.index({ "members.user": 1, isActive: 1, updatedAt: -1 });
 chatSchema.index({ "members.user": 1 });
 chatSchema.index({ updatedAt: -1 });
+chatSchema.index({ type: 1, "members.user": 1 });
 
 const Chat = mongoose.model<IChat>("Chat", chatSchema);
 

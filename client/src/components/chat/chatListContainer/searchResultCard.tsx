@@ -1,6 +1,7 @@
 import React from "react";
 import { UserPlus } from "lucide-react";
 import { User } from "@/types";
+import { useChatStore } from "@/store/chatStore";
 
 export interface SearchResultCardProps {
   person: User & { connectionStatus?: string };
@@ -16,6 +17,7 @@ function SearchResultCard({
   onInvite,
 }: SearchResultCardProps) {
   const id = (person._id || person.id || "").toString();
+  const isOnline = useChatStore((state) => (id ? state.onlineUserIds?.includes(id) : false));
   const status = person.connectionStatus;
 
   const disabled =
@@ -37,7 +39,7 @@ function SearchResultCard({
         <div className="flex items-center gap-2">
           <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
             {person.name?.charAt(0)?.toUpperCase() || "U"}
-            {person.isOnline && (
+            {isOnline && (
               <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-green-500" />
             )}
           </div>

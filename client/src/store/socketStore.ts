@@ -133,5 +133,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     if (activeSocket?.connected && chatId) {
       activeSocket.emit("mark_messages_read", { chatId: chatId });
     }
+
+    const authStore = useAuthStore.getState();
+    const currentUserId = (authStore?.user?._id || authStore?.user?.id)?.toString();
+    if (currentUserId && chatId) {
+      import("./chatStore").then(({ useChatStore }) => {
+        useChatStore.setState((state) => ({
+          chats: state.chats.map((c) => {
+            if (c._id === chatId) {
+              const newUnread = { ...(c.unreadCount || {}) };
+              newUnread[currentUserId] = 0;
+              return { ...c, unreadCount: newUnread };
+            }
+            return c;
+          }),
+        }));
+      });
+    }
   },
 }));

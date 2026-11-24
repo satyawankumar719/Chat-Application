@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Circle } from "lucide-react";
+import { Circle, Check, CheckCheck } from "lucide-react";
 import { useChatStore } from "@/store/chatStore";
 import { Chat } from "@/types";
 import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
@@ -11,13 +11,24 @@ export interface ChatCardProps {
   onSelectChat: (chatId: string) => void;
 }
 
-const ChatCard = ({ chat, currentUserId: currentUserIdProp, selectedChatId, onSelectChat }: ChatCardProps) => {
-  const onlineUserIds = useChatStore((state) => state.onlineUserIds) || [];
+const ChatCard = ({
+  chat,
+  currentUserId: currentUserIdProp,
+  selectedChatId,
+  onSelectChat,
+}: ChatCardProps) => {
   const currentUserId = getResolvedCurrentUserId(currentUserIdProp);
 
   const displayUser = getOtherUser(chat, currentUserId);
   const displayUserId = (displayUser?._id || displayUser?.id || "").toString();
-  const isOnline = onlineUserIds.includes(displayUserId) || Boolean(displayUser?.isOnline);
+
+  const isOnlineInStore = useChatStore(
+    React.useCallback(
+      (state) => (displayUserId ? state.onlineUserIds?.includes(displayUserId) : false),
+      [displayUserId]
+    )
+  );
+  const isOnline = Boolean(isOnlineInStore);
 
   const lastSender = chat.lastMessage?.sender;
   const senderId = (typeof lastSender === "object" ? (lastSender?._id || lastSender?.id) : lastSender)?.toString() || "";
@@ -27,8 +38,6 @@ const ChatCard = ({ chat, currentUserId: currentUserIdProp, selectedChatId, onSe
 
   const message = isSystemMsg
     ? chat.lastMessage?.content || ""
-    : isMine
-    ? `You: ${chat.lastMessage?.content || ""}`
     : chat.lastMessage?.content || "Start a conversation";
 
   const time = chat.lastMessage?.createdAt || chat.updatedAt;
@@ -45,19 +54,21 @@ const ChatCard = ({ chat, currentUserId: currentUserIdProp, selectedChatId, onSe
   const isGroup = chat.type === "group";
   const title = isGroup ? chat.name || "Group Chat" : (displayUser?.name || "Unknown User");
   const avatarUrl = typeof displayUser?.avatar === "string" ? displayUser.avatar : displayUser?.avatar?.url;
+  const isSelected = selectedChatId === chat._id;
 
   return (
     <button
       onClick={() => onSelectChat(chat._id)}
-      className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${
-        selectedChatId === chat._id
-          ? "border-primary bg-primary/10"
-          : "border-transparent bg-card hover:border-border"
+      className={`w-full flex items-center gap-3 px-3.5 py-3 text-left transition-colors cursor-pointer select-none ${
+        isSelected
+          ? "bg-muted/80 dark:bg-muted/50 border-l-4 border-primary pl-2.5"
+          : "hover:bg-muted/40"
       }`}
     >
-      <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
+      {/* WhatsApp Circular Avatar with Online Indicator */}
+      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
         {isGroup ? (
-          <span className="font-bold text-sm">GRP</span>
+          <span className="font-bold text-xs">GRP</span>
         ) : avatarUrl ? (
           <img
             src={avatarUrl}
@@ -69,44 +80,48 @@ const ChatCard = ({ chat, currentUserId: currentUserIdProp, selectedChatId, onSe
         )}
 
         {!isGroup && isOnline && (
-          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500 ring-2 ring-emerald-500/20 animate-pulse" />
+          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-emerald-500 ring-2 ring-emerald-500/20" />
         )}
       </div>
 
+      {/* WhatsApp Message Metadata & Snippet */}
       <div className="min-w-0 flex-1">
-        <div className="flex justify-between">
-          <p className="truncate font-medium">
+        <div className="flex justify-between items-baseline mb-0.5">
+          <p className="truncate font-semibold text-sm text-foreground">
             {title}
           </p>
 
-          <div className="flex gap-2">
-            {time && (
-              <span className="text-[10px] text-muted-foreground">
-                {new Date(time).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-            )}
-          </div>
+          {time && (
+            <span className={`text-[11px] shrink-0 font-medium ${unread > 0 ? "text-primary font-bold" : "text-muted-foreground"}`}>
+              {new Date(time).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center justify-between">
-          <p className="truncate text-sm text-muted-foreground flex-1 pr-2">
-            {message}
-          </p>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            {unread > 0 ? (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-xs animate-bounce">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            ) : isOnline && (
-              <Circle className="h-3 w-3 fill-emerald-500 text-emerald-500" />
-            ) 
-              
-            }
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center gap-1 min-w-0 flex-1">
+            {isMine && !isSystemMsg && (
+              chat.lastMessage?.status === "read" ? (
+                <CheckCheck className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+              ) : chat.lastMessage?.status === "delivered" ? (
+                <CheckCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              ) : (
+                <Check className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              )
+            )}
+            <p className="truncate text-xs text-muted-foreground">
+              {message}
+            </p>
           </div>
+
+          {unread > 0 && (
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-xs shrink-0">
+              {unread > 99 ? "99+" : unread}
+            </span>
+          )}
         </div>
       </div>
     </button>

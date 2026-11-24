@@ -11,7 +11,8 @@ import {
   notifyMessageSenders,
 } from "./socketHelpers.js";
 import { isUserOnline } from "./userManager.js";
-import cacheService from "../services/cache.service.js";
+import cacheService, { CACHE_KEYS } from "../services/cache.service.js";
+import { fetchUser } from "../services/auth.service.js";
 
 interface sendMessageI {
   chatId: string;
@@ -25,6 +26,13 @@ interface sendMessageI {
 }
 
 async function validateSocketUser(socket: any, messageData: any, currentUserId: string) {
+  if (socket.user) {
+    const sId = (socket.user._id || socket.user.id)?.toString();
+    if (sId && sId === currentUserId.toString()) {
+      return socket.user;
+    }
+  }
+
   let token: string | undefined;
   if (messageData && typeof messageData === "object" && "token" in messageData) {
     token = messageData.token;
@@ -45,12 +53,13 @@ async function validateSocketUser(socket: any, messageData: any, currentUserId: 
     throw new Error("UNAUTHORIZED");
   }
 
-  const dbUser = await User.findById(currentUserId);
-  if (!dbUser) {
+  const cachedOrDbUser = await fetchUser(currentUserId);
+  if (!cachedOrDbUser) {
     throw new Error("UNAUTHORIZED");
   }
 
-  return dbUser;
+  socket.user = cachedOrDbUser;
+  return cachedOrDbUser;
 }
 
 function handleMarkMessagesRead(socket: any, currentUserId: string) {
@@ -68,7 +77,9 @@ function handleMarkMessagesRead(socket: any, currentUserId: string) {
         chat: chatId,
         sender: { $ne: currentUserId },
         status: { $ne: "read" },
-      });
+      })
+        .select("_id sender")
+        .lean();
 
       setUserUnreadCount(chat, currentUserId, 0);
       await chat.save();
@@ -167,16 +178,20 @@ function handleSendMessage(io: Server, socket: any, currentUserId: string) {
       }
 
       const recipientMembers = chat.members.filter(
-        (member: any) => member.user.toString() !== currentUserId
+        (member: any) => {
+          const uid = (member.user?._id || member.user?.id || member.user)?.toString();
+          return uid !== currentUserId;
+        }
       );
 
-      const isAnyRecipientOnline = recipientMembers.some((member: any) =>
-        isUserOnline(member.user)
-      );
+      const isAnyRecipientOnline = recipientMembers.some((member: any) => {
+        const uid = (member.user?._id || member.user?.id || member.user)?.toString();
+        return uid ? isUserOnline(uid) : false;
+      });
 
-      const messageStatus = isAnyRecipientOnline
-        ? "delivered"
-        : "sent";
+      // On creation, message status is standard: delivered (if online) or sent (if offline).
+      // It ONLY becomes "read" when the recipient explicitly views the chat (mark_messages_read).
+      const messageStatus = isAnyRecipientOnline ? "delivered" : "sent";
 
       let finalType: string = type;
       let finalFileUrl: string | null = fileUrl;
@@ -200,6 +215,7 @@ function handleSendMessage(io: Server, socket: any, currentUserId: string) {
         content: messageText || finalFileName || "Attachment",
         type: finalType as any,
         status: messageStatus,
+        readBy: [],
         fileUrl: finalFileUrl,
         fileName: finalFileName,
         fileSize: finalFileSize,
@@ -209,57 +225,50 @@ function handleSendMessage(io: Server, socket: any, currentUserId: string) {
       chat.lastMessage = savedMessage._id;
 
       for (const member of recipientMembers) {
-        if (member?.user) {
-          increaseUnreadCount(chat, member.user.toString());
+        const rId = (member.user?._id || member.user?.id || member.user)?.toString();
+        if (rId) {
+          increaseUnreadCount(chat, rId);
         }
       }
 
       await chat.save();
 
-      await cacheService.refreshChatMessages(chatId, async () => {
-        const recentMessages = await Message.find({ chat: chatId })
-          .populate("sender", "name email avatar")
-          .sort({ _id: -1 })
-          .limit(51);
-
-        const hasMore = recentMessages.length > 50;
-        if (hasMore) {
-          recentMessages.pop();
-        }
-        recentMessages.reverse();
-
-        return {
-          messages: recentMessages,
-          hasMore,
-        };
-      });
+      // Fast non-blocking cache invalidation
+      cacheService.del(CACHE_KEYS.CHAT_MESSAGES(chatId)).catch(() => {});
 
       chat.members.forEach((member: any) => {
         const memberId = (member.user?._id || member.user?.id || member.user)?.toString();
         if (memberId) {
-          cacheService.invalidateUserConversations(memberId);
+          cacheService.invalidateUserConversations(memberId).catch(() => {});
         }
       });
 
-      const populatedMessage = await Message.findById(
-        savedMessage._id
-      ).populate("sender", "name email avatar");
+      // Construct populated message in-memory without extra DB queries
+      const senderProfile = socket.user || (await fetchUser(currentUserId));
+      const senderInfo = {
+        _id: (senderProfile?._id || senderProfile?.id || currentUserId).toString(),
+        name: senderProfile?.name || "User",
+        email: senderProfile?.email || "",
+        avatar: senderProfile?.avatar || "",
+      };
+
+      const rawMsg = typeof savedMessage.toObject === "function" ? savedMessage.toObject() : savedMessage;
+      const populatedMessage = {
+        ...rawMsg,
+        sender: senderInfo,
+      };
 
       const messagePayload = {
         message: populatedMessage,
         tempId,
       };
 
-      io.to(`chat:${chatId}`).emit(
-        "receive_message",
-        messagePayload
-      );
-
+      // Broadcast cleanly to each recipient's personal user room (exactly once, never duplicate)
       recipientMembers.forEach((member: any) => {
-        io.to(`user:${member.user}`).emit(
-          "receive_message",
-          messagePayload
-        );
+        const recipientId = (member.user?._id || member.user?.id || member.user)?.toString();
+        if (recipientId) {
+          io.to(`user:${recipientId}`).emit("receive_message", messagePayload);
+        }
       });
 
       acknowledge?.({

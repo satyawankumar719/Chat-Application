@@ -6,8 +6,14 @@ declare global {
 
 const connectedUserSockets = new Map<string, Set<string>>();
 
+function normalizeUserId(userId: any): string {
+  if (!userId) return "";
+  return (userId._id || userId.id || userId).toString();
+}
+
 function addUserSocket(userId: any, socketId: string): void {
-  const userIdString = userId.toString();
+  const userIdString = normalizeUserId(userId);
+  if (!userIdString) return;
 
   if (!connectedUserSockets.has(userIdString)) {
     connectedUserSockets.set(userIdString, new Set());
@@ -17,7 +23,9 @@ function addUserSocket(userId: any, socketId: string): void {
 }
 
 function removeUserSocket(userId: any, socketId: string): boolean {
-  const userIdString = userId.toString();
+  const userIdString = normalizeUserId(userId);
+  if (!userIdString) return true;
+
   const socketIds = connectedUserSockets.get(userIdString);
 
   if (!socketIds) return true;
@@ -32,22 +40,68 @@ function removeUserSocket(userId: any, socketId: string): boolean {
   return false;
 }
 
+function removeAllUserSockets(userId: any): void {
+  const userIdString = normalizeUserId(userId);
+  if (userIdString) {
+    connectedUserSockets.delete(userIdString);
+  }
+}
+
+function getUserSockets(userId: any): Set<string> | undefined {
+  const userIdString = normalizeUserId(userId);
+  return connectedUserSockets.get(userIdString);
+}
+
 function isUserOnline(userId: any): boolean {
-  const socketIds = connectedUserSockets.get(userId.toString());
-  return !!(socketIds && socketIds.size > 0);
+  const uid = normalizeUserId(userId);
+  if (!uid) return false;
+
+  const socketIds = connectedUserSockets.get(uid);
+  if (!socketIds || socketIds.size === 0) return false;
+
+  if (global.io) {
+    for (const sid of Array.from(socketIds)) {
+      const socket = global.io.sockets.sockets.get(sid);
+      if (!socket || !socket.connected) {
+        socketIds.delete(sid);
+      }
+    }
+
+    if (socketIds.size === 0) {
+      connectedUserSockets.delete(uid);
+      return false;
+    }
+  }
+
+  return socketIds.size > 0;
 }
 
 function getSocketCount(userId: any): number {
-  const socketIds = connectedUserSockets.get(userId.toString());
+  const uid = normalizeUserId(userId);
+  const socketIds = connectedUserSockets.get(uid);
   return socketIds ? socketIds.size : 0;
 }
 
 export function getAllOnlineUserIds(): string[] {
+  if (global.io) {
+    for (const [uid, socketIds] of connectedUserSockets.entries()) {
+      for (const sid of Array.from(socketIds)) {
+        const socket = global.io.sockets.sockets.get(sid);
+        if (!socket || !socket.connected) {
+          socketIds.delete(sid);
+        }
+      }
+      if (socketIds.size === 0) {
+        connectedUserSockets.delete(uid);
+      }
+    }
+  }
   return Array.from(connectedUserSockets.keys());
 }
 
 export function getSocketByUserId(userId: any) {
-  const socketIds = connectedUserSockets.get(userId.toString());
+  const uid = normalizeUserId(userId);
+  const socketIds = connectedUserSockets.get(uid);
 
   if (!socketIds || socketIds.size === 0) {
     return null;
@@ -65,6 +119,8 @@ export function getSocketByUserId(userId: any) {
 export {
   addUserSocket,
   removeUserSocket,
+  removeAllUserSockets,
+  getUserSockets,
   isUserOnline,
   getSocketCount,
 };

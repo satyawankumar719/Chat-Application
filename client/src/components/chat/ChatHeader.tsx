@@ -83,7 +83,7 @@ function ChatHeader({
   const displayUser = getOtherUser(chat, myId);
 
   const otherUserId = (displayUser?._id || displayUser?.id || "").toString();
-  const isOnline = onlineUserIds.includes(otherUserId) || Boolean(displayUser?.isOnline);
+  const isOnline = Boolean(otherUserId && onlineUserIds.includes(otherUserId));
 
   let statusText = "Offline";
   if (isOnline) {

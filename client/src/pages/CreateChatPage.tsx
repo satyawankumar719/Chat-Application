@@ -90,20 +90,21 @@ function CreateChatPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="mb-2 -ml-2 text-muted-foreground"
-        >
-          &larr; Back
-        </Button>
+    <div className="w-full h-full overflow-y-auto p-4 sm:p-6 md:p-8">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="mb-2 -ml-2 text-muted-foreground"
+          >
+            &larr; Back
+          </Button>
 
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Start a new chat
-        </h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Start a new chat
+          </h1>
 
         <p className="text-sm text-muted-foreground">
           Search people by name or email and send an invite
@@ -207,6 +208,7 @@ function CreateChatPage() {
         </Button>
       </div>
     </div>
+  </div>
   );
 }
 

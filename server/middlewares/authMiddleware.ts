@@ -1,6 +1,6 @@
 import { verifyToken } from "../utils/index.js";
-import User from "../models/User.js";
 import sessionService from "../services/session.service.js";
+import { fetchUser } from "../services/auth.service.js";
 import type { Request, Response, NextFunction } from "express";
 
 export const authMiddleware = async (
@@ -49,7 +49,8 @@ export const authMiddleware = async (
       });
     }
 
-    const activeSession = await sessionService.getSession(
+    const activeSession = await sessionService.isRefreshTokenValid(
+      decoded.id,
       decoded.jti
     );
 
@@ -61,9 +62,9 @@ export const authMiddleware = async (
       });
     }
 
-    const dbUser = await User.findById(decoded.id).select("-password");
+    const cachedOrDbUser = await fetchUser(decoded.id);
 
-    if (!dbUser) {
+    if (!cachedOrDbUser) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized access. User no longer exists.",
@@ -71,7 +72,7 @@ export const authMiddleware = async (
       });
     }
 
-    req.user = dbUser;
+    req.user = cachedOrDbUser as any;
     req.token = token;
 
     next();

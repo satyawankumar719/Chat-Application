@@ -13,6 +13,15 @@ export const getPresignedUrl = async (req: AuthRequest, res: Response, next: Nex
       });
     }
 
+    const FORBIDDEN_EXTENSIONS = ['.exe', '.bat', '.cmd', '.sh', '.msi', '.dll', '.com', '.scr', '.vbs'];
+    const isDangerous = FORBIDDEN_EXTENSIONS.some((ext) => fileName.toLowerCase().endsWith(ext));
+    if (isDangerous) {
+      return res.status(400).json({
+        success: false,
+        message: 'Executable and script file uploads are not permitted.',
+      });
+    }
+
     if (!isS3Configured()) {
       return res.status(500).json({
         success: false,

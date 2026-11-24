@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { PlusCircle, Users, MessageSquarePlus } from "lucide-react";
 import ChatList from "@/components/chat/chatListContainer/ChatList";
 import ChatContainer from "@/components/chat/ChatContainer";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
+import { Button } from "@/components/ui/button";
 
 function ChatsPage() {
   const navigate = useNavigate();
@@ -31,8 +33,11 @@ function ChatsPage() {
         setSelectedChatId(queryChatId);
       }
       setMobileViewChat(true);
+    } else {
+      setSelectedChatId(null);
+      setMobileViewChat(false);
     }
-  }, [searchParams, selectedChatId, setSelectedChatId]);
+  }, [searchParams]);
 
   const selectedChat = chats.find((chat) => chat._id === selectedChatId) || null;
 
@@ -41,40 +46,67 @@ function ChatsPage() {
     setMobileViewChat(true);
   };
 
-  const handleBack = () => setMobileViewChat(false);
+  const handleBack = () => {
+    setMobileViewChat(false);
+    setSelectedChatId(null);
+  };
 
   if (checkingAuth || !user) {
     return null;
   }
 
   return (
-    <div className="h-[calc(100vh-8rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-      <div className="flex h-full w-full">
-        <aside
-          className={`${mobileViewChat ? "hidden" : "flex"
-            } md:flex h-full w-full flex-col md:w-[360px] md:flex-shrink-0 md:border-r md:border-border`}
-        >
-          <div className="border-b border-border p-4">
-            <h2 className="text-lg font-semibold">Chats</h2>
-            <p className="text-sm text-muted-foreground">Your contacts</p>
+    <div className="h-full w-full flex overflow-hidden bg-background">
+      {/* WhatsApp Left Sidebar: Chats List */}
+      <aside
+        className={`${
+          mobileViewChat ? "hidden" : "flex"
+        } md:flex h-full w-full md:w-[380px] lg:w-[420px] flex-col shrink-0 border-r border-border bg-card/30`}
+      >
+        {/* WhatsApp Sidebar Header */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-border bg-card/60 backdrop-blur-sm">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Chats</h1>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <ChatList
-              chats={chats}
-              selectedChatId={selectedChatId}
-              onSelectChat={handleSelectChat}
-              loading={loadingChats}
-            />
-          </div>
-        </aside>
 
-        <section
-          className={`${mobileViewChat ? "flex" : "hidden"
-            } md:flex h-full flex-1`}
-        >
-          <ChatContainer chat={selectedChat} onBack={handleBack} />
-        </section>
-      </div>
+          <div className="flex items-center gap-1.5">
+            <Link
+              to="/chats/create"
+              title="New Chat"
+              className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
+            >
+              <MessageSquarePlus className="size-6 shrink-0" />
+            </Link>
+
+            <Link
+              to="/groups"
+              title="Groups"
+              className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
+            >
+              <Users className="size-6 shrink-0" />
+            </Link>
+          </div>
+        </div>
+
+        {/* WhatsApp Chat List with Search & Filter Chips */}
+        <div className="flex-1 overflow-hidden">
+          <ChatList
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onSelectChat={handleSelectChat}
+            loading={loadingChats}
+          />
+        </div>
+      </aside>
+
+      {/* WhatsApp Right Chat Conversation / Empty State Area */}
+      <section
+        className={`${
+          mobileViewChat ? "flex" : "hidden"
+        } md:flex h-full flex-1 flex-col overflow-hidden bg-background`}
+      >
+        <ChatContainer chat={selectedChat} onBack={handleBack} />
+      </section>
     </div>
   );
 }

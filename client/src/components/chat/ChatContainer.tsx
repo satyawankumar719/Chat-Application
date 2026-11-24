@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Lock, ShieldCheck, Laptop } from "lucide-react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
@@ -72,16 +72,40 @@ function ChatContainer({ chat, onBack, setShowGroupInfo: setShowGroupInfoProp }:
     };
   }, [chat?._id, markMessagesRead]);
 
+  // Mark newly arriving messages as read if this chat container is actively rendered on screen
+  useEffect(() => {
+    if (!chat?._id || !messages || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    const senderId = (typeof lastMsg.sender === "object" ? (lastMsg.sender?._id || lastMsg.sender?.id) : lastMsg.sender)?.toString();
+    if (senderId && currentUserId && senderId !== currentUserId.toString() && lastMsg.status !== "read") {
+      markMessagesRead(chat._id);
+    }
+  }, [messages, chat?._id, currentUserId, markMessagesRead]);
+
   if (!chat) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-muted/10">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-xs">
-          <MessageSquare className="h-8 w-8" />
+      <div className="flex h-full w-full flex-col items-center justify-between p-8 text-center bg-muted/20 select-none">
+        <div />
+        <div className="flex flex-col items-center max-w-sm">
+          <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary ring-12 ring-primary/5">
+            <Laptop className="h-12 w-12" />
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            ChatApp Web
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+            Send and receive messages seamlessly without keeping your phone online.
+          </p>
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/60 px-4 py-1.5 text-xs text-muted-foreground shadow-xs">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            <span>End-to-end encrypted</span>
+          </div>
         </div>
-        <h3 className="text-lg font-semibold tracking-tight">Your Messages</h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-xs">
-          Select a conversation from the left to start chatting in real time.
-        </p>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+          <Lock className="h-3 w-3" />
+          <span>Your personal messages are end-to-end encrypted</span>
+        </div>
       </div>
     );
   }

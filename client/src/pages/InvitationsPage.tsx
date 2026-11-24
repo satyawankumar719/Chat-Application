@@ -21,27 +21,29 @@ function InvitationsPage() {
   }, [fetchPendingInvitations]);
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Invitations</h1>
-          <p className="text-sm text-muted-foreground">
-            People who want to chat with you
-          </p>
+    <div className="w-full h-full overflow-y-auto p-4 sm:p-6 md:p-8">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Invitations</h1>
+            <p className="text-sm text-muted-foreground">
+              People who want to chat with you
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => navigate("/chats/create")}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Invite someone
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={() => navigate("/chats/create")}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Invite someone
-        </Button>
-      </div>
 
-      <InvitationList
-        invitations={pendingInvitations}
-        loading={loadingInvitations}
-        actionLoadingId={actionLoadingId}
-        onAccept={acceptInvitation}
-        onReject={rejectInvitation}
-      />
+        <InvitationList
+          invitations={pendingInvitations}
+          loading={loadingInvitations}
+          actionLoadingId={actionLoadingId}
+          onAccept={acceptInvitation}
+          onReject={rejectInvitation}
+        />
+      </div>
     </div>
   );
 }

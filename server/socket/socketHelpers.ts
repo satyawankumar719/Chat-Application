@@ -45,10 +45,13 @@ function increaseUnreadCount(chat: any, userId: string): number {
 
 function notifyMessageSenders(senderIds: string[], statusPayload: any): void {
   senderIds.forEach((senderId) => {
-    const senderSocket = getSocketByUserId(senderId);
-  
-    senderSocket?.emit("message_status_update", statusPayload);
+    const uid = senderId.toString();
+    global.io?.to(`user:${uid}`).emit("message_status_update", statusPayload);
   });
+
+  if (statusPayload?.chatId) {
+    global.io?.to(`chat:${statusPayload.chatId}`).emit("message_status_update", statusPayload);
+  }
 }
 
 async function deliverPendingMessages(userId: string): Promise<void> {
@@ -56,7 +59,9 @@ async function deliverPendingMessages(userId: string): Promise<void> {
     const userChats = await Chat.find({
       "members.user": userId,
       isActive: true,
-    }).select("_id");
+    })
+      .select("_id")
+      .lean();
 
     if (userChats.length === 0) return;
 
@@ -66,7 +71,9 @@ async function deliverPendingMessages(userId: string): Promise<void> {
       chat: { $in: chatIds },
       sender: { $ne: userId },
       status: "sent",
-    });
+    })
+      .select("_id chat sender")
+      .lean();
 
     if (pendingMessages.length === 0) return;
 
