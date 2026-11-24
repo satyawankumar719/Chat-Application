@@ -10,7 +10,7 @@ import { User } from "@/types";
 export default function GroupChat() {
   const navigate = useNavigate();
   const { user, checkingAuth } = useAuthStore();
-  const { chats, selectedChatId, loadingChats, setSelectedChatId, fetchChats } = useChatStore();
+  const { chats, selectedChatId, loadingChats, setSelectedChatId, fetchChats, onlineUserIds } = useChatStore();
 
   const currentUserId = (user?._id || user?.id)?.toString();
 
@@ -36,12 +36,8 @@ export default function GroupChat() {
 
     const isSelectedGroupValid = groupChats.some((c) => c._id === selectedChatId);
 
-    if (!isSelectedGroupValid) {
-      if (groupChats.length > 0) {
-        setSelectedChatId(groupChats[0]._id);
-      } else if (selectedChatId !== null) {
-        setSelectedChatId(null);
-      }
+    if (!isSelectedGroupValid && selectedChatId !== null) {
+      setSelectedChatId(null);
     }
   }, [chats, selectedChatId, loadingChats, setSelectedChatId, groupChats]);
 
@@ -77,6 +73,7 @@ export default function GroupChat() {
 
   const handleBack = () => {
     setMobileViewChat(false);
+    setSelectedChatId(null);
   };
 
   if (checkingAuth || !user) {
@@ -84,12 +81,13 @@ export default function GroupChat() {
   }
 
   return (
-    <div className="h-[calc(100vh-8rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
+    <div className="h-full w-full flex overflow-hidden bg-background">
       <div className="flex h-full w-full">
 
         <aside
-          className={`${mobileViewChat ? "hidden" : "flex"
-            } md:flex h-full w-full flex-col md:w-[380px] md:flex-shrink-0 md:border-r md:border-border`}
+          className={`${
+            mobileViewChat ? "hidden" : "flex"
+          } md:flex h-full w-full flex-col md:w-[380px] lg:w-[420px] shrink-0 md:border-r md:border-border bg-card/30`}
         >
 
           <div className="border-b border-border p-4 space-y-3">
@@ -194,7 +192,8 @@ export default function GroupChat() {
                 const onlineCount =
                   group.members?.filter((m) => {
                     const u = typeof m.user === "object" ? (m.user as User) : null;
-                    return u?.isOnline;
+                    const uid = (u?._id || u?.id)?.toString();
+                    return uid ? (onlineUserIds || []).includes(uid) : false;
                   }).length || 0;
 
                 const lastMsg = group.lastMessage?.content || "No messages yet";

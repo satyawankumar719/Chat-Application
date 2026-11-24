@@ -3,6 +3,7 @@ import Invitation from "../models/Invitation.js";
 import Chat from "../models/Conversation.js";
 import { isUserOnline } from "../socket/userManager.js";
 import mongoose, { type Types } from "mongoose";
+import cacheService, { CACHE_KEYS } from "./cache.service.js";
 
 type UserId = string | Types.ObjectId;
 
@@ -44,6 +45,7 @@ export const searchUsers = async (
 
   const filter: any = {
     _id: { $ne: currentObjId },
+    isVerified: true,
   };
 
   if (searchQuery && searchQuery.trim()) {
@@ -58,7 +60,8 @@ export const searchUsers = async (
 
   const users = await User.find(filter)
     .select("name email phoneNumber avatar isOnline lastSeen bio")
-    .limit(30);
+    .limit(30)
+    .lean();
 
   if (users.length === 0) {
     return [];
@@ -70,7 +73,7 @@ export const searchUsers = async (
     type: "direct",
     "members.user": { $all: [currentUserId] },
     members: { $elemMatch: { user: { $in: userIds } } }
-  });
+  }).lean();
 
   const connectedUserIds = new Set<string>();
   chats.forEach((chat) => {
@@ -86,7 +89,7 @@ export const searchUsers = async (
       { invitedBy: currentUserId, receiver: { $in: userIds } },
       { invitedBy: { $in: userIds }, receiver: currentUserId }
     ]
-  }).sort({ updatedAt: -1 });
+  }).sort({ updatedAt: -1 }).lean();
 
   const now = new Date();
   const ExpiryTime = 24 * 60 * 60 * 1000;
@@ -129,7 +132,7 @@ export const searchUsers = async (
       _id: user._id as Types.ObjectId,
       name: user.name,
       email: user.email,
-      phoneNumber: user.phoneNumber,
+      phoneNumber: user.phoneNumber || "",
       avatar: user.avatar,
       isOnline: isUserOnline(user._id.toString()),
       lastSeen: user.lastSeen,
@@ -176,6 +179,7 @@ export const updateUserProfileService = async (
   }
 
   await user.save();
+  await cacheService.del(CACHE_KEYS.USER_PROFILE(userId.toString()));
 
   return User.findById(userId).select("-password");
 };

@@ -511,7 +511,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                 if (!u) return null;
                 const uid = (u._id || u.id)?.toString();
                 const isMe = uid === currentUserId;
-                const isOnline = Boolean(uid && onlineUserIds.includes(uid)) || Boolean(u.isOnline);
+                const isOnline = Boolean(uid && onlineUserIds.includes(uid));
 
                 const myRole = currentMember?.role;
                 const targetRole = m.role;

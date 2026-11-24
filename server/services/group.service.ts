@@ -3,6 +3,7 @@ import Message from "../models/Message.js";
 import User from "../models/User.js";
 import { getSocketByUserId } from "../socket/userManager.js";
 import { logger } from "../logger.js";
+import cacheService from "./cache.service.js";
 
 import type { IMessage } from "../models/Message.js";
 import type { Types } from "mongoose";
@@ -55,9 +56,11 @@ function notifyGroupMembers(
   payload: SocketMessagePayload
 ): void {
   memberUserIds.forEach((id) => {
-    const socket = getSocketByUserId(id.toString());
+    const uid = id.toString();
+    const socket = getSocketByUserId(uid);
 
     socket?.emit(eventName, payload);
+    cacheService.invalidateUserConversations(uid).catch(() => {});
   });
 }
 
@@ -215,7 +218,8 @@ export const getUserGroups = async (
     })
     .sort({
       updatedAt: -1,
-    });
+    })
+    .lean();
 };
 
 export const getGroupById = async (

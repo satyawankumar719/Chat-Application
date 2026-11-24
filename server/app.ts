@@ -48,9 +48,33 @@ app.use(
     res: Response,
     _next: NextFunction
   ) => {
-    res.status(err.status || 500).json({
+    let status = err.status || 500;
+    let message = err.message || "Internal server error";
+
+    // MongoDB Duplicate Key Error (E11000)
+    if (err.code === 11000) {
+      status = 409;
+      const keyPattern = err.keyPattern || err.keyValue || {};
+      const field = Object.keys(keyPattern)[0] || "field";
+      const fieldName =
+        field === "phoneNumber"
+          ? "Phone number"
+          : field === "email"
+          ? "Email"
+          : field.charAt(0).toUpperCase() + field.slice(1);
+      message = `${fieldName} is already registered. Please use another one.`;
+    } else if (err.name === "ValidationError") {
+      status = 400;
+      const firstError = Object.values(err.errors || {})[0] as any;
+      message = firstError?.message || "Validation failed";
+    } else if (err.name === "CastError") {
+      status = 400;
+      message = `Invalid ${err.path || "ID"} format`;
+    }
+
+    res.status(status).json({
       success: false,
-      message: err.message || "Internal server error",
+      message,
       ...(err.isVerified !== undefined && { isVerified: err.isVerified }),
       ...(err.email && { email: err.email }),
     });

@@ -413,20 +413,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       const response = await messageApi.getUserChats();
       const chats: Chat[] = response.data?.data || response.data || [];
-      const currentOnlineSet = new Set<string>(get().onlineUserIds || []);
-
-      chats.forEach((chat) => {
-        if (!chat || !chat.members) return;
-        chat.members.forEach((member) => {
-          const userObj = typeof member.user === "object" && member.user !== null ? (member.user as User) : null;
-          if (userObj && userObj.isOnline) {
-            const memberId = (userObj._id || userObj.id || "").toString();
-            if (memberId) currentOnlineSet.add(memberId);
-          }
-        });
-      });
-
-      const updatedOnlineIds = Array.from(currentOnlineSet);
+      const currentOnlineList = get().onlineUserIds || [];
+      const updatedOnlineIds = currentOnlineList;
 
       const updatedChats = chats.map((chat) => {
         if (!chat || !chat.members) return chat;
@@ -434,7 +422,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           const userObj = typeof member.user === "object" && member.user !== null ? (member.user as User) : null;
           if (!userObj) return member;
           const memberId = (userObj._id || userObj.id || "").toString();
-          const isOnline = updatedOnlineIds.includes(memberId) || Boolean(userObj.isOnline);
+          const isOnline = updatedOnlineIds.includes(memberId);
           return {
             ...member,
             user: {
@@ -560,12 +548,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const senderId = getSenderId(incomingMessage.sender);
     const isMyOwnMessage = Boolean(senderId && currentUserId && senderId === currentUserId.toString());
     const isForCurrentlySelectedChat = Boolean(current.selectedChatId && incomingMessage.chat === current.selectedChatId);
-    const isChatActiveOnScreen = isForCurrentlySelectedChat && typeof window !== "undefined" && document.hasFocus();
 
-    if (isChatActiveOnScreen && !isMyOwnMessage && current.selectedChatId) {
+    if (isForCurrentlySelectedChat && !isMyOwnMessage && current.selectedChatId) {
       (useSocketStore.getState() as any).markMessagesRead(current.selectedChatId);
     }
-    if (!isMyOwnMessage && !isChatActiveOnScreen) {
+    if (!isMyOwnMessage && !isForCurrentlySelectedChat) {
       const senderObj = typeof incomingMessage.sender === "object" ? (incomingMessage.sender as User) : null;
       const targetChat = current.chats.find((c) => c._id === incomingMessage.chat);
       const isGroup = targetChat?.type === "group";
@@ -902,7 +889,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const serverMessage = response.message;
 
       set((state) => ({
-        messages: state.messages.map((m) => m._id === tempId ? serverMessage : m),
+        messages: state.messages.map((m) => {
+          if (m._id === tempId || (m as any).tempId === tempId) {
+            const preservedStatus = m.status === "read" ? "read" : (serverMessage.status || "sent");
+            return {
+              ...serverMessage,
+              status: preservedStatus,
+              tempId,
+            };
+          }
+          return m;
+        }),
         chats: updateLastMessageInChats(state.chats, chatId, serverMessage)
       }));
 
@@ -925,16 +922,32 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((state) => {
       let changed = false;
 
-      const updated = state.messages.map((message) => {
-        const idMatch = message._id === messageId || message.id === messageId;
+      const updatedMessages = state.messages.map((message) => {
+        const idMatch = message._id === messageId || message.id === messageId || (message as any).tempId === messageId;
 
-        if (!idMatch || message.status === newStatus) return message;
+        if (!idMatch) return message;
+        if (message.status === newStatus) return message;
 
         changed = true;
         return { ...message, status: newStatus };
       });
 
-      return changed ? { messages: updated } : state;
+      const updatedChats = state.chats.map((chat) => {
+        const lastMsgId = (chat.lastMessage?._id || chat.lastMessage?.id || (chat.lastMessage as any)?.tempId)?.toString();
+        if (lastMsgId === messageId && chat.lastMessage?.status !== newStatus) {
+          changed = true;
+          return {
+            ...chat,
+            lastMessage: {
+              ...chat.lastMessage,
+              status: newStatus,
+            },
+          };
+        }
+        return chat;
+      });
+
+      return changed ? { messages: updatedMessages, chats: updatedChats } : state;
     });
   },
 

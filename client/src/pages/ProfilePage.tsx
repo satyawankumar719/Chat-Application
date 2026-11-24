@@ -119,8 +119,9 @@ function ProfilePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="rounded-3xl border border-border bg-card/70 backdrop-blur-md p-6 sm:p-8 shadow-xl">
+    <div className="w-full h-full overflow-y-auto py-6 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="rounded-3xl border border-border bg-card/70 backdrop-blur-md p-6 sm:p-8 shadow-xl">
         <div className="border-b border-border pb-6 mb-6">
           <h1 className="text-2xl font-bold tracking-tight">User Profile</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -264,6 +265,7 @@ function ProfilePage() {
         </form>
       </div>
     </div>
+  </div>
   );
 }
 

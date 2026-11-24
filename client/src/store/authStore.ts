@@ -36,6 +36,16 @@ function handleError(error: any): AuthResult {
     }
   }
 
+  if (message.includes("E11000") || message.toLowerCase().includes("duplicate key")) {
+    if (message.includes("phoneNumber") || message.includes("phone")) {
+      message = "This phone number is already registered. Please use another one.";
+    } else if (message.includes("email")) {
+      message = "This email is already registered. Please login or use another email.";
+    } else {
+      message = "An account with these details already exists.";
+    }
+  }
+
   return {
     success: false,
     message: message,
@@ -98,6 +108,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async (): Promise<void> => {
     try {
+      clearEverythingOnClient();
       await authApi.logout();
     } catch {
     } finally {

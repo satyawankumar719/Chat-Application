@@ -4,6 +4,7 @@ import Chat from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import Notification from "../models/Notification.js";
 import { getSocketByUserId } from "../socket/userManager.js";
+import cacheService from "./cache.service.js";
 import type { Types } from "mongoose";
 
 type UserId = string | Types.ObjectId;
@@ -317,6 +318,15 @@ export const acceptInvitationService = async (
   const inviterSocket = getSocketByUserId(invitation.invitedBy.toString());
   if (inviterSocket) {
     inviterSocket.emit("invitation_accepted", { invitation, chat: populatedChat });
+  }
+
+  try {
+    await Promise.all([
+      cacheService.invalidateUserConversations(invitation.invitedBy.toString()),
+      cacheService.invalidateUserConversations(currentUserId.toString()),
+    ]);
+  } catch (cacheErr) {
+    // Non-blocking cache error
   }
 
   return {

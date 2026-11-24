@@ -14,6 +14,7 @@ import { generateToken } from "../utils/index.js";
 import { ENV } from "../config/envConfig.js";
 import sessionService from "../services/session.service.js";
 import type { SignupInterface } from "../services/auth.service.js";
+import { handleUserLogout } from "../socket/statusHandlers.js";
 const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: ENV.NODE_ENV === "production",
@@ -139,6 +140,11 @@ export const handleLogout = async (
                 : undefined
         );
 
+    const userId = req.user?._id || req.user?.id;
+    if (userId) {
+        await handleUserLogout(userId);
+    }
+
     if (token) {
         await sessionService.deleteSession(token);
     }
@@ -157,7 +163,8 @@ export const getCurrentUser = async (
     next: NextFunction
 ) => {
     try {
-        const user = await fetchUser(req.user?._id);
+        const userId = req.user?._id || req.user?.id;
+        const user = req.user || (await fetchUser(userId));
 
         return res.status(200).json({
             success: true,

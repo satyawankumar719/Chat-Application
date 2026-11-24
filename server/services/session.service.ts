@@ -95,8 +95,8 @@ class SessionService {
     return { jti: decoded.jti, userId: uid };
   }
 
-  async getSession(_jti: string): Promise<boolean> {
-    return true; 
+  async getSession(userId: UserId, jti: string): Promise<boolean> {
+    return this.isRefreshTokenValid(userId, jti);
   }
 
   async deleteSession(tokenOrJti: string): Promise<void> {

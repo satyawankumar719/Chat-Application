@@ -1,7 +1,8 @@
 import type { Socket } from "socket.io";
 import { verifyToken } from "../utils/index.js";
-import User, { type UserSchemaInterface } from "../models/User.js";
+import { type UserSchemaInterface } from "../models/User.js";
 import sessionService from "../services/session.service.js";
+import { fetchUser } from "../services/auth.service.js";
 
 export interface AuthenticatedSocket extends Socket {
   user?: UserSchemaInterface;
@@ -56,17 +57,20 @@ async function socketAuthMiddleware(socket: AuthenticatedSocket, next: (err?: Er
       return next(new Error("UNAUTHORIZED: Session expired or logged out"));
     }
 
-    const activeSession = await sessionService.getSession(decodedUser.jti);
+    const activeSession = await sessionService.isRefreshTokenValid(
+      decodedUser.id,
+      decodedUser.jti
+    );
     if (!activeSession) {
       return next(new Error("UNAUTHORIZED: Session expired or logged out"));
     }
 
-    const dbUser = await User.findById(decodedUser.id).select("-password");
-    if (!dbUser) {
+    const cachedOrDbUser = await fetchUser(decodedUser.id);
+    if (!cachedOrDbUser) {
       return next(new Error("UNAUTHORIZED: User no longer exists"));
     }
 
-    socket.user = dbUser;
+    socket.user = cachedOrDbUser as any;
     socket.authToken = token;
     next();
   } catch {

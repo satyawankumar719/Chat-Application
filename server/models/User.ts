@@ -5,7 +5,7 @@ export interface UserSchemaInterface extends Document {
   id?: any;
   name: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber?: string;
   password: string | null;
 
   avatar: {
@@ -48,9 +48,8 @@ const userSchema = new mongoose.Schema<UserSchemaInterface>(
 
     phoneNumber: {
       type: String,
-      default: "",
       unique: true,
-    
+      sparse: true,
       minlength: 10,
     },
 
@@ -114,6 +113,7 @@ const userSchema = new mongoose.Schema<UserSchemaInterface>(
 );
 
 userSchema.index({
+  isVerified: 1,
   name: 1,
   email: 1,
   phoneNumber: 1,

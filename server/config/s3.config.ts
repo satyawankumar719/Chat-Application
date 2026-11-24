@@ -41,9 +41,10 @@ export async function generatePresignedUploadUrl({
   fileType,
   subfolder = 'files',
 }: PresignedUrlOptions): Promise<PresignedUrlResult> {
+  const cleanSubfolder = (subfolder || 'files').replace(/[^a-zA-Z0-9_-]/g, '') || 'files';
   const cleanFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
   const uniquePrefix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-  const key = `uploads/${subfolder}/${uniquePrefix}-${cleanFileName}`;
+  const key = `uploads/${cleanSubfolder}/${uniquePrefix}-${cleanFileName}`;
 
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
@@ -51,7 +52,7 @@ export async function generatePresignedUploadUrl({
     ContentType: fileType,
   });
 
-  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 900 });
   const fileUrl = `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 
   return {

@@ -1,2 +1,7 @@
 node_modules
 *.env
+dist
+logs
+*.d.ts
+*.d.ts.map
+*.js.map

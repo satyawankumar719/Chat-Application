@@ -1,5 +1,12 @@
 import User from "../models/User.js";
-import { addUserSocket, removeUserSocket, getSocketCount, getAllOnlineUserIds } from "./userManager.js";
+import {
+  addUserSocket,
+  removeUserSocket,
+  removeAllUserSockets,
+  getUserSockets,
+  getSocketCount,
+  getAllOnlineUserIds,
+} from "./userManager.js";
 import { deliverPendingMessages } from "./socketHelpers.js";
 import { logger } from "../logger.js";
 import cacheService, { CACHE_KEYS, CACHE_TTL } from "../services/cache.service.js";
@@ -87,9 +94,62 @@ async function handleUserDisconnect(io: Server, socket: any, currentUserId: stri
   }
 }
 
+async function handleUserLogout(userId: string): Promise<void> {
+  const uid = (userId as any)?._id?.toString() || (userId as any)?.id?.toString() || userId?.toString();
+  if (!uid) return;
+
+  logger.info(`User Logging Out & Clearing Presence: ${uid}`);
+
+  const socketIds = getUserSockets(uid);
+  if (socketIds && socketIds.size > 0 && global.io) {
+    for (const sid of Array.from(socketIds)) {
+      const socket = global.io.sockets.sockets.get(sid);
+      if (socket) {
+        socket.disconnect(true);
+      }
+    }
+  }
+  removeAllUserSockets(uid);
+
+  try {
+    const lastSeen = new Date();
+
+    await User.findByIdAndUpdate(uid, {
+      isOnline: false,
+      lastSeen,
+    });
+
+    await cacheService.set(
+      CACHE_KEYS.ONLINE_STATUS(uid),
+      { isOnline: false, lastSeen },
+      CACHE_TTL.ONLINE_STATUS
+    );
+    await cacheService.invalidateUserProfile(uid);
+
+    const onlineUserIds = getAllOnlineUserIds();
+    await cacheService.set(
+      CACHE_KEYS.ONLINE_USERS_LIST(),
+      onlineUserIds,
+      CACHE_TTL.ONLINE_STATUS
+    );
+
+    if (global.io) {
+      global.io.emit("user_status_changed", {
+        userId: uid,
+        isOnline: false,
+        lastSeen,
+      });
+
+      global.io.emit("get_online_users", onlineUserIds);
+    }
+  } catch (error) {
+    logger.error("User Logout Status Error:", error);
+  }
+}
+
 function handleGetOnlineUsers(socket: any) {
   const onlineUserIds = getAllOnlineUserIds();
   socket.emit("get_online_users", onlineUserIds);
 }
 
-export { handleUserConnect, handleUserDisconnect, handleGetOnlineUsers };
+export { handleUserConnect, handleUserDisconnect, handleUserLogout, handleGetOnlineUsers };
