@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+.husky/_/
+package-lock.json
+client/package-lock.json
+server/package-lock.json
+server/logs/
+server/uploads/
+.env
+.env.*

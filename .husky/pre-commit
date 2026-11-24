@@ -1,0 +1,5 @@
+echo "Running pre-commit..."
+
+npx lint-staged
+npm run precommit:client
+npm run precommit:server
