@@ -58,18 +58,19 @@ function ChatsPage() {
         } md:flex h-full w-full md:w-[380px] lg:w-[420px] flex-col shrink-0 border-r border-border bg-card/30`}
       >
         {/* WhatsApp Sidebar Header */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-border bg-card/60 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3.5">
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Chats</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Chats</h1>
           </div>
 
           <div className="flex items-center gap-1.5">
             <Link
               to="/chats/create"
               title="New Chat"
-              className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
+              className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-ring"
+              aria-label="New chat"
             >
-              <MessageSquarePlus className="size-6 shrink-0" />
+              <MessageSquarePlus aria-hidden="true" className="size-5" />
             </Link>
 
             <Link

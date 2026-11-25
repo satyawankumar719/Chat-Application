@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Plus, Search, Shield, Crown, Sparkles } from "lucide-react";
 import ChatContainer from "@/components/chat/ChatContainer";
@@ -6,17 +6,21 @@ import CreateGroupModal from "@/components/groupChat/createGroup";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { User } from "@/types";
+import { useDebouncedSearchQuery } from "@/lib/searchDebounce";
+import { SearchLoader } from "@/components/ui/search-loader";
 
 export default function GroupChat() {
   const navigate = useNavigate();
   const { user, checkingAuth } = useAuthStore();
-  const { chats, selectedChatId, loadingChats, setSelectedChatId, fetchChats, onlineUserIds } = useChatStore();
+  const { chats, selectedChatId, loadingChats, setSelectedChatId, fetchChats, onlineUserIds } =
+    useChatStore();
 
   const currentUserId = (user?._id || user?.id)?.toString();
 
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [mobileViewChat, setMobileViewChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, searching] = useDebouncedSearchQuery(searchQuery);
   const [filterTab, setFilterTab] = useState<"all" | "managed" | "member">("all");
 
   useEffect(() => {
@@ -29,7 +33,7 @@ export default function GroupChat() {
     }
   }, [user, checkingAuth, navigate, fetchChats]);
 
-  const groupChats = chats.filter((c) => c.type === "group");
+  const groupChats = useMemo(() => chats.filter((c) => c.type === "group"), [chats]);
 
   useEffect(() => {
     if (loadingChats) return;
@@ -41,28 +45,33 @@ export default function GroupChat() {
     }
   }, [chats, selectedChatId, loadingChats, setSelectedChatId, groupChats]);
 
-  const filteredGroups = groupChats.filter((group) => {
-    const matchesSearch =
-      group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      group.groupDescription?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      group.description?.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredGroups = useMemo(
+    () =>
+      groupChats.filter((group) => {
+        const matchesSearch =
+          !debouncedQuery ||
+          group.name?.toLowerCase().includes(debouncedQuery) ||
+          group.groupDescription?.toLowerCase().includes(debouncedQuery) ||
+          group.description?.toLowerCase().includes(debouncedQuery);
 
-    if (!matchesSearch) return false;
+        if (!matchesSearch) return false;
 
-    const myMemberObj = group.members?.find((m) => {
-      const u = typeof m.user === "object" ? (m.user as User) : null;
-      const uid = u ? (u._id || u.id) : (m.user as string);
-      return uid?.toString() === currentUserId;
-    });
+        const myMemberObj = group.members?.find((m) => {
+          const u = typeof m.user === "object" ? (m.user as User) : null;
+          const uid = u ? u._id || u.id : (m.user as string);
+          return uid?.toString() === currentUserId;
+        });
 
-    if (filterTab === "managed") {
-      return myMemberObj?.role === "owner" || myMemberObj?.role === "admin";
-    }
-    if (filterTab === "member") {
-      return myMemberObj?.role === "member";
-    }
-    return true;
-  });
+        if (filterTab === "managed") {
+          return myMemberObj?.role === "owner" || myMemberObj?.role === "admin";
+        }
+        if (filterTab === "member") {
+          return myMemberObj?.role === "member";
+        }
+        return true;
+      }),
+    [groupChats, debouncedQuery, currentUserId, filterTab]
+  );
 
   const selectedGroup = groupChats.find((c) => c._id === selectedChatId) || null;
 
@@ -83,21 +92,19 @@ export default function GroupChat() {
   return (
     <div className="h-full w-full flex overflow-hidden bg-background">
       <div className="flex h-full w-full">
-
         <aside
           className={`${
             mobileViewChat ? "hidden" : "flex"
           } md:flex h-full w-full flex-col md:w-[380px] lg:w-[420px] shrink-0 md:border-r md:border-border bg-card/30`}
         >
-
-          <div className="border-b border-border p-4 space-y-3">
+          <div className="space-y-3 border-b border-border bg-card p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">
                   <Users className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-foreground">Group Chats</h2>
+                  <h1 className="text-xl font-semibold tracking-tight text-foreground">Groups</h1>
                   <p className="text-xs text-muted-foreground">
                     {groupChats.length} {groupChats.length === 1 ? "group" : "groups"} active
                   </p>
@@ -106,7 +113,7 @@ export default function GroupChat() {
 
               <button
                 onClick={() => setShowCreateGroup(true)}
-                className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition shadow-xs"
+                className="flex min-h-11 items-center gap-1.5 rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-ring"
                 title="Create New Group"
               >
                 <Plus className="h-4 w-4" />
@@ -115,35 +122,48 @@ export default function GroupChat() {
             </div>
 
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+              />
               <input
                 type="text"
+                aria-label="Search groups"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search groups..."
-                className="w-full rounded-xl border border-border bg-muted/40 pl-9 pr-3 py-2 text-xs focus:bg-background focus:outline-none focus:ring-1 focus:ring-primary transition"
+                className="h-11 w-full rounded-xl border border-input bg-background pr-3 pl-9 text-base transition-colors focus-visible:outline-2 focus-visible:outline-ring md:text-sm"
               />
             </div>
 
             <div className="flex gap-1 rounded-lg bg-muted/50 p-1 text-xs">
               <button
                 onClick={() => setFilterTab("all")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "all" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "all"
+                    ? "bg-background text-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 All
               </button>
               <button
                 onClick={() => setFilterTab("managed")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "managed" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "managed"
+                    ? "bg-background text-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 Managed
               </button>
               <button
                 onClick={() => setFilterTab("member")}
-                className={`flex-1 rounded-md py-1 font-medium transition ${filterTab === "member" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                className={`flex-1 rounded-md py-1 font-medium transition ${
+                  filterTab === "member"
+                    ? "bg-background text-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 Member
               </button>
@@ -151,7 +171,9 @@ export default function GroupChat() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
-            {loadingChats ? (
+            {searching ? (
+              <SearchLoader />
+            ) : loadingChats ? (
               <div className="flex flex-col items-center justify-center h-48 text-muted-foreground text-xs gap-2">
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 <span>Loading groups...</span>
@@ -184,7 +206,7 @@ export default function GroupChat() {
                 const isSelected = selectedChatId === group._id;
                 const myMemberObj = group.members?.find((m) => {
                   const u = typeof m.user === "object" ? (m.user as User) : null;
-                  const uid = u ? (u._id || u.id) : (m.user as string);
+                  const uid = u ? u._id || u.id : (m.user as string);
                   return uid?.toString() === currentUserId;
                 });
                 const role = myMemberObj?.role || "member";
@@ -212,10 +234,11 @@ export default function GroupChat() {
                   <button
                     key={group._id}
                     onClick={() => handleSelectGroup(group._id)}
-                    className={`flex items-center gap-3 w-full rounded-xl border p-3 text-left transition ${isSelected
-                      ? "border-primary bg-primary/10 shadow-xs"
-                      : "border-transparent bg-card hover:border-border"
-                      }`}
+                    className={`flex items-center gap-3 w-full rounded-xl border p-3 text-left transition ${
+                      isSelected
+                        ? "border-primary bg-primary/10 shadow-xs"
+                        : "border-transparent bg-card hover:border-border"
+                    }`}
                   >
                     <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 font-bold text-primary text-sm">
                       {group.name?.[0]?.toUpperCase() || "G"}
@@ -249,9 +272,7 @@ export default function GroupChat() {
                         )}
                       </div>
 
-                      <p className="truncate text-xs text-muted-foreground mt-0.5">
-                        {lastMsg}
-                      </p>
+                      <p className="truncate text-xs text-muted-foreground mt-0.5">{lastMsg}</p>
 
                       <div className="flex items-center justify-between mt-1.5">
                         <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
@@ -274,10 +295,7 @@ export default function GroupChat() {
           </div>
         </aside>
 
-        <section
-          className={`${mobileViewChat ? "flex" : "hidden"
-            } md:flex h-full flex-1`}
-        >
+        <section className={`${mobileViewChat ? "flex" : "hidden"} md:flex h-full flex-1`}>
           {selectedGroup ? (
             <ChatContainer chat={selectedGroup} onBack={handleBack} />
           ) : (
@@ -288,7 +306,8 @@ export default function GroupChat() {
               </div>
               <h3 className="text-xl font-bold text-foreground">Select a Group</h3>
               <p className="text-xs text-muted-foreground max-w-sm mt-2 leading-relaxed">
-                Choose a group chat from the sidebar to view messages, share files, and collaborate with your team in real time.
+                Choose a group chat from the sidebar to view messages, share files, and collaborate
+                with your team in real time.
               </p>
 
               <button
@@ -303,10 +322,7 @@ export default function GroupChat() {
         </section>
       </div>
 
-      <CreateGroupModal
-        isOpen={showCreateGroup}
-        onClose={() => setShowCreateGroup(false)}
-      />
+      <CreateGroupModal isOpen={showCreateGroup} onClose={() => setShowCreateGroup(false)} />
     </div>
   );
 }

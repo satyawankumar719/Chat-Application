@@ -21,17 +21,18 @@ function InvitationsPage() {
   }, [fetchPendingInvitations]);
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 sm:p-6 md:p-8">
+    <div className="h-full w-full overflow-y-auto px-4 py-6 sm:px-8 sm:py-10">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Invitations</h1>
-            <p className="text-sm text-muted-foreground">
-              People who want to chat with you
-            </p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Invitations</h1>
+            <p className="mt-1 text-sm text-muted-foreground">People who want to chat with you</p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => navigate("/chats/create")}>
-            <UserPlus className="mr-2 h-4 w-4" />
+          <Button
+            className="min-h-11 gap-2 rounded-xl px-4"
+            onClick={() => navigate("/chats/create")}
+          >
+            <UserPlus aria-hidden="true" className="size-4" />
             Invite someone
           </Button>
         </div>

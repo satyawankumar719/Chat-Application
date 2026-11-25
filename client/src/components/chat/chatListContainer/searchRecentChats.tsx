@@ -1,74 +1,25 @@
-import React, { useState } from "react";
 import { Search } from "lucide-react";
-import { Chat } from "@/types";
-import { getOtherUser, getResolvedCurrentUserId } from "@/lib/chatHelpers";
 
-export interface SearchRecentUsersProps {
-  setSearchResults: (results: Chat[]) => void;
-  chats?: Chat[];
-  setSearching: (searching: boolean) => void;
-  currentUserId?: string | null;
+interface SearchRecentUsersProps {
+  value: string;
+  onChange: (value: string) => void;
 }
 
-function SearchRecentUsers({
-  setSearchResults,
-  chats = [],
-  setSearching,
-  currentUserId: currentUserIdProp,
-}: SearchRecentUsersProps) {
-  const [searchText, setSearchText] = useState("");
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setSearchText(text);
-
-    const query = text.toLowerCase().trim();
-
-    if (query === "") {
-      setSearchResults(chats);
-      setSearching(false);
-      return;
-    }
-
-    const currentId = getResolvedCurrentUserId(currentUserIdProp);
-
-    const filtered = chats.filter((chat) => {
-      if (chat.type === "group") {
-        const groupName = (chat.name || "").toLowerCase();
-        return groupName.includes(query);
-      }
-
-      if (chat.type === "direct" || chat.type === "private") {
-        const otherUser = getOtherUser(chat, currentId);
-        const userName = (otherUser?.name || "").toLowerCase();
-       
-
-         return userName.includes(query) 
-   
-      }
-
-      return false;
-    });
-
-    setSearching(true);
-    setSearchResults(filtered);
-  };
-
+export default function SearchRecentUsers({ value, onChange }: SearchRecentUsersProps) {
   return (
     <div className="relative w-full">
       <Search
+        aria-hidden="true"
         className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
       />
-
       <input
         type="text"
-        value={searchText}
-        onChange={handleSearch}
+        aria-label="Search chats"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         placeholder="Search chats..."
-        className="h-10 w-full rounded-lg border bg-background pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary"
+        className="h-11 w-full rounded-xl border border-input bg-background pr-4 pl-10 text-base focus-visible:outline-2 focus-visible:outline-ring md:text-sm"
       />
     </div>
   );
 }
-
-export default SearchRecentUsers;

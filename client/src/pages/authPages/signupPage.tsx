@@ -4,13 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { notify } from "@/lib/notify";
@@ -75,14 +69,17 @@ function SignupPage() {
   };
 
   return (
-    <div className="relative h-screen h-dvh w-full overflow-hidden flex items-center justify-center p-4 bg-background text-foreground transition-colors duration-300">
+    <div className="relative flex min-h-dvh w-full items-center justify-center overflow-clip bg-background px-4 pt-20 pb-8 text-foreground transition-colors duration-300 sm:pt-24 sm:pb-12">
       {/* Decorative ambient background glows */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/15 blur-3xl" />
 
       {/* Top Branding (Left) */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-8 z-20">
-        <Link to="/login" className="flex items-center gap-2 font-bold tracking-tight text-lg group">
+        <Link
+          to="/login"
+          className="flex items-center gap-2 font-bold tracking-tight text-lg group"
+        >
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
             <MessageSquare className="h-4 w-4" />
           </div>
@@ -109,7 +106,11 @@ function SignupPage() {
         </Button>
 
         <Link to="/login">
-          <Button variant="outline" size="sm" className="rounded-full text-xs font-semibold px-3.5 h-8 border-border/80 hover:bg-muted">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full text-xs font-semibold px-3.5 h-8 border-border/80 hover:bg-muted"
+          >
             Sign In
           </Button>
         </Link>
@@ -117,7 +118,7 @@ function SignupPage() {
 
       {/* Centered Signup Card */}
       <div className="relative z-10 w-full max-w-[430px] my-auto">
-        <Card className="rounded-2xl border border-border/80 bg-card/90 backdrop-blur-xl shadow-xl">
+        <Card className="rounded-3xl border border-border bg-card shadow-lg shadow-primary/5">
           <CardHeader className="space-y-1 text-center pb-3 pt-5 px-6">
             <div className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-4 ring-primary/5">
               <MessageSquare className="h-5 w-5" />
@@ -136,7 +137,10 @@ function SignupPage() {
             <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-3">
               {/* Name Input */}
               <div className="space-y-1">
-                <Label htmlFor="name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <Label
+                  htmlFor="name"
+                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                >
                   Full Name
                 </Label>
                 <div className="relative">
@@ -153,7 +157,10 @@ function SignupPage() {
 
               {/* Email Input */}
               <div className="space-y-1">
-                <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                >
                   Email Address
                 </Label>
                 <div className="relative">
@@ -172,7 +179,10 @@ function SignupPage() {
               {/* Phone Number Input */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="phoneNumber" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <Label
+                    htmlFor="phoneNumber"
+                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                  >
                     Phone Number
                   </Label>
                   <span className="text-[11px] text-muted-foreground">Optional</span>
@@ -192,7 +202,10 @@ function SignupPage() {
 
               {/* Password Input */}
               <div className="space-y-1">
-                <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <Label
+                  htmlFor="password"
+                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+                >
                   Password
                 </Label>
                 <div className="relative">
