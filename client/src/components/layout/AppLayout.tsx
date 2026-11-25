@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   MessageCircle,
@@ -9,6 +10,7 @@ import {
   Sun,
   Moon,
   LogOut,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
@@ -19,10 +21,16 @@ import { useChatStore } from "@/store/chatStore";
 import { useSocketStore } from "@/store/socketStore";
 import { useGroupStore } from "@/store/groupStore";
 
+export interface AppLayoutContext {
+  requestLogout: () => void;
+}
+
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { connectSocket, socket } = useSocketStore();
   const { pendingInvitations, fetchPendingInvitations, initInvitationListeners } =
@@ -59,13 +67,19 @@ function AppLayout() {
     return total + unread;
   }, 0);
 
+  const requestLogout = () => setShowLogoutDialog(true);
+
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logout();
+      setShowLogoutDialog(false);
       notify.success("Logged out successfully");
       navigate("/login", { replace: true });
     } catch (err: any) {
       notify.error(err, "Failed to log out");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -79,8 +93,8 @@ function AppLayout() {
     }`;
 
   const mobileNavClass = ({ isActive }: { isActive: boolean }) =>
-    `relative flex flex-col items-center justify-center py-1 px-3 text-xs font-medium transition-colors ${
-      isActive ? "text-primary" : "text-muted-foreground"
+    `relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring ${
+      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
     }`;
 
   const isChatDetailPage =
@@ -168,25 +182,33 @@ function AppLayout() {
 
           {/* Logout */}
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="h-10 w-10 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            title="Logout"
+            type="button"
+            variant="destructive"
+            size="icon"
+            onClick={requestLogout}
+            aria-haspopup="dialog"
+            aria-label="Log out"
+            className="size-10 rounded-xl border-destructive/25"
+            title="Log out"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut aria-hidden="true" className="size-[18px]" />
           </Button>
         </div>
       </aside>
 
       {/* Main Application Area (Edge-to-Edge full height) */}
-      <main className="flex-1 h-full overflow-hidden flex flex-col relative pb-14 md:pb-0">
-        <Outlet />
+      <main
+        className={`relative flex h-full min-w-0 flex-1 flex-col overflow-hidden ${
+          isChatDetailPage ? "" : "pb-[calc(3.75rem+env(safe-area-inset-bottom))] md:pb-0"
+        }`}
+      >
+        <Outlet context={{ requestLogout } satisfies AppLayoutContext} />
       </main>
 
       {/* Mobile Bottom Navigation Bar (hidden on desktop or when full chat open on mobile) */}
       <nav
-        className={`md:hidden fixed bottom-0 left-0 right-0 h-14 bg-card/95 backdrop-blur-lg border-t border-border z-40 flex items-center justify-around px-2 ${
+        aria-label="Main navigation"
+        className={`fixed inset-x-0 bottom-0 z-40 h-[calc(3.75rem+env(safe-area-inset-bottom))] items-center gap-1 border-t border-border bg-card/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg md:hidden ${
           isChatDetailPage ? "hidden" : "flex"
         }`}
       >
@@ -224,6 +246,52 @@ function AppLayout() {
           <span>Profile</span>
         </NavLink>
       </nav>
+
+      <AlertDialog.Root
+        open={showLogoutDialog}
+        onOpenChange={(open) => {
+          if (!isLoggingOut) setShowLogoutDialog(open);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm" />
+          <div className="pointer-events-none fixed inset-0 z-50 grid place-items-center p-4">
+            <AlertDialog.Popup className="pointer-events-auto w-full max-w-sm rounded-2xl border border-border bg-card p-5 shadow-xl sm:p-6">
+              <div className="mb-4 grid size-11 place-items-center rounded-xl bg-destructive/10 text-destructive">
+                <LogOut aria-hidden="true" className="size-5" />
+              </div>
+              <AlertDialog.Title className="text-lg font-semibold">Log out?</AlertDialog.Title>
+              <AlertDialog.Description className="mt-1 text-sm text-muted-foreground">
+                You’ll need to sign in again to access your chats.
+              </AlertDialog.Description>
+              <div className="mt-5 grid grid-cols-2 gap-2.5 border-t border-border pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isLoggingOut}
+                  onClick={() => setShowLogoutDialog(false)}
+                  className="min-h-11 rounded-xl px-3"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  disabled={isLoggingOut}
+                  onClick={handleLogout}
+                  className="min-h-11 gap-2 rounded-xl bg-red-700 px-3 text-white hover:bg-red-800 focus-visible:ring-red-500/50"
+                >
+                  {isLoggingOut ? (
+                    <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+                  ) : (
+                    <LogOut aria-hidden="true" className="size-4" />
+                  )}
+                  {isLoggingOut ? "Logging out…" : "Log out"}
+                </Button>
+              </div>
+            </AlertDialog.Popup>
+          </div>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }

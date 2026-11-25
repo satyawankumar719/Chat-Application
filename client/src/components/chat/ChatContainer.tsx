@@ -4,10 +4,12 @@ import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
 import { Lock, ShieldCheck, Laptop } from "lucide-react";
 import ChatHeader from "./ChatHeader";
+import ContactInfoDialog from "./ContactInfoDialog";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import GroupInfoModal from "@/components/groupChat/GroupInfoModal";
 import { Chat, User } from "@/types";
+import { getOtherUser, getUserId } from "@/lib/chatHelpers";
 
 export interface ChatContainerProps {
   chat: Chat | null;
@@ -21,15 +23,26 @@ function ChatContainer({
   setShowGroupInfo: setShowGroupInfoProp,
 }: ChatContainerProps) {
   const [isTyping, setIsTyping] = useState(false);
-  const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [infoChatId, setInfoChatId] = useState<string | null>(null);
+  const infoTriggerRef = useRef<HTMLButtonElement>(null);
+  const infoReturnFocusRef = useRef<HTMLButtonElement>(null);
   const currentChatIdRef = useRef<string | null>(null);
 
-  const handleOpenGroupInfo = (val = true) => {
-    if (setShowGroupInfoProp) {
-      setShowGroupInfoProp(val);
-    }
-    setShowGroupInfo(val);
+  const handleOpenInfo = (trigger?: HTMLButtonElement) => {
+    if (!chat) return;
+    infoReturnFocusRef.current = trigger ?? infoTriggerRef.current;
+    setInfoChatId(chat._id);
+    if (chat.type === "group") setShowGroupInfoProp?.(true);
   };
+
+  const handleCloseInfo = () => {
+    setInfoChatId(null);
+    if (chat?.type === "group") setShowGroupInfoProp?.(false);
+  };
+
+  useEffect(() => {
+    setInfoChatId((openChatId) => (openChatId === chat?._id ? openChatId : null));
+  }, [chat?._id]);
 
   const { user } = useAuthStore();
   const { socket, markMessagesRead } = useSocketStore();
@@ -38,6 +51,23 @@ function ChatContainer({
     useChatStore();
 
   const currentUserId = user?._id || user?.id;
+  const displayUser = chat?.type === "group" ? null : getOtherUser(chat, currentUserId);
+  const otherUserId = getUserId(displayUser);
+  const isOnline = useChatStore((state) =>
+    Boolean(otherUserId && state.onlineUserIds?.includes(otherUserId))
+  );
+  let statusText = "Offline";
+  if (isOnline) {
+    statusText = "Online";
+  } else if (displayUser?.lastSeen) {
+    const lastSeen = new Date(displayUser.lastSeen);
+    if (!Number.isNaN(lastSeen.getTime())) {
+      statusText = `Last seen at ${lastSeen.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    }
+  }
 
   useEffect(() => {
     if (!socket || !chat?._id) return;
@@ -157,9 +187,12 @@ function ChatContainer({
     <div className="flex h-full w-full flex-col bg-background">
       <ChatHeader
         chat={chat}
-        currentUserId={currentUserId}
+        displayUser={displayUser}
+        isOnline={isOnline}
+        statusText={statusText}
         onBack={onBack}
-        setShowGroupInfo={handleOpenGroupInfo}
+        onOpenInfo={handleOpenInfo}
+        infoTriggerRef={infoTriggerRef}
         isTyping={isTyping}
       />
 
@@ -176,7 +209,24 @@ function ChatContainer({
 
       <MessageInput chat={chat} onSendMessage={sendMessage} sendingMessage={sendingMessage} />
 
-      <GroupInfoModal isOpen={showGroupInfo} onClose={() => setShowGroupInfo(false)} chat={chat} />
+      {chat.type === "group" ? (
+        <GroupInfoModal
+          key={chat._id}
+          isOpen={infoChatId === chat._id}
+          onClose={handleCloseInfo}
+          returnFocusRef={infoReturnFocusRef}
+          chat={chat}
+        />
+      ) : (
+        <ContactInfoDialog
+          key={chat._id}
+          isOpen={infoChatId === chat._id}
+          onClose={handleCloseInfo}
+          returnFocusRef={infoReturnFocusRef}
+          user={displayUser}
+          statusText={statusText}
+        />
+      )}
     </div>
   );
 }
