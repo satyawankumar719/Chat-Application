@@ -21,11 +21,7 @@ function VerifyOtp() {
 
   const email = (location.state as any)?.email || localStorage.getItem("pendingEmail") || "";
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-  } = useForm<VerifyOtpData>({
+  const { register, handleSubmit, setValue } = useForm<VerifyOtpData>({
     resolver: zodResolver(verifyOtpSchema),
     defaultValues: {
       email: email,
@@ -114,8 +110,8 @@ function VerifyOtp() {
   });
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 px-4 py-8">
-      <Card className="w-full max-w-md shadow-2xl border-border/80 bg-card/90 backdrop-blur-md">
+    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 px-4 py-8">
+      <Card className="w-full max-w-md rounded-3xl border border-border bg-card shadow-lg shadow-primary/5">
         <CardHeader className="text-center space-y-1 pb-4">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <KeyRound className="h-6 w-6" />
@@ -128,9 +124,16 @@ function VerifyOtp() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(handleVerifyOtpSubmit, onInvalid)} noValidate className="space-y-4">
+          <form
+            onSubmit={handleSubmit(handleVerifyOtpSubmit, onInvalid)}
+            noValidate
+            className="space-y-4"
+          >
             <div className="space-y-1.5">
-              <Label htmlFor="otp" className="text-center block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Label
+                htmlFor="otp"
+                className="text-center block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Enter Verification Code
               </Label>
 
@@ -147,7 +150,11 @@ function VerifyOtp() {
             <div className="flex items-center justify-between pt-1 text-sm">
               <span className="font-mono text-xs text-muted-foreground">
                 Expires in:{" "}
-                <span className={timeLeft < 60 ? "text-destructive font-bold" : "font-semibold text-foreground"}>
+                <span
+                  className={
+                    timeLeft < 60 ? "text-destructive font-bold" : "font-semibold text-foreground"
+                  }
+                >
                   {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
                 </span>
               </span>
@@ -165,7 +172,11 @@ function VerifyOtp() {
               </Button>
             </div>
 
-            <Button type="submit" className="w-full font-semibold shadow-md mt-2 h-10" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full font-semibold shadow-md mt-2 h-10"
+              disabled={loading}
+            >
               {loading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -177,7 +188,10 @@ function VerifyOtp() {
             </Button>
 
             <div className="text-center pt-2">
-              <Link to="/signup" className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground">
+              <Link
+                to="/signup"
+                className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
+              >
                 <ArrowLeft className="mr-1 h-3 w-3" /> Back to Signup
               </Link>
             </div>

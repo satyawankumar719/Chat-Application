@@ -1,22 +1,49 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Users, X, UserPlus, Shield, UserMinus, Search, Check, Edit2, LogOut, Save, Trash2 } from "lucide-react";
+import React, { useState, useEffect, type RefObject } from "react";
+import {
+  Users,
+  UserPlus,
+  Shield,
+  UserMinus,
+  Search,
+  Check,
+  Edit2,
+  LogOut,
+  Save,
+  Trash2,
+} from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useChatStore } from "@/store/chatStore";
 import { useGroupStore } from "@/store/groupStore";
 import { queryApi } from "@/api/userApi";
 import { Chat, User } from "@/types";
+import ChatInfoDialog from "@/components/chat/ChatInfoDialog";
+import { SEARCH_DEBOUNCE_MS } from "@/lib/searchDebounce";
+import { SearchLoader } from "@/components/ui/search-loader";
 
 export interface GroupInfoModalProps {
   isOpen: boolean;
   onClose: () => void;
+  returnFocusRef?: RefObject<HTMLButtonElement | null>;
   chat: Chat | null;
 }
 
-export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModalProps) {
+export default function GroupInfoModal({
+  isOpen,
+  onClose,
+  returnFocusRef,
+  chat,
+}: GroupInfoModalProps) {
   const { user } = useAuthStore();
   const onlineUserIds = useChatStore((state) => state.onlineUserIds) || [];
-  const { addMembers, removeMember, updateMemberRole, updateGroupInfo, leaveGroup, deleteGroup, sendGroupInvitation } =
-    useGroupStore();
+  const {
+    addMembers,
+    removeMember,
+    updateMemberRole,
+    updateGroupInfo,
+    leaveGroup,
+    deleteGroup,
+    sendGroupInvitation,
+  } = useGroupStore();
   const currentUserId = (user?._id || user?.id)?.toString();
 
   const [showAddMembers, setShowAddMembers] = useState(false);
@@ -44,36 +71,30 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
 
   const currentMember = chat?.members?.find((m) => {
     const u = typeof m.user === "object" ? (m.user as User) : null;
-    const uid = u ? (u._id || u.id) : (m.user as string);
+    const uid = u ? u._id || u.id : (m.user as string);
     return uid?.toString() === currentUserId;
   });
   const isAdminOrOwner = currentMember?.role === "owner" || currentMember?.role === "admin";
 
   const [searching, setSearching] = useState(false);
-  const searchSeqRef = useRef(0);
+  const queryToUse = searchQuery.trim();
 
   useEffect(() => {
-    if (!showAddMembers) {
-      setSearchResults([]);
-      return;
-    }
-
-    const queryToUse = searchQuery.trim();
-
-    if (!queryToUse) {
+    if (!isOpen || !showAddMembers || !queryToUse) {
       setSearchResults([]);
       setSearching(false);
       return;
     }
 
+    let ignore = false;
+    setSearchResults([]);
     setSearching(true);
-    const currentSeq = ++searchSeqRef.current;
 
     const timer = setTimeout(async () => {
       try {
         const res = await queryApi.searchUsers(queryToUse);
 
-        if (currentSeq !== searchSeqRef.current) return;
+        if (ignore) return;
 
         const rawUsers = res.data?.data || res.data || [];
         const users: User[] = Array.isArray(rawUsers) ? rawUsers : [];
@@ -81,7 +102,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
         const memberIdSet = new Set(
           (chat?.members || []).map((m) => {
             const u = typeof m.user === "object" ? (m.user as User) : null;
-            const uid = u ? (u._id || u.id) : (m.user as string);
+            const uid = u ? u._id || u.id : (m.user as string);
             return uid ? uid.toString() : "";
           })
         );
@@ -99,19 +120,22 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
 
         setSearchResults(filtered);
       } catch (err) {
-        if (currentSeq === searchSeqRef.current) {
+        if (!ignore) {
           console.error("Search users error in GroupInfoModal:", err);
           setSearchResults([]);
         }
       } finally {
-        if (currentSeq === searchSeqRef.current) {
+        if (!ignore) {
           setSearching(false);
         }
       }
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
-    return () => clearTimeout(timer);
-  }, [searchQuery, showAddMembers, chat?.members, currentUserId]);
+    return () => {
+      ignore = true;
+      clearTimeout(timer);
+    };
+  }, [queryToUse, isOpen, showAddMembers, chat?.members, currentUserId]);
 
   const handleSendInvitation = async (receiverId: string) => {
     if (!chat?._id) return;
@@ -145,7 +169,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
     }
   };
 
-  if (!isOpen || !chat) return null;
+  if (!chat) return null;
 
   const toggleSelectUser = (u: User) => {
     const id = (u._id || u.id || "").toString();
@@ -260,18 +284,14 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl border border-border">
-        <div className="flex items-center justify-between border-b pb-4">
-          <div className="flex items-center gap-2 font-semibold text-lg">
-            <Users className="h-5 w-5 text-primary" />
-            <span>Group Info</span>
-          </div>
-          <button onClick={onClose} className="rounded-full p-1 hover:bg-muted">
-            <X className="h-5 w-5 text-muted-foreground" />
-          </button>
-        </div>
-
+    <ChatInfoDialog
+      title="Group Info"
+      isOpen={isOpen}
+      onClose={onClose}
+      returnFocusRef={returnFocusRef}
+      icon={<Users className="h-5 w-5 text-primary" />}
+    >
+      <div>
         {error && (
           <div className="mt-3 rounded-lg bg-destructive/10 p-2.5 text-xs text-destructive">
             {error}
@@ -279,7 +299,6 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
         )}
 
         <div className="mt-4 space-y-4">
-
           <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-2">
             {isEditing ? (
               <div className="space-y-3">
@@ -347,9 +366,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold">
-              Members ({chat.members?.length || 0})
-            </span>
+            <span className="text-sm font-semibold">Members ({chat.members?.length || 0})</span>
             {isAdminOrOwner && (
               <button
                 onClick={() => setShowAddMembers(!showAddMembers)}
@@ -389,9 +406,7 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                     Type a name, email, or phone number above to search users.
                   </div>
                 ) : searching ? (
-                  <div className="p-3 text-center text-xs text-muted-foreground">
-                    Searching users...
-                  </div>
+                  <SearchLoader />
                 ) : searchResults.length === 0 ? (
                   <div className="p-3 text-center text-xs text-muted-foreground">
                     No users match "{searchQuery}".
@@ -437,19 +452,19 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                                     isFriend
                                       ? "bg-green-500/15 text-green-700 dark:text-green-400"
                                       : isPendingSent
-                                      ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
-                                      : isPendingReceived
-                                      ? "bg-purple-500/15 text-purple-700 dark:text-purple-400"
-                                      : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                        ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
+                                        : isPendingReceived
+                                          ? "bg-purple-500/15 text-purple-700 dark:text-purple-400"
+                                          : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
                                   }`}
                                 >
                                   {isFriend
                                     ? "Friend (Direct Add)"
                                     : isPendingSent
-                                    ? "Invite Sent"
-                                    : isPendingReceived
-                                    ? "Invite Received"
-                                    : "Not Connected"}
+                                      ? "Invite Sent"
+                                      : isPendingReceived
+                                        ? "Invite Received"
+                                        : "Not Connected"}
                                 </span>
                               </div>
                               <p className="text-xs text-muted-foreground truncate">{u.email}</p>
@@ -465,7 +480,9 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                               {isSelected ? (
                                 <Check className="h-5 w-5 text-primary" />
                               ) : (
-                                <span className="text-xs font-medium text-primary hover:underline">+ Select</span>
+                                <span className="text-xs font-medium text-primary hover:underline">
+                                  + Select
+                                </span>
                               )}
                             </button>
                           ) : !isPendingSent && !isPendingReceived ? (
@@ -517,9 +534,10 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
                 const targetRole = m.role;
 
                 const canManageRole = myRole === "owner" && !isMe && targetRole !== "owner";
-                const canRemoveMember = !isMe && targetRole !== "owner" && (
-                  myRole === "owner" || (myRole === "admin" && targetRole === "member")
-                );
+                const canRemoveMember =
+                  !isMe &&
+                  targetRole !== "owner" &&
+                  (myRole === "owner" || (myRole === "admin" && targetRole === "member"));
 
                 return (
                   <div
@@ -649,6 +667,6 @@ export default function GroupInfoModal({ isOpen, onClose, chat }: GroupInfoModal
           )}
         </div>
       </div>
-    </div>
+    </ChatInfoDialog>
   );
 }

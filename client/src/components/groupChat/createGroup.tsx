@@ -4,6 +4,8 @@ import { Users, X, Search, Check } from "lucide-react";
 import { queryApi } from "@/api/userApi";
 import { useAuthStore } from "@/store/authStore";
 import { useGroupStore } from "@/store/groupStore";
+import { SEARCH_DEBOUNCE_MS } from "@/lib/searchDebounce";
+import { SearchLoader } from "@/components/ui/search-loader";
 import { User } from "@/types";
 
 export interface CreateGroupModalProps {
@@ -27,6 +29,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
+  const trimmedQuery = searchQuery.trim();
 
   const {
     register,
@@ -50,31 +53,37 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
       setSelectedUserIds([]);
       setSelectedUsers([]);
       clearErrors();
-      return;
     }
+  }, [isOpen, reset, clearErrors]);
 
-    const trimmedQuery = searchQuery.trim();
-    if (!trimmedQuery) {
+  useEffect(() => {
+    if (!isOpen || !trimmedQuery) {
       setSearchResults([]);
       setSearching(false);
       return;
     }
 
+    let ignore = false;
+    setSearchResults([]);
     setSearching(true);
     const timer = setTimeout(async () => {
       try {
         const res = await queryApi.searchUsers(trimmedQuery);
-        let users: User[] = res.data?.data || res.data || [];
+        if (ignore) return;
+        const users: User[] = res.data?.data || res.data || [];
         setSearchResults(users.filter((u) => (u._id || u.id)?.toString() !== currentUserId));
       } catch {
-        setSearchResults([]);
+        if (!ignore) setSearchResults([]);
       } finally {
-        setSearching(false);
+        if (!ignore) setSearching(false);
       }
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
-    return () => clearTimeout(timer);
-  }, [searchQuery, currentUserId, isOpen, reset, clearErrors]);
+    return () => {
+      ignore = true;
+      clearTimeout(timer);
+    };
+  }, [trimmedQuery, currentUserId, isOpen]);
 
   if (!isOpen) return null;
 
@@ -83,7 +92,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
     const id = (u._id || u.id || "").toString();
     if (selectedUserIds.includes(id)) {
       setSelectedUserIds((prev) => prev.filter((i) => i !== id));
-      setSelectedUsers((prev) => prev.filter((item) => (item._id || item.id || "").toString() !== id));
+      setSelectedUsers((prev) =>
+        prev.filter((item) => (item._id || item.id || "").toString() !== id)
+      );
     } else {
       setSelectedUserIds((prev) => [...prev, id]);
       setSelectedUsers((prev) => [...prev, u]);
@@ -150,7 +161,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
               placeholder="e.g. Project Team"
               {...register("name", { required: "Please enter a group name." })}
               className={`mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                errors.name ? "border-red-500 focus:ring-red-500" : "border-border focus:ring-primary"
+                errors.name
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-border focus:ring-primary"
               }`}
             />
             {errors.name && (
@@ -159,7 +172,9 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Description (optional)</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Description (optional)
+            </label>
             <input
               type="text"
               placeholder="What is this group about?"
@@ -204,9 +219,7 @@ export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalPr
                   Type a name or email to search users to add.
                 </div>
               ) : searching ? (
-                <div className="p-3 text-center text-xs text-muted-foreground">
-                  Searching users...
-                </div>
+                <SearchLoader />
               ) : searchResults.length === 0 ? (
                 <div className="p-3 text-center text-xs text-muted-foreground">
                   No users match "{searchQuery}".

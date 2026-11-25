@@ -2,23 +2,18 @@ import React from "react";
 import { UserPlus } from "lucide-react";
 import { User } from "@/types";
 import { useChatStore } from "@/store/chatStore";
+import { Button } from "@/components/ui/button";
 
 export interface SearchResultCardProps {
   person: User & { connectionStatus?: string };
-  message: string;
-  setMessage: (msg: string) => void;
   onInvite: (id: string) => void;
 }
 
-function SearchResultCard({
-  person,
-  message,
-  setMessage,
-  onInvite,
-}: SearchResultCardProps) {
+function SearchResultCard({ person, onInvite }: SearchResultCardProps) {
   const id = (person._id || person.id || "").toString();
   const isOnline = useChatStore((state) => (id ? state.onlineUserIds?.includes(id) : false));
   const status = person.connectionStatus;
+  const avatarUrl = typeof person.avatar === "string" ? person.avatar : person.avatar?.url;
 
   const disabled =
     status === "connected" ||
@@ -34,40 +29,38 @@ function SearchResultCard({
   else if (status === "cooldown") label = "Cooldown";
 
   return (
-    <div className="rounded-lg border border-border p-2">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
-            {person.name?.charAt(0)?.toUpperCase() || "U"}
-            {isOnline && (
-              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-green-500" />
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-medium">{person.name}</p>
-            <p className="text-xs text-muted-foreground">{person.email}</p>
-          </div>
+    <li className="flex items-center justify-between gap-3 rounded-xl border border-foreground/25 bg-background px-3 py-3 transition-colors hover:bg-muted/50 sm:px-4 dark:border-foreground/35">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="size-full rounded-full object-cover" />
+          ) : (
+            person.name?.charAt(0)?.toUpperCase() || "U"
+          )}
+          {isOnline && (
+            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-green-500" />
+          )}
         </div>
-
-        <button
-          onClick={() => onInvite(id)}
-          disabled={disabled}
-          className="flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-xs text-white disabled:opacity-50 cursor-pointer"
-        >
-          {!disabled && <UserPlus className="h-3.5 w-3.5" />}
-          {label}
-        </button>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium">{person.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{person.email}</p>
+        </div>
       </div>
 
-      {!disabled && (
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Optional message"
-          className="mt-2 w-full rounded-md border px-2 py-1 text-xs"
-        />
+      {disabled ? (
+        <span className="shrink-0 text-xs font-medium text-muted-foreground">{label}</span>
+      ) : (
+        <Button
+          type="button"
+          onClick={() => onInvite(id)}
+          className="h-10 px-3"
+          aria-label={`Invite ${person.name}`}
+        >
+          <UserPlus aria-hidden="true" className="size-4" />
+          Invite
+        </Button>
       )}
-    </div>
+    </li>
   );
 }
 

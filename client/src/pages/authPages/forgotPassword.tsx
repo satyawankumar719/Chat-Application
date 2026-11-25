@@ -8,19 +8,10 @@ import { notify } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useAuthStore } from "@/store/authStore";
-import {
-  forgotPasswordSchema,
-  resetPasswordSchema,
-} from "@/validations/auth.validation";
+import { forgotPasswordSchema, resetPasswordSchema } from "@/validations/auth.validation";
 import { ForgotPasswordData, ResetPasswordData } from "@/types";
 
 const PasswordInput = ({
@@ -56,11 +47,7 @@ const PasswordInput = ({
           onClick={onToggle}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
-          {showPassword ? (
-            <EyeOff className="w-4 h-4" />
-          ) : (
-            <Eye className="w-4 h-4" />
-          )}
+          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
       </div>
     </div>
@@ -77,11 +64,7 @@ interface ResetPasswordFormValues {
 export function ForgotPassword() {
   const navigate = useNavigate();
 
-  const {
-    forgotPassword,
-    resetPassword,
-    loading,
-  } = useAuthStore();
+  const { forgotPassword, resetPassword, loading } = useAuthStore();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [submittedEmail, setSubmittedEmail] = useState("");
@@ -171,10 +154,7 @@ export function ForgotPassword() {
       return;
     }
 
-    notify.success(
-      "Password reset successfully!",
-      "Please login with your new password."
-    );
+    notify.success("Password reset successfully!", "Please login with your new password.");
     navigate("/login");
   };
 
@@ -207,8 +187,8 @@ export function ForgotPassword() {
   });
 
   return (
-    <div className="min-h-screen flex justify-center items-center px-4 py-8 bg-gradient-to-br from-primary/5 via-background to-primary/10">
-      <Card className="w-full max-w-md shadow-2xl border-border/80 bg-card/90 backdrop-blur-md">
+    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 px-4 py-8">
+      <Card className="w-full max-w-md rounded-3xl border border-border bg-card shadow-lg shadow-primary/5">
         <CardHeader>
           <div className="flex items-center gap-2 mb-1">
             {step === 2 && (
@@ -236,7 +216,11 @@ export function ForgotPassword() {
 
         <CardContent>
           {step === 1 ? (
-            <form onSubmit={step1Form.handleSubmit(handleRequestOtp, onInvalidStep1)} noValidate className="space-y-4">
+            <form
+              onSubmit={step1Form.handleSubmit(handleRequestOtp, onInvalidStep1)}
+              noValidate
+              className="space-y-4"
+            >
               <div className="grid gap-1.5">
                 <Label htmlFor="email" className="flex items-center gap-1.5">
                   <Mail className="w-4 h-4 text-muted-foreground" />
@@ -278,7 +262,11 @@ export function ForgotPassword() {
               </div>
             </form>
           ) : (
-            <form onSubmit={step2Form.handleSubmit(handleResetPasswordSubmit, onInvalidStep2)} noValidate className="space-y-4">
+            <form
+              onSubmit={step2Form.handleSubmit(handleResetPasswordSubmit, onInvalidStep2)}
+              noValidate
+              className="space-y-4"
+            >
               <div className="flex flex-col gap-3.5">
                 <div className="grid gap-1.5">
                   <div className="flex justify-between items-center">
@@ -288,8 +276,7 @@ export function ForgotPassword() {
                     </Label>
 
                     <span className="text-xs font-mono text-muted-foreground">
-                      {Math.floor(timeLeft / 60)}:
-                      {String(timeLeft % 60).padStart(2, "0")}
+                      {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
                     </span>
                   </div>
 

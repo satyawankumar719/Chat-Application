@@ -20,42 +20,38 @@ function InvitationList({
 }: InvitationListProps) {
   if (loading && (!invitations || invitations.length === 0)) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+      <div
+        role="status"
+        className="flex flex-col items-center justify-center rounded-2xl border bg-card p-8 text-center"
+      >
         <Loader2 className="mb-2 h-6 w-6 animate-spin text-muted-foreground" />
-        <p className="text-sm font-medium text-muted-foreground">
-          Loading invitations...
-        </p>
+        <p className="text-sm font-medium text-muted-foreground">Loading invitations...</p>
       </div>
     );
   }
 
   if (!invitations || !invitations.length) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <MailOpen className="h-6 w-6 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center rounded-2xl border bg-card px-5 py-10 text-center">
+        <div className="mb-3 grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+          <MailOpen aria-hidden="true" className="size-5" />
         </div>
 
-        <h3 className="text-base font-semibold">
-          No new invitations
-        </h3>
+        <h3 className="text-base font-semibold">No new invitations</h3>
 
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          You don't have any pending invitations right now. New invitations
-          will appear here when someone invites you.
+          Incoming chat invitations will appear here.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-amber-400/40 bg-amber-50 p-2 dark:bg-amber-950/30">
-      <div className="mb-2 flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase text-amber-700 dark:text-amber-400">
-          New invitations
-        </p>
+    <div className="rounded-2xl border bg-card p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-sm font-semibold">New invitations</p>
 
-        <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
           {invitations.length}
         </span>
       </div>

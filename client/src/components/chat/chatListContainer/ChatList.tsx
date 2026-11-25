@@ -5,6 +5,9 @@ import SearchRecentUsers from "./searchRecentChats";
 import EmptyState from "./EmptyState";
 import { Chat } from "@/types";
 import { ChatListSkeleton } from "@/components/ui/skeleton";
+import { SearchLoader } from "@/components/ui/search-loader";
+import { getOtherUser } from "@/lib/chatHelpers";
+import { useDebouncedSearchQuery } from "@/lib/searchDebounce";
 
 export interface ChatListProps {
   chats?: Chat[];
@@ -13,25 +16,27 @@ export interface ChatListProps {
   loading?: boolean;
 }
 
-function ChatList({
-  chats = [],
-  selectedChatId,
-  onSelectChat,
-  loading,
-}: ChatListProps) {
+function ChatList({ chats = [], selectedChatId, onSelectChat, loading }: ChatListProps) {
   const { user } = useAuthStore();
   const currentUserId = user?._id?.toString() || user?.id?.toString();
 
-  const [searchResults, setSearchResults] = useState<Chat[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchQuery, searching] = useDebouncedSearchQuery(searchText);
   const [activeFilter, setActiveFilter] = useState<"all" | "unread" | "groups">("all");
-
-  const baseList = searching ? searchResults : chats;
 
   // Apply WhatsApp filter pills with memoization to prevent unnecessary recalculations
   // NOTE: Must run before any early return to adhere to React Rules of Hooks
   const filteredList = useMemo(() => {
-    return baseList.filter((chat) => {
+    return chats.filter((chat) => {
+      if (searchQuery) {
+        let name = "";
+        if (chat.type === "group") {
+          name = chat.name || "";
+        } else if (chat.type === "direct" || chat.type === "private") {
+          name = getOtherUser(chat, currentUserId)?.name || "";
+        }
+        if (!name.toLowerCase().includes(searchQuery)) return false;
+      }
       if (activeFilter === "groups") {
         return chat.type === "group";
       }
@@ -48,7 +53,7 @@ function ChatList({
       }
       return true;
     });
-  }, [baseList, activeFilter, currentUserId]);
+  }, [chats, activeFilter, currentUserId, searchQuery]);
 
   if (loading && (!chats || chats.length === 0)) {
     return (
@@ -62,12 +67,7 @@ function ChatList({
     <div className="flex h-full flex-col overflow-hidden bg-card/20">
       {/* WhatsApp Search Bar & Filter Chips Header */}
       <div className="p-2.5 pb-2 space-y-2 border-b border-border/60 bg-card/40">
-        <SearchRecentUsers
-          setSearching={setSearching}
-          setSearchResults={setSearchResults}
-          chats={chats}
-          currentUserId={currentUserId}
-        />
+        <SearchRecentUsers value={searchText} onChange={setSearchText} />
 
         {/* WhatsApp Signature Filter Chips */}
         <div className="flex items-center gap-1.5 px-0.5">
@@ -110,7 +110,9 @@ function ChatList({
       </div>
 
       {/* WhatsApp Chat Rows List */}
-      {!filteredList.length ? (
+      {searching ? (
+        <SearchLoader />
+      ) : !filteredList.length ? (
         <EmptyState />
       ) : (
         <div className="flex-1 overflow-y-auto divide-y divide-border/30">
